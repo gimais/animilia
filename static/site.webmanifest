@@ -1,0 +1,18 @@
+{
+  "short_name": "Anime ქართულად",
+  "name": "Animilia",
+  "icons": [
+  {
+    "src": "icon.png",
+    "type": "image/png",
+    "sizes": "192x192"
+  },
+  {
+    "src": "icon-144.png",
+    "sizes": "144x144",
+    "type": "image/png"
+   }],
+  "start_url": "/?utm_source=homescreen",
+  "background_color": "#fafafa",
+  "theme_color": "#fafafa"
+}

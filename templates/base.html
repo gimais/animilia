@@ -1,0 +1,100 @@
+<!doctype html>
+<html class="no-js" lang="ka-GE">
+
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}{% endblock %}</title>
+{#  <meta name="description" content=""> AQ SAITIS AGWERA UNDA GAKETDES#}
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+{#  <link rel="manifest" href="{% static "site.webmanifest" %}">#}
+  <link rel="apple-touch-icon" href="{% static "icon.png" %}">
+  <link rel="icon" sizes="192x192" href="{% static "icon.png" %}">
+    <link rel="icon" sizes="144x144" href="{% static "icon-144.png" %}">
+
+  <link rel="stylesheet" href="{% static "css/normalize.css" %}">
+  <link rel="stylesheet" href="{% static "css/main.css" %}">
+
+    {% block extra %}{% endblock %}
+  <meta name="theme-color" content="#973116">
+</head>
+
+  <!--[if IE]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser.
+        Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+
+  <!-- Add your site or application content here -->
+     <div class="top-background"></div>
+    <nav>
+        <div class="top-menu">
+            <div class="top-logo">
+                <a class="logo" href="/"></a>
+            </div>
+            <div id="mob-menu">menu</div>
+            <ul class="top-nav" id="mob-topnav">
+{#                <li><a class="active" href="/">home</a></li>#}
+{#                <li><a href="#menu2">menu2</a></li>#}
+{#                <li><a href="#menu3">menu3</a></li>#}
+{#                <li><a href="#menu4">menu4</a></li>#}
+{#                <li><a href="#menu5">menu5</a></li>#}
+{#                {% if user.is_anonymous %}#}
+{#                <li><a href="{% url 'login' %}">login</a></li>#}
+{#                {% else %}<li><a href="{% url 'profile' %}">account</a></li>{% endif %}#}
+                {% if user.is_anonymous %}
+                    <li>
+                        <div id="login-focus">შესვლა</div>
+                            <form class="login-form" method="post" action="{% url 'login' %}">
+                                {% csrf_token %}
+                                <input type="text" name="username" class="form-input pad" autofocus placeholder="ნიკი" autocapitalize="none" autocomplete="off" maxlength="150" required>
+                                <input type="password" name="password" autocomplete="current-password" class="form-input pad" placeholder="პაროლი" required id="id_password">
+                                <input type="submit" value="შესვლა">
+                                <a  href="{% url 'password_reset' %}">არ მახსოვს პაროლი...</a>
+                            </form>
+                    </li>
+                    <li><a href="{% url 'signup' %}">რეგისტრაცია</a></li>
+                {% else %}
+                    <li><a class='active' href="{% url 'profile' %}">{{user}}</a></li>
+                    <li><a href="{% url 'logout' %}">გასვლა</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+    {% if messages %}
+      <div class="wrapper">
+        {% for msg in messages %}
+            {% if 'green' in msg.extra_tags %}
+                <div class='flash-message' style="background: #973116">{{ msg }}</div>
+            {% elif 'red' in msg.extra_tags %}
+                <div class='flash-message' style="background: red">{{ msg }}</div>
+            {% elif 'gray' in msg.extra_tags %}
+                <div class='flash-message' style="background: tomato">{{ msg }}</div>
+            {% elif 'maimuni' in msg.extra_tags %}
+                <div class='flash-message' style="background: greenyellow">{{ msg }}</div>
+            {% endif %}
+        {% endfor %}
+        </div>
+    {% endif %}
+    <section>
+        {% block content %}
+        {% endblock %}
+    </section>
+    <div class="push"></div>
+    <footer>
+                დახმარებისთვის დარეკეთ 112-ში!
+    </footer>
+  <script src="{% static "js/vendor/modernizr-3.8.0.min.js" %}"></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <script>window.jQuery || document.write('<script src="/static/js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
+  <script src="{% static "js/plugins.js" %}"></script>
+  <script src="{% static "js/main.js" %}"></script>
+
+  <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+<!--  <script>-->
+<!--    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;-->
+<!--    ga('create', 'UA-XXXXX-Y', 'auto'); ga('set','transport','beacon'); ga('send', 'pageview')-->
+<!--  </script>-->
+<!--  <script src="https://www.google-analytics.com/analytics.js" async></script>-->
+</body>
+
+</html>

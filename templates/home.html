@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}HOME{% endblock %}
+
+{% block content %}
+    <div class="container">
+{#        <div class="content">#}
+    {#        <ul class="tabs">#}
+    {#            <li class="active">ახალი დამატებულები</li>#}
+    {#        </ul>#}
+            <div class="items-list">
+    {#            {% csrf_token %}#}
+                {% for anime,categories in animes_list.items %}
+
+                    <div class="item">
+                        <a href = "#"><img src="/media/posters/{{ anime.poster }}.jpg" width="170px" height="240px" alt="სურათი არ არის">
+                        </a>
+                        <div class="item-info">
+                            <div class="item-name">{{ anime.name }}</div>
+                            <ul>
+                                {% if anime.type == 0 %}
+                                    <li>{{ anime.year }}  |  სერიალი  |  52</li>
+                                {% elif anime.type == 1 %}
+                                    <li>{{ anime.year }}  |  ფილმი</li>
+                                {% endif %}
+                                <ul class='categories-list' style="border: none;padding: 0">
+                                    <span style="font-weight: 600;">ჟანრები:</span>
+                                    {% for category in categories %}
+                                        <li>{{ category }}</li>
+                                        {% endfor %}
+                                </ul>
+                            <span style="font-weight: 600;">ასაკობრივი შეზღუდვა:</span>
+                            <li>{{ anime.age }}+</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                {% endfor %}
+{#            </div>#}
+        </div>
+{#        {% if anims.has_next %}#}
+{#            <div class="showmore">#}
+{#                <a class='next-page'  href="?page={{ anims.next_page_number }}" data-next="{{ anims.next_page_number }}">შემდეგი</a>#}
+{#            </div>#}
+{#        {% endif %}#}
+{#        {% if anims.has_previous %}#}
+{#            <div class="showmore">#}
+{#                <a class="previous-page" data-previous="{{ anims.previous_page_number }}">Previous</a>#}
+{#            </div>#}
+{#        {% endif %}#}
+{#        </div>#}
+{% endblock %}
