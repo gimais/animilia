@@ -43,12 +43,12 @@ class SignUpForm(UserCreationForm):
     class Meta:
         model = User
 
-        User._meta.get_field('username').max_length = 16
+        # User._meta.get_field('username').max_length = 16
         User.username_validator.message = "ნიკი შეიძლება შეიცავდეს მხოლოდ ასოებს,ციფრებსა და @/./+/-/_ სიმბოლოებს."
         User._meta.get_field('username').validators[1].limit_value = 16
         MinLengthValidator.limit_value = 3
         MinLengthValidator.message = "ნიკის სიგრძე მინიმუმ 3 სიმბოლოსგან უნდა შედგებოდეს. (შეყვანილია %(show_value)d სიმბოლო)"
-        MaxLengthValidator.message = "რა იყო არაბი ხარ? ნიკის სიგრძე მაქსიმუმ 16 სიმბოლოსგან უნდა შედგებოდეს. (შეყვანილია %(show_value)d სიმბოლო)"
+        MaxLengthValidator.message = "რა იყო არაბი ხარ ბლიად? ნიკის სიგრძე მაქსიმუმ 16 სიმბოლოსგან უნდა შედგებოდეს. (შეყვანილია %(show_value)d სიმბოლო)"
         User._meta.get_field('username').validators.append(MinLengthValidator(3))
         User._meta.get_field('username').error_messages['unique'] = 'ეს ნიკი დაკავებულია!'
 

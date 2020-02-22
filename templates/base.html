@@ -30,17 +30,13 @@
         <div class="top-menu">
             <div class="top-logo">
                 <a class="logo" href="/"></a>
+                <a class="web-name"></a>
             </div>
             <div id="mob-menu">menu</div>
-            <ul class="top-nav" id="mob-topnav">
-{#                <li><a class="active" href="/">home</a></li>#}
+            <ul class="top-nav">
+                <li><a id="mob-home" href="/">მთავარი გვერდი</a></li>
 {#                <li><a href="#menu2">menu2</a></li>#}
 {#                <li><a href="#menu3">menu3</a></li>#}
-{#                <li><a href="#menu4">menu4</a></li>#}
-{#                <li><a href="#menu5">menu5</a></li>#}
-{#                {% if user.is_anonymous %}#}
-{#                <li><a href="{% url 'login' %}">login</a></li>#}
-{#                {% else %}<li><a href="{% url 'profile' %}">account</a></li>{% endif %}#}
                 {% if user.is_anonymous %}
                     <li>
                         <div id="login-focus">შესვლა</div>

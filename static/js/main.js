@@ -1,7 +1,6 @@
 $('#mob-menu').click(function () {
-        $('#mob-topnav').toggleClass('show-mob');
-        $('section').slideToggle();
-        $('footer').slideToggle();
+        $('nav').toggleClass('open');
+        $('.top-nav').toggleClass('open')
 });
 
 $('#login-focus').on('click',function () {
@@ -12,10 +11,22 @@ $('#login-focus').on('click',function () {
 HOVERED_ON_LOGO = 0;
 
 $('.logo').hover(function () {
+        $('.web-name').toggleClass('web-name-focus');
+
         HOVERED_ON_LOGO+=1;
-        console.log(HOVERED_ON_LOGO);
-        if(HOVERED_ON_LOGO===10){
-                alert('კაი ხოო გადაიწვა ნათურა!!!');
-                HOVERED_ON_LOGO=0;
+
+        switch(HOVERED_ON_LOGO){
+                case 10:
+                        alert('კაი ხოო გადაიწვა ნათურა!!!');
+                        break;
+                case 20:
+                        alert('გადაიწვა თქო ბლიად!!!');
+                        break;
+                case 30:
+                        alert('რატომ შეეცი?!!');
+                        break;
+                case 40:
+                        window.location = 'https://www.youtube.com/watch?v=G8iyI_-Amhw';
+                        break;
         }
 });

@@ -17,6 +17,9 @@ class AnimeSeriesAdmin(admin.ModelAdmin):
     list_filter = ("anime",)
     exclude = ('row',)
 
+    class Media:
+        js = ('/static/admin/js/hide_attribute.js',)
+
 
 admin.site.register(Category)
 admin.site.register(Anime,AnimeAdmin)

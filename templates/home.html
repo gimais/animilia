@@ -2,7 +2,7 @@
 {% block title %}HOME{% endblock %}
 
 {% block content %}
-    <div class="container">
+    <div class="container clearfix">
 {#        <div class="content">#}
     {#        <ul class="tabs">#}
     {#            <li class="active">ახალი დამატებულები</li>#}
@@ -12,10 +12,10 @@
                 {% for anime,categories in animes_list.items %}
 
                     <div class="item">
-                        <a href = "#"><img src="/media/posters/{{ anime.poster }}.jpg" width="170px" height="240px" alt="სურათი არ არის">
+                        <a href = "/anime/{{ anime.slug }}"><img src="/media/{{ anime.poster }}" height="240px" alt="სურათი არ არის">
                         </a>
                         <div class="item-info">
-                            <div class="item-name">{{ anime.name }}</div>
+                            <a class="item-name" href = "/anime/{{ anime.slug }}">{{ anime.name }}</a>
                             <ul>
                                 {% if anime.type == 0 %}
                                     <li>{{ anime.year }}  |  სერიალი  |  52</li>

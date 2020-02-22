@@ -1,12 +1,52 @@
 {% extends "base.html" %}
-{% block title %}ANIME to{% endblock %}
+{% block title %}{{ anime.name }}{% endblock %}
 
 {% block content %}
     <div class="container">
-        {{ anime.name }}
-        <br>
-        {{ anime.year }}
-        <br>
-        {{ anime.categories }}
+        <div class="item-page">
+            <img src="/media/{{ anime.poster }}"  alt="სურათი არ არის">
+            <div class="item-page-info">
+                <div class="item-page-head">
+                <h1>{{ anime.name }}</h1>
+                <h4> {{ anime.nameen }}</h4>
+                <h4> {{ anime.namejp }}</h4>
+                <h4> {{ anime.nameru }}</h4>
+{#                    <div shepasebis sistema></div>#}
+                </div>
+                <hr>
+                <div class="item-page-row">
+                    <dl>
+                        <dt>ტიპი:</dt>
+                        {% if anime.type == 0 %}
+                            <dd>სერიალი</dd>
+                        {% elif anime.type == 1 %}
+                            <dd>ფილმი</dd>
+                        {% endif %}
+                        <dt>სტუდია:</dt>
+                        <dd>{{ anime.studio }}</dd>
+                        <dt>გამოშვების წელი:</dt>
+                        <dd>{{ anime.year }}</dd>
+                        <dt>ჟანრები:</dt>
+                        <dd>
+                            {% for genre in genres %}
+                                <li>{{ genre }}</li>
+                            {% endfor %}
+                        </dd>
+                        <dt>ასაკობრივი შეზღუდვა:</dt>
+                        <dd>{{ anime.age }}+</dd>
+                        <dt>რეჟისორი:</dt>
+                        <dd>{{ anime.director }}</dd>
+                        <dt>სერიების რაოდენობა:</dt>
+                    {% if last_uploaded == None %}
+                        <dd>0/{{ anime.episodes }}</dd>
+                    {% else %}
+                        <dd>{{ last_uploaded }}/{{ anime.episodes }}</dd>
+                        {% endif %}
+                        <dt>გამხმოვანებელი:</dt>
+                        <dd>{{ anime.dubber }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}
