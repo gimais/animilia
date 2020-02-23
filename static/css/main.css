@@ -602,6 +602,7 @@ section:after {
 
 .item img{
     float: left;
+    height: 240px;
 }
 
 .item ul{
@@ -824,7 +825,6 @@ div#login-focus:hover {
 @media (max-width: 1260px) {
 
     .items-list:after {
-        content: "1260px";
         display: table;
         clear: both;
     }
@@ -849,11 +849,6 @@ div#login-focus:hover {
         content: "1185px";
     }
 
-    .items-list:after {
-        content: "1185px";
-        display: table;
-        clear: both;
-    }
 
     .item {
         margin-left: auto;
@@ -867,11 +862,6 @@ div#login-focus:hover {
         content: "1024px";
     }
 
-    .items-list:after {
-      content: "1024px";
-      display: table;
-      clear: both;
-    }
 
     .item-page-info {
         width: 75%;
@@ -889,11 +879,6 @@ div#login-focus:hover {
         content: "900px";
     }
 
-    .items-list:after {
-      content: "900px";
-      display: table;
-      clear: both;
-    }
 
     .top-nav li a {
         padding: 16px 21px;
@@ -968,11 +953,6 @@ div#login-focus:hover {
         content: "768px";
     }
 
-    .items-list:after {
-        content: "768px";
-        display: table;
-        clear: both;
-    }
 
     .form-input {
         width: 80%;
@@ -1041,11 +1021,25 @@ div#login-focus:hover {
         content: "480px";
     }
 
-    .items-list:after {
-      content: "480px";
-      display: table;
-      clear: both;
+    .item-page img {
+        width: 100%;
     }
+
+    .item-page-info {
+        width: 100%;
+    }
+
+    .signup-content {
+        padding: 50px 25px;
+    }
+}
+
+@media screen and (max-width: 414px) {
+
+    .clearfix:after {
+        content: "414px";
+    }
+
     .item-page img {
         width: 100%;
     }
