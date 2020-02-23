@@ -289,12 +289,20 @@ nav{
 }
 
 
-.top-background{
-    background: url('/static/img/background.jpg') bottom 74% center;
+/*.top-background{*/
+/*    background: url('/static/img/background.jpg') bottom 74% center;*/
+/*    height: 190px;*/
+/*    position: relative;*/
+/*    background-size: cover;*/
+/*}*/
+
+header{
+       background: url('/static/img/background.jpg') bottom 74% center;
     height: 190px;
     position: relative;
     background-size: cover;
 }
+
 #mob-menu{
     display: none;
     padding: 24px 0;
@@ -404,10 +412,6 @@ li{
 }
 
 section{
-    /*max-width: 1200px;*/
-    /*margin: 0 auto;*/
-    /*position: relative;*/
-    /*padding: 0 5px;*/
     margin-top: 50px;
     min-height: 100%;
     margin-bottom: -121px;
@@ -658,7 +662,7 @@ section:after {
     margin: 15px 0;
     font-weight: bold;
     font-size: large;
-    display: block;
+    display: inline-block;
     color:black;
     text-decoration: none;
 }
@@ -907,7 +911,11 @@ div#login-focus:hover {
 
 @media (max-width: 768px) {
 
-    .top-background{
+    /*.top-background{*/
+    /*    height: 0;*/
+    /*}*/
+
+    header{
         height: 0;
     }
 
@@ -920,7 +928,7 @@ div#login-focus:hover {
     }
 
     nav.open{
-        height: 180px;
+        height: 185px;
     }
 
     #mob-home {
@@ -1021,6 +1029,10 @@ div#login-focus:hover {
         content: "480px";
     }
 
+    section{
+        margin-top: 20px;
+    }
+
     .item-page img {
         width: 100%;
     }
@@ -1051,15 +1063,44 @@ div#login-focus:hover {
     .signup-content {
         padding: 50px 25px;
     }
+
+    .item{
+        max-height: none;
+    }
+
+    .item img{
+        width: 100%;
+        height: auto;
+    }
+
+    .item-name {
+        color: white;
+        margin: 5px 0;
+    }
+
+    .item-info {
+        bottom: 0;
+        position: absolute;
+        font-size: 10px;
+        max-height: 140px;
+        padding: 0 20px;
+        width: 100%;
+        background: rgba(29,20,18,.8);
+        color: white;
+    }
 }
 
 @media screen and (min-width: 4000px) {
-.top-background {
-    height: 280px;
-}
+    /*.top-background {*/
+    /*    height: 280px;*/
+    /*}*/
 
-.logo {
-    top: 265px;
-}
+    header{
+        height: 280px;
+    }
+
+    .logo {
+        top: 265px;
+    }
 
 }
