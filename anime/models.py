@@ -24,9 +24,9 @@ class Anime(models.Model):
     )
 
     name = models.CharField(max_length=100,unique=True,verbose_name='სახელი')
-    nameen = models.CharField(max_length=100,unique=True,verbose_name='ინგლისურად',blank=True)
-    namejp = models.CharField(max_length=100,unique=True,verbose_name='იაპონურად',blank=True)
-    nameru = models.CharField(max_length=100,unique=True,verbose_name='რუსულად',blank=True)
+    nameen = models.CharField(max_length=100,verbose_name='ინგლისურად',blank=True)
+    namejp = models.CharField(max_length=100,verbose_name='იაპონურად',blank=True)
+    nameru = models.CharField(max_length=100,verbose_name='რუსულად',blank=True)
     dubber = models.CharField(max_length=16,verbose_name='გამხმოვანებელი',unique=False)
     poster = models.ImageField(upload_to='posters/',max_length=50,blank=True,verbose_name='სურათი')
     year = models.PositiveSmallIntegerField(verbose_name='გამოშვების წელი')

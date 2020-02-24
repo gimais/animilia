@@ -36,16 +36,29 @@
                         <dd>{{ anime.age }}+</dd>
                         <dt>რეჟისორი:</dt>
                         <dd>{{ anime.director }}</dd>
+                        {% if anime.type == 0 %}
                         <dt>სერიების რაოდენობა:</dt>
-                    {% if last_uploaded == None %}
-                        <dd>0/{{ anime.episodes }}</dd>
-                    {% else %}
-                        <dd>{{ last_uploaded }}/{{ anime.episodes }}</dd>
+                        <dd>{% firstof last_uploaded "0" %}/{{anime.episodes}}</dd>
                         {% endif %}
                         <dt>გამხმოვანებელი:</dt>
                         <dd>{{ anime.dubber }}</dd>
                     </dl>
                 </div>
+            </div>
+            <div class="item-page-desc">
+                <p>{{anime.description}}</p>
+            </div>
+            <hr>
+            {% if anime.type == 0 %}
+            <div class="item-page-episodes">
+                {% for episode in episodes %}
+                <div class="episode-select-button" data-id="{{episode.row}}" data-url="{{episode.url}}">{{ episode.row }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <div class="item-player hidden">
+                <iframe  src="https://www.youtube.com/embed/5qap5aO4i9A" allowfullscreen>
+                </iframe>
             </div>
         </div>
     </div>

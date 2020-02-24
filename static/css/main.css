@@ -821,6 +821,49 @@ div#login-focus:hover {
     content: '';
 }
 
+.item-page-desc{
+    clear: both;
+    padding: 12px;
+    font-size: 15px;
+}
+
+
+.item-page-episodes {
+    margin: 15px 0 5px;
+}
+
+.episode-select-button{
+    height: 33px;
+    display: inline-block;
+    text-align: center;
+    /*transition: .3s;*/
+    cursor: pointer;
+    padding: 9px 5px 0;
+    margin: 0 9px 16px 0;
+    background: #292018;
+    color: #ffffff;
+    min-width: 33px;
+    border-radius: 100px;
+}
+
+.episode-select-button:hover{
+    background: #973116;
+}
+
+.episode-select-button.active{
+    background: #973116;
+}
+
+.item-player.hidden{
+    display: none;
+}
+
+.item-player iframe{
+    width: 100%;
+    height: 540px;
+}
+/*================================*/
+
 .show{
     display: block;
 }
@@ -868,11 +911,11 @@ div#login-focus:hover {
 
 
     .item-page-info {
-        width: 75%;
+        width: 72%;
     }
 
     .item-page img {
-        width: 25%;
+        width: 28%;
     }
 
 }
@@ -987,6 +1030,13 @@ div#login-focus:hover {
         width: 32%;
     }
 
+    section{
+        margin-top: 20px;
+    }
+    .item-page {
+        width: 100%;
+    }
+
 }
 
 @media screen and (max-width: 515px) {
@@ -1029,16 +1079,15 @@ div#login-focus:hover {
         content: "480px";
     }
 
-    section{
-        margin-top: 20px;
-    }
-
     .item-page img {
         width: 100%;
     }
 
     .item-page-info {
         width: 100%;
+    }
+    .item-page-desc {
+        padding: 8px 0;
     }
 
     .signup-content {
@@ -1075,20 +1124,20 @@ div#login-focus:hover {
 
     .item-name {
         color: white;
-        margin: 5px 0;
+        margin: 7px 0;
     }
 
     .item-info {
         bottom: 0;
         position: absolute;
         font-size: 10px;
-        max-height: 140px;
         padding: 0 20px;
         width: 100%;
         background: rgba(29,20,18,.8);
         color: white;
     }
 }
+
 
 @media screen and (min-width: 4000px) {
     /*.top-background {*/
