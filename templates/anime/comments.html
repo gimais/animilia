@@ -7,14 +7,16 @@
 </form>
 </div>
 
-{% for comment in comments %}
-    <div class="comments" style="padding: 10px;">
-        <p class="font-weight-bold">
-            {{ comment.user }}
-        <span class=" text-muted font-weight-normal">
-            {{ comment.created }}
-        </span>
-        </p>
-      {{ comment.body | linebreaks }}
-    </div>
-{% endfor %}
+<div class="comments-box">
+    {% for comment in comments %}
+        <div class="comment" style="padding: 10px;">
+            <p class="font-weight-bold">
+                {{ comment.user }}
+            <span class=" text-muted font-weight-normal">
+                {{ comment.created }}
+            </span>
+            </p>
+          {{ comment.body | linebreaks }}
+        </div>
+    {% endfor %}
+</div>

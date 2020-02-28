@@ -95,6 +95,32 @@ $('.episode-select-button').on('click',function () {
         setCookie(locationURL.substring(28,locationURL.length-1),clickedButton.data('id'),10,locationURL.substring(22));
 });
 
+
+function makeCommentBoxHTML(data) {
+    var html = '';
+    html += '<div class=\"comment\" style=\"padding: 10px;\">';
+    html += '<p class="font-weight-bold">';
+    html += `${data.username} `;
+    html += "<span class=\" text-muted font-weight-normal\">";
+    html += `${data.time}`;
+    html += "</span>";
+    html += "</p>";
+    html += `${data.textBody}`;
+    html += '</div>';
+    html += '</div>';
+    return html
+}
+
+const monthNames = ["იან", "თებ", "მარ", "აპრ", "მაი", "ივნ",
+    "ივლ", "აგვ", "სექ", "ოქტ", "ნოვ", "დეკ"
+];
+
+function convertTimeGeo(timestamp) {
+    var date = new Date(timestamp*1000);
+    date = `${date.getDay()} ${monthNames[date.getMonth()]} ${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`;
+    return date;
+}
+
 var $commentForm = $('.comment-form');
 $commentForm.submit(function(event){
     event.preventDefault();
@@ -104,23 +130,25 @@ $commentForm.submit(function(event){
         url: window.location.href+'comment/',
         data: $formDataSerialized,
         success: function (data) {
-            textBody = $(this).serializeArray();
-            console.log(textBody);
-            console.log(data);
+            data.textBody = $(".comment-form textarea").val();
+            data.time = convertTimeGeo(new Date().getTime()/1000);
+            var html =makeCommentBoxHTML(data);
+            $(".comments-box").prepend(html);
+            $commentForm.trigger('reset');
         },
-        error: function (data,textStatus,errorThrown) {
+        error: function (data) {
             console.log(data);
         },
     })
 });
 
-function handleFormSuccess(data, textStatus, jqXHR){
-    console.log(data);
-    $commentForm.trigger('reset');
-}
-
-function handleFormError(jqXHR, textStatus, errorThrown){
-    console.log(jqXHR);
-    console.log(textStatus);
-    console.log(errorThrown)
-}
+// function handleFormSuccess(data, textStatus, jqXHR){
+//     console.log(data);
+//     $commentForm.trigger('reset');
+// }
+//
+// function handleFormError(jqXHR, textStatus, errorThrown){
+//     console.log(jqXHR);
+//     console.log(textStatus);
+//     console.log(errorThrown)
+// }

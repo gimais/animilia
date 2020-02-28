@@ -25,11 +25,13 @@ class CommentFormView(AjaxCommentFormMixin, FormView):
     form_class = CommentForm
     success_url = '/success/'
 
+
+
 def add_comment(request,slug):
     if request.is_ajax():
         form = CommentForm(request.POST)
         if form.is_valid():
-
+            #
             # comment = Comment(anime=Anime.objects.get(slug=slug),user=request.user,body=request.POST['body'])
             # comment.save()
 

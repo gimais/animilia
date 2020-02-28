@@ -289,13 +289,6 @@ nav{
 }
 
 
-/*.top-background{*/
-/*    background: url('/static/img/background.jpg') bottom 74% center;*/
-/*    height: 190px;*/
-/*    position: relative;*/
-/*    background-size: cover;*/
-/*}*/
-
 header{
        background: url('/static/img/background.jpg') bottom 74% center;
     height: 190px;
@@ -390,16 +383,6 @@ header{
     background-color: #973116;
 }
 
-/*.top-nav li span {*/
-/*    cursor: pointer;*/
-/*    display: block;*/
-/*    color: white;*/
-/*    float: left;*/
-/*    text-align: center;*/
-/*    padding: 16px 28px;*/
-/*    text-decoration: none;*/
-/*}*/
-
 
 ul.top-nav li:last-child a:hover:not(.active) {background-color: #973116;}
 
@@ -421,13 +404,6 @@ section:after {
     display: block;
 }
 
-
-/*.slide-items{*/
-/*    height: 200px;*/
-/*    text-align: center;*/
-/*    margin-bottom: 15px;*/
-/*    border: 2px solid red;*/
-/*}*/
 
 .signup-form{
     text-align: center;
@@ -672,11 +648,6 @@ section:after {
     color: #973116;
 }
 
-/*.item-name:visited{*/
-/*    color:black;*/
-/*    tex*/
-/*}*/
-
 .genres-list span{
     font-weight: 600;
 }
@@ -837,7 +808,6 @@ div#login-focus:hover {
     height: 33px;
     display: inline-block;
     text-align: center;
-    /*transition: .3s;*/
     cursor: pointer;
     padding: 9px 5px 0;
     margin: 0 9px 16px 0;
@@ -940,24 +910,12 @@ div#login-focus:hover {
         width: 100%;
     }
 
-    /*.item-page-info {*/
-    /*    width: 70%;*/
-    /*}*/
-
-    /*.item-page img {*/
-    /*    width: 30%;*/
-    /*}*/
-
     .item-page {
         width: 95%;
     }
 }
 
 @media (max-width: 768px) {
-
-    /*.top-background{*/
-    /*    height: 0;*/
-    /*}*/
 
     header{
         height: 0;
@@ -1056,18 +1014,6 @@ div#login-focus:hover {
         padding: 0;
     }
 
-    /*.item-page h1{*/
-    /*    margin-bottom: 50px;*/
-    /*}*/
-
-    /*.item-page h4{*/
-    /*    margin-bottom: 15px;*/
-    /*}*/
-
-    /*.item-page hr{*/
-    /*    margin-top: 50px;*/
-    /*}*/
-
     .item-page{
         padding: 5px;
     }
@@ -1141,9 +1087,6 @@ div#login-focus:hover {
 
 
 @media screen and (min-width: 4000px) {
-    /*.top-background {*/
-    /*    height: 280px;*/
-    /*}*/
 
     header{
         height: 280px;
