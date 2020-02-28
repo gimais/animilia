@@ -1,3 +1,7 @@
+// ANIMILIA JAVASCRIPT CODE
+// jQuery 3.4.1
+
+
 $('#mob-menu').click(function () {
         $('nav').toggleClass('open');
         $('.top-nav').toggleClass('open')
@@ -64,17 +68,21 @@ function getCookie(cname) {
   return "";
 }
 
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        }
+    }
+});
+
 const locationURL = document.location.href;
 const itemSlug = locationURL.substring(21,locationURL.length-1);
-
-window.onload = function(){
-  if(itemSlug.substring(0,7)==='/anime/'){
-          var pageCookie = getCookie(itemSlug.substring(7));
-          if(pageCookie!==""){
-                  $('.item-page-episodes').find(`.episode-select-button[data-id=${pageCookie}]`).addClass('active');
-          }
-  }
-};
 
 $('.episode-select-button').on('click',function () {
         var clickedButton = $(this);
@@ -86,3 +94,33 @@ $('.episode-select-button').on('click',function () {
         }
         setCookie(locationURL.substring(28,locationURL.length-1),clickedButton.data('id'),10,locationURL.substring(22));
 });
+
+var $commentForm = $('.comment-form');
+$commentForm.submit(function(event){
+    event.preventDefault();
+    var $formDataSerialized = $(this).serialize();
+    $.ajax({
+        method: "POST",
+        url: window.location.href+'comment/',
+        data: $formDataSerialized,
+        success: function (data) {
+            textBody = $(this).serializeArray();
+            console.log(textBody);
+            console.log(data);
+        },
+        error: function (data,textStatus,errorThrown) {
+            console.log(data);
+        },
+    })
+});
+
+function handleFormSuccess(data, textStatus, jqXHR){
+    console.log(data);
+    $commentForm.trigger('reset');
+}
+
+function handleFormError(jqXHR, textStatus, errorThrown){
+    console.log(jqXHR);
+    console.log(textStatus);
+    console.log(errorThrown)
+}

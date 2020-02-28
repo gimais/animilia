@@ -14,10 +14,17 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.contrib.admin.forms import AdminAuthenticationForm
 from django.urls import path,include
 from django.conf.urls.static import static
 from django.conf import settings
 
+AdminAuthenticationForm.error_messages = {
+    'invalid_login':
+        "გთხოვთ, შეიყვანოთ სწორი მომხმარებლის სახელი და პაროლი. "
+        "იქონიეთ მხედველობაში, რომ ორივე ველი ითვალისწინებს პატარა და დიდ ასოებს."
+        "ან ადმინი არ ხარ!!"
+}
 
 urlpatterns = [
     path('admin/', admin.site.urls),

@@ -1,17 +1,26 @@
 from datetime import datetime
+
+from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import F
 
 # Create your models here.
+from django.db.models import Count
 
+# commaseparatedintegerfield
 
 class Category(models.Model):
-    name = models.CharField(max_length=18,primary_key=True)
-    # posts = models.PositiveSmallIntegerField()
+    name = models.CharField(max_length=18,unique=True)
+    posts = models.PositiveSmallIntegerField(default=0,editable=False)
 
     class Meta:
         db_table = 'categories'
-        verbose_name = 'category'
-        verbose_name_plural = 'categories'
+        verbose_name = 'კატეგორია'
+        verbose_name_plural = 'კატეგორიები'
+
+    def save(self, *args, **kwargs):
+        print(self.name)
+        super(Category, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -39,13 +48,28 @@ class Anime(models.Model):
     episodes = models.PositiveSmallIntegerField(verbose_name='ეპიზოდების რაოდენობა',default=1)
     # comments = models.PositiveSmallIntegerField()
     updated = models.DateTimeField(auto_now=True)
+    dubbed = models.PositiveSmallIntegerField(default=0,verbose_name='გახმოვანებული',editable=False)
     slug = models.SlugField(unique=True,verbose_name='ლინკი')
 
 
     class Meta:
         db_table = 'animes_list'
-        verbose_name = 'Anime'
-        verbose_name_plural = 'Anime'
+        verbose_name = 'ანიმე'
+        verbose_name_plural = 'ანიმეები'
+
+    def save(self, *args, **kwargs):
+        if self.type==1:
+            self.episodes = 1
+
+        super(Anime, self).save(*args, **kwargs)
+
+        if self._state.adding:
+            for category in self.categories.all():
+                Category.objects.filter(pk=category.pk).update(posts=F('posts')+1)
+
+    def delete(self, *args, **kwargs):
+        print('waishala')
+        super(Anime,self).delete(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -54,24 +78,51 @@ class Anime(models.Model):
 class AnimeSeries(models.Model):
     anime = models.ForeignKey(Anime,on_delete=models.CASCADE,verbose_name='ანიმე',limit_choices_to={'type':0})
     url = models.CharField(max_length=60,verbose_name='ვიდეოს ლინკი')
-    row = models.PositiveSmallIntegerField(default=1,verbose_name='მერამდენე ეპიზოდია')
+    row = models.PositiveSmallIntegerField(default=1,verbose_name='მერამდენე ეპიზოდია',editable=False)
 
     class Meta:
         db_table = 'animes_series'
-        verbose_name = 'Anime Serie'
-        verbose_name_plural = 'Anime Series'
+        verbose_name = 'ანიმე სერია'
+        verbose_name_plural = 'ანიმე სერიები'
 
     def save(self, *args, **kwargs):
         if self._state.adding:
             last_id = AnimeSeries.objects.filter(anime=self.anime).aggregate(largest=models.Max('row'))['largest']
 
+            if self.anime.type==1 and last_id is not None:
+                return
+
             if last_id is not None:
                 self.row = last_id + 1
+
         super(AnimeSeries, self).save(*args, **kwargs)
 
         Anime.objects.get(pk=self.anime.pk).updated = datetime.now() # update after adding episodes
 
-        Anime.save(self.anime,update_fields=['updated'])
+        Anime.save(self.anime)
+
+        largest = AnimeSeries.objects.filter(anime=self.anime).aggregate(largest=models.Max('row'))['largest']
+        Anime.objects.filter(pk=self.anime.pk).update(dubbed=largest)
 
     def __str__(self):
-        return '{} - {}'.format(self.anime,self.row)
+        if self.anime.type == 0:
+            return '{} - {}'.format(self.anime,self.row)
+        else:
+            return str(self.anime)
+
+
+class Comment(models.Model):
+    anime = models.ForeignKey(Anime,on_delete=models.CASCADE,related_name='comments')
+    user = models.ForeignKey(User,on_delete=models.SET_NULL,null=True)
+    body = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    active = models.BooleanField(default=True)
+    parent = models.ForeignKey('self',on_delete=models.CASCADE,null=True,blank=True,related_name='replies')
+
+    class Meta:
+        ordering = ['created']
+        verbose_name = 'კომენტარი'
+        verbose_name_plural = 'კომენტარი'
+
+    def __str__(self):
+        return '{}-ის კომენტარი'.format(self.user)

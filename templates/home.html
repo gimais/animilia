@@ -9,7 +9,7 @@
 {#            </ul>#}
             <div class="items-list">
     {#            {% csrf_token %}#}
-                {% for anime,vals in animes_list.items %}
+                {% for anime in animes_list %}
 
                     <div class="item">
                         <a href = "/anime/{{ anime.slug }}"><img src="/media/{{ anime.poster }}" alt="სურათი არ არის">
@@ -18,13 +18,13 @@
                             <a class="item-name" href = "/anime/{{ anime.slug }}">{{ anime.name }}</a>
                             <ul>
                                 {% if anime.type == 0 %}
-                                    <li>{{ anime.year }}  |  სერიალი  |  {% firstof vals.1 "0" %}/{{anime.episodes}}</li>
+                                    <li>{{ anime.year }}  |  სერიალი  |  {{anime.dubbed}}/{{anime.episodes}}</li>
                                 {% elif anime.type == 1 %}
                                     <li>{{ anime.year }}  |  ფილმი</li>
                                 {% endif %}
                                 <ul class='categories-list' style="border: none;padding: 0">
                                     <span style="font-weight: 600;">ჟანრები:</span>
-                                    {% for category in vals.0 %}
+                                    {% for category in anime.categories.all %}
                                         <li>{{ category }}</li>
                                     {% endfor %}
                                 </ul>

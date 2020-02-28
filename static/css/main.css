@@ -412,7 +412,6 @@ li{
 }
 
 section{
-    margin-top: 50px;
     min-height: 100%;
     margin-bottom: -121px;
 }
@@ -423,17 +422,21 @@ section:after {
 }
 
 
-.slide-items{
-    height: 200px;
+/*.slide-items{*/
+/*    height: 200px;*/
+/*    text-align: center;*/
+/*    margin-bottom: 15px;*/
+/*    border: 2px solid red;*/
+/*}*/
+
+.signup-form{
     text-align: center;
-    margin-bottom: 15px;
-    /*margin-top: 30px;*/
-    border: 2px solid red;
 }
 
 .reg-error{
     color: #953116;
     font-size: 14px;
+    margin-bottom: 15px;
 }
 
 .form-title {
@@ -455,9 +458,8 @@ section:after {
 }
 
 .container{
-    /*margin: 50px auto;*/
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 50px auto;
     position: relative;
     padding: 0 5px;
 }
@@ -475,7 +477,6 @@ section:after {
 .form-group {
   overflow: hidden;
   margin-bottom: 20px;
-    text-align: center;
 }
 
 
@@ -1030,8 +1031,8 @@ div#login-focus:hover {
         width: 32%;
     }
 
-    section{
-        margin-top: 20px;
+    .container{
+        margin: 20px auto;
     }
     .item-page {
         width: 100%;

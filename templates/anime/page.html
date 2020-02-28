@@ -28,7 +28,7 @@
                         <dd>{{ anime.year }}</dd>
                         <dt>ჟანრები:</dt>
                         <dd>
-                            {% for genre in genres %}
+                            {% for genre in anime.categories.all %}
                                 <li>{{ genre }}</li>
                             {% endfor %}
                         </dd>
@@ -38,7 +38,7 @@
                         <dd>{{ anime.director }}</dd>
                         {% if anime.type == 0 %}
                         <dt>სერიების რაოდენობა:</dt>
-                        <dd>{% firstof last_uploaded "0" %}/{{anime.episodes}}</dd>
+                        <dd>{{ anime.dubbed }}/{{anime.episodes}}</dd>
                         {% endif %}
                         <dt>გამხმოვანებელი:</dt>
                         <dd>{{ anime.dubber }}</dd>
@@ -55,11 +55,32 @@
                 <div class="episode-select-button" data-id="{{episode.row}}" data-url="{{episode.url}}">{{ episode.row }}</div>
                 {% endfor %}
             </div>
-            {% endif %}
             <div class="item-player hidden">
-                <iframe  src="https://www.youtube.com/embed/5qap5aO4i9A" allowfullscreen>
-                </iframe>
+                <iframe  allowfullscreen></iframe>
             </div>
+            {% else %}
+            <div class="item-player">
+                {% for episode in episodes %}
+                <iframe src="{{episode.url}}" allowfullscreen></iframe>
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
+
+        {% include "anime/comments.html" %}
+
     </div>
+{% endblock %}
+
+{% block script %}
+    {% if anime.type == 0 %}
+        <script>
+            if (itemSlug.substring(0, 7) === '/anime/') {
+                var pageCookie = getCookie(itemSlug.substring(7));
+                if (pageCookie !== "") {
+                    $('.item-page-episodes').find(`.episode-select-button[data-id=${pageCookie}]`).addClass('active');
+                }
+            }
+        </script>
+    {% endif %}
 {% endblock %}
