@@ -18,6 +18,7 @@
     outline: none;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    font-family: "DejaVu Sans Condensed", sans-serif;
 }
 
 html {
@@ -25,7 +26,6 @@ html {
 }
 
 body {
-    font-family: open sans,sans-serif;
     font-size: 14px;
     background: #e2e2e2;
     color: #333;
@@ -135,6 +135,26 @@ textarea {
 *    causes content to wrap 1 word per line:
 *    https://medium.com/@jessebeach/beware-smushed-off-screen-accessible-text-5952a4c2cbfe
 */
+
+@font-face {
+    font-family: 'KA_LORTKIPANIDZE';
+    src: url('../fonts/ka-lortkipanidze-webfont.eot'); /* IE9 Compat Modes */
+    src: url('../fonts/ka-lortkipanidze-webfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../fonts/ka-lortkipanidze-webfont.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../fonts/ka-lortkipanidze-webfont.woff') format('woff'), /* Pretty Modern Browsers */
+         url('../fonts/ka-lortkipanidze-webfont.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../fonts/ka-lortkipanidze-webfont.svg#ka_lortkipanidzeregular') format('svg'); /* Legacy iOS */
+}
+
+@font-face {
+    font-family: 'DejaVu Sans Condensed';
+    src: url('../fonts/dejavu-sans-condensed-webfont.eot'); /* IE9 Compat Modes */
+    src: url('../fonts/dejavu-sans-condensed-webfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('../fonts/dejavu-sans-condensed-webfont.woff2') format('woff2'), /* Super Modern Browsers */
+         url('../fonts/dejavu-sans-condensed-webfont.woff') format('woff'), /* Pretty Modern Browsers */
+         url('../fonts/dejavu-sans-condensed-webfont.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('../fonts/dejavu-sans-condensed-webfont.svg#dejavu_sans_condensedregular') format('svg'); /* Legacy iOS */
+}
 
 .sr-only {
   border: 0;
@@ -314,7 +334,7 @@ header{
     height: 100px;
     position: absolute;
     top:175px;
-    border-radius: 100px;
+    border-radius: 50%;
     background: url('/static/img/logo.png');
 }
 
@@ -636,6 +656,7 @@ section:after {
 }
 
 .item-name{
+    font-family: "KA_LORTKIPANIDZE", sans-serif;
     margin: 15px 0;
     font-weight: bold;
     font-size: large;
@@ -652,18 +673,20 @@ section:after {
     font-weight: 600;
 }
 
-/*.showmore{*/
-/*    margin: auto;*/
-/*    width: 150px;*/
-/*    border: 3px solid green;*/
-/*    padding: 10px;*/
-/*    text-align: center;*/
-/*    cursor: pointer;*/
-/*}*/
+.showmore{
+    margin: auto;
+    width: 150px;
+    background-color: #555555;
+    border-radius: 4px;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+}
 
-/*.showmore:hover{*/
-/*    background-color: tomato;*/
-/*}*/
+.showmore:hover{
+    background-color: #973116;
+}
 
 footer{
     /*width: 100%;*/
@@ -735,10 +758,9 @@ div#login-focus:hover {
     width: 85%;
     margin: auto;
     background: white;
-    padding: 10px;
+    padding: 15px;
     border-radius: 4px;
 }
-
 
 .item-page img{
     width: 20%;
@@ -759,11 +781,13 @@ div#login-focus:hover {
 
 .item-page-head h4{
     font-size: 16px;
+    font-family: none;
 }
 
 .item-page-head h1{
     margin: auto;
     margin-bottom: 7px;
+    font-family: "KA_LORTKIPANIDZE", sans-serif;
 }
 
 
@@ -829,10 +853,147 @@ div#login-focus:hover {
     display: none;
 }
 
-.item-player iframe{
-    width: 100%;
-    height: 540px;
+.item-player {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    padding-top: 25px;
+    height: 0;
 }
+.item-player iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.comments-box.clearfix:before {
+    clear: both;
+}
+
+.comment-form textarea {
+    resize: vertical;
+    border: 1px solid #aaa;
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+}
+
+.comment-form button{
+    background: #333;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-right: 5px;
+    float: right;
+}
+
+.comment-form button[type=reset]{
+    background-color: #973116;
+}
+
+.comment {
+    border-bottom: 1px solid #e2e2e2;
+    padding: 5px;
+}
+
+
+.comment-user-img {
+    background: url('/static/img/no-avatar.jpg');
+    background-size: 100%;
+    width: 90px;
+    height: 90px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.comment-user-img img{
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.comment-body{
+    display: inline-block;
+    vertical-align: middle;
+    width: calc(100% - 105px);
+    min-height: 100px;
+    margin-left: 10px;
+    padding: 5px 10px;
+    font-size: .9rem;
+    color: #555;
+    background-color: #FFF;
+}
+
+.comment-info > .comment-user{
+    color:#ff2e01;
+    font-size: 18px;
+    display: inline-block;
+}
+
+.comment-info > .comment-time{
+    color:black;
+    font-size: 12px
+}
+
+
+.comment-buttons:after{
+    content: "";
+    clear: both;
+}
+
+.comment-buttons{
+    height: 16px;
+    padding: 2px;
+}
+
+.reply-button {
+    margin-left: 5px;
+    cursor: pointer;
+    display: inline-block;
+    border: 1px solid;
+    border-radius: 3px;
+    padding: 1px 6px;
+}
+
+.comment-replies-box {
+    margin-left: 30px;
+    border-left: 1px solid #973116;
+    padding: 0 10px;
+}
+
+.comment-replies-box > .comment{
+    border: none;
+    border-bottom: 1px solid #e2e2e2;
+}
+.comment-info > p {
+    line-height: 20px;
+}
+
+.comment-replies-box > .comment:last-child {
+    border: none;
+}
+
+.comment-replies-check{
+    border: 1px solid #e2e2e2;
+    padding: 5px;
+    text-align: center;
+    border-radius: 2px;
+    margin: 5px 0;
+    cursor: pointer;
+}
+
+.comment-replies-check:hover{
+    color: #973116;
+}
+
+i.fas.fa-caret-down:hover {
+    color: #973116;
+}
+
 /*================================*/
 
 .show{
@@ -1032,6 +1193,7 @@ div#login-focus:hover {
 
     .item-page-info {
         width: 100%;
+        margin-top: 8px;
     }
     .item-page-desc {
         padding: 8px 0;

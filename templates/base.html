@@ -39,7 +39,7 @@
                 {% if user.is_anonymous %}
                     <li>
                         <div id="login-focus">შესვლა</div>
-                            <form class="login-form" method="post" action="{% url 'login' %}">
+                            <form class="login-form" method="post" action="{% url 'login' %}?next={{ request.path }}">
                                 {% csrf_token %}
                                 <input type="text" name="username" class="form-input pad" autofocus placeholder="ნიკი" autocapitalize="none" autocomplete="off" maxlength="150" required>
                                 <input type="password" name="password" autocomplete="current-password" class="form-input pad" placeholder="პაროლი" required id="id_password">
@@ -50,7 +50,8 @@
                     <li><a href="{% url 'signup' %}">რეგისტრაცია</a></li>
                 {% else %}
                     <li><a class='active' href="{% url 'profile' %}">{{user}}</a></li>
-                    <li><a href="{% url 'logout' %}">გასვლა</a></li>
+                    <li><a href="{% url 'logout' %}?next={{ request.path }}">გასვლა</a></li>
+
                 {% endif %}
             </ul>
         </div>

@@ -65,16 +65,15 @@
                 {% endfor %}
             </div>
             {% endif %}
+            <hr>
+            {% include "anime/comments.html" %}
         </div>
-
-        {% include "anime/comments.html" %}
-
     </div>
 {% endblock %}
 
 {% block script %}
+    <script>
     {% if anime.type == 0 %}
-        <script>
             if (itemSlug.substring(0, 7) === '/anime/') {
                 var pageCookie = getCookie(itemSlug.substring(7));
                 if (pageCookie !== "") {
@@ -83,4 +82,7 @@
             }
         </script>
     {% endif %}
+    {% if user.is_authenticated %}
+    {% endif %}
+    </script>
 {% endblock %}

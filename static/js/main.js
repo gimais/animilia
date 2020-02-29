@@ -98,26 +98,36 @@ $('.episode-select-button').on('click',function () {
 
 function makeCommentBoxHTML(data) {
     var html = '';
-    html += '<div class=\"comment\" style=\"padding: 10px;\">';
-    html += '<p class="font-weight-bold">';
-    html += `${data.username} `;
-    html += "<span class=\" text-muted font-weight-normal\">";
-    html += `${data.time}`;
-    html += "</span>";
-    html += "</p>";
-    html += `${data.textBody}`;
-    html += '</div>';
-    html += '</div>';
+    html += `<div class="comment">
+                    <div class="comment-user-img" href="#user">
+                        <img src="#" alt>
+                    </div>
+                    <div class="comment-body">
+                        <div class="comment-info">
+                            <p class='comment-user'>${data.username}</p>
+                            <p class='comment-time'>${data.time}</p>
+                        </div>
+                            <p style="word-wrap: break-word">${data.textBody}</p>
+                    </div>
+                </div>`;
     return html
 }
 
-const monthNames = ["იან", "თებ", "მარ", "აპრ", "მაი", "ივნ",
-    "ივლ", "აგვ", "სექ", "ოქტ", "ნოვ", "დეკ"
-];
+function makeCommentTextAreaHTML(username,parent_id){
+    var html = '';
+    html += `<form class=\'comment-form\' style=\'padding: 15px 0\' method=\'POST\' data-id=\"${parent_id}\">`;
+    html += `<input type="hidden" name="csrfmiddlewaretoken" value="${getCookie('csrftoken')}">`;
+    html += `<p> <textarea name="body" cols="40" rows="10" placeholder="კომენტარი" id="id_body">${username}, </textarea></p>`;
+    html += '<button type="reset">გაუქმება</button>';
+    html += '<button type="submit">გაგზავნა</button>';
+    html += '</form>';
+    return html
+}
 
-function convertTimeGeo(timestamp) {
-    var date = new Date(timestamp*1000);
-    date = `${date.getDay()} ${monthNames[date.getMonth()]} ${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`;
+function convertTimeGeo(date) {
+    date = new Date(date*1000);
+    date = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}
+     ${(date.getHours()<10?'0':'') + date.getHours()}:${(date.getMinutes()<10?'0':'') + date.getMinutes()}`;
     return date;
 }
 
@@ -132,7 +142,7 @@ $commentForm.submit(function(event){
         success: function (data) {
             data.textBody = $(".comment-form textarea").val();
             data.time = convertTimeGeo(new Date().getTime()/1000);
-            var html =makeCommentBoxHTML(data);
+            var html = makeCommentBoxHTML(data);
             $(".comments-box").prepend(html);
             $commentForm.trigger('reset');
         },
@@ -142,13 +152,62 @@ $commentForm.submit(function(event){
     })
 });
 
-// function handleFormSuccess(data, textStatus, jqXHR){
-//     console.log(data);
-//     $commentForm.trigger('reset');
-// }
-//
-// function handleFormError(jqXHR, textStatus, errorThrown){
-//     console.log(jqXHR);
-//     console.log(textStatus);
-//     console.log(errorThrown)
-// }
+
+$(".reply-button").on('click',function () {
+    var button = $(this);
+    var parent_id = button.data('id');
+    var username = button.data('username');
+    var formHTML = makeCommentTextAreaHTML(username,parent_id);
+    var parent = button.parents('.comment:last');
+    if(parent.find('.comment-form').length===0){
+        parent.append(formHTML);
+    }
+});
+
+$('.comment').on("click", ".comment-form button[type=reset]", function() {
+    $(this).parent().remove();
+});
+
+$('.comment').on("click", ".comment-form button[type=submit]", function(event) {
+    event.preventDefault();
+    var that = $(this).parent();
+    var $formDataSerialized = that.serialize();
+    $.ajax({
+        method: "POST",
+        url: window.location.href+'comment/',
+        data: $formDataSerialized + `&parent_id=${that.data('id')}`,
+        success: function (data) {
+            data.textBody = that.find('textarea').val();
+            data.time = convertTimeGeo(new Date().getTime()/1000);
+            var html = '';
+            if(that.parent().has('.comment-replies-box').length){
+                html = makeCommentBoxHTML(data);
+                that.parent().children('.comment-replies-box').append(html)
+            }else {
+               html += '<div class="comment-replies-box">';
+               html += makeCommentBoxHTML(data);
+               html += '</div>';
+               that.parent().append(html);
+            }
+            that.remove();
+        },
+        error: function (data) {
+            console.log(data);
+        },
+    })
+});
+
+// $('.showmore.comments').on('click',function () {
+//         var $formDataSerialized = $(this).serialize();
+//         $.ajax({
+//         method: "GET",
+//         url: window.location.href+'get_comments/',
+//         data: $formDataSerialized,
+//         success: function (data) {
+//             console.log(data)
+//         },
+//         error: function (data) {
+//             console.log(data);
+//         },
+//     })
+// });

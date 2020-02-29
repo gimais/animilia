@@ -77,7 +77,7 @@ class Anime(models.Model):
 
 class AnimeSeries(models.Model):
     anime = models.ForeignKey(Anime,on_delete=models.CASCADE,verbose_name='ანიმე',limit_choices_to={'type':0})
-    url = models.CharField(max_length=60,verbose_name='ვიდეოს ლინკი')
+    url = models.CharField(max_length=100,verbose_name='ვიდეოს ლინკი')
     row = models.PositiveSmallIntegerField(default=1,verbose_name='მერამდენე ეპიზოდია',editable=False)
 
     class Meta:
@@ -115,12 +115,14 @@ class Comment(models.Model):
     anime = models.ForeignKey(Anime,on_delete=models.CASCADE,related_name='comments')
     user = models.ForeignKey(User,on_delete=models.SET_NULL,null=True)
     body = models.TextField()
+    # like = models.PositiveSmallIntegerField(default=0,editable=False,verbose_name='ლაიქები')
+    # dislike = models.PositiveSmallIntegerField(default=0, editable=False, verbose_name='დისლაიქები')
     created = models.DateTimeField(auto_now_add=True)
     active = models.BooleanField(default=True)
     parent = models.ForeignKey('self',on_delete=models.CASCADE,null=True,blank=True,related_name='replies')
 
     class Meta:
-        ordering = ['created']
+        ordering = ['-created']
         verbose_name = 'კომენტარი'
         verbose_name_plural = 'კომენტარი'
 

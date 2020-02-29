@@ -1,26 +1,26 @@
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
+from django.contrib.auth.views import LoginView
+from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from account.forms import SignUpForm,MyAuthenticationForm
-from animilia.settings import LOGIN_REDIRECT_URL
 
 # Create your views here.
 def login_view(request):
+    next_page = request.GET.get('next') or request.META.get('HTTP_REFERER', '/')
     if request.method == 'POST':
         form = MyAuthenticationForm(data=request.POST)
         if form.is_valid():
-            # log the user in
             login(request, form.get_user())
             messages.success(request,'გამარჯობა, {}'.format(form.get_user()),extra_tags='green')
-            return HttpResponseRedirect(LOGIN_REDIRECT_URL)
+            return HttpResponseRedirect(next_page)
         else:
             messages.error(request, 'ნიკი ან პაროლი არასწორია. თავიდან სცადეთ!',extra_tags='red')
-            return HttpResponseRedirect('/')
+            return HttpResponseRedirect(next_page)
     else:
-        messages.warning(request,'ნუ ჩათლახობ! O_o ',extra_tags='maimuni')
-        return HttpResponseRedirect('/')
-
+        messages.error(request,'მოხდა შეცდომა,თავიდან სცადეთ!',extra_tags='red')
+        return HttpResponseRedirect(next_page)
 
 def signup_view(request):
     if request.user.is_anonymous:

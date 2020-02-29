@@ -1,10 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
-from django.views.generic import FormView
 from anime.models import Anime, AnimeSeries, Comment
 from .forms import CommentForm
-from .mixins import AjaxCommentFormMixin
 from django.http import JsonResponse
 
 
@@ -12,7 +10,7 @@ def page_view(request,slug):
     template_name = 'anime/page.html'
     anime = get_object_or_404(Anime,slug=slug)
     episodes = AnimeSeries.objects.filter(anime=anime)
-    comments = anime.comments.filter(active=True)
+    comments = anime.comments.filter(active=True,parent__isnull=True)
     comment_form = CommentForm
     return render(request,template_name,{'anime':anime,
                                          'episodes':episodes,
@@ -20,27 +18,36 @@ def page_view(request,slug):
                                          'comment_form': comment_form,
                                          })
 
-# @login_required
-class CommentFormView(AjaxCommentFormMixin, FormView):
-    form_class = CommentForm
-    success_url = '/success/'
-
-
-
+@login_required
 def add_comment(request,slug):
-    if request.is_ajax():
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            #
-            # comment = Comment(anime=Anime.objects.get(slug=slug),user=request.user,body=request.POST['body'])
-            # comment.save()
+        if request.is_ajax():
+            anime = Anime.objects.get(slug=slug) # anime object from current page
+            form = CommentForm(request.POST)
+            if form.is_valid():
+                # parent_id = None
+                try:
+                    parent_id = int(request.POST.get('parent_id'))
+                except:
+                    parent_id = None
 
-            response_data = {
-                'username':request.user.username,
-                'avatar':'avataris surati',
-            }
-            return JsonResponse(response_data)
+                if parent_id:
+                    reply_comment = form.save(commit=False)
+                    reply_comment.anime = anime
+                    reply_comment.parent = Comment.objects.get(id=parent_id)
+                    reply_comment.user = request.user
+                    reply_comment.save()
+                else:
+                    comment = form.save(commit=False)
+                    comment.anime = anime
+                    comment.user = request.user
+                    comment.save()
+
+                response_data = {
+                    'username':request.user.username,
+                    'avatar':'avataris surati',
+                }
+                return JsonResponse(response_data)
+            else:
+                return JsonResponse({'status':'400'}, status=400)
         else:
-            return JsonResponse(form.errors, status=400)
-    else:
-        return render(request,'anime/page.html')
+            return render(request,'anime/page.html')
