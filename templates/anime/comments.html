@@ -25,34 +25,40 @@
                     {% if user.is_authenticated %}
                     <p class="reply-button" data-id="{{comment.id}}" data-username="{{comment.user}}"><i class="fas fa-reply"></i>  პასუხი</p>
                     {% endif %}
-                    <p class='comment-time'>{{ comment.created|date:"d/m/Y  |  H:i" }}</p>
+                    <p class='comment-time'>{{ comment.created|date:"d/m/Y | H:i" }}</p>
                 </div>
                     <p>{{ comment.body}}</p>
             </div>
             {% if comment.replies.all %}
-            <div class="comment-replies-check"><i class="fas fa-caret-down"></i> პასუხების ჩვენება ({{comment.replies.all|length}})</div>
-            <div class="comment-replies-box">
-                {% for reply in comment.replies.all reversed%}
-                <div class="comment">
-                    <div class="comment-user-img" href="#user">
-                        <img src="#" alt>
-                    </div>
-                    <div class="comment-body">
-                        <div class="comment-info">
-                            <p class='comment-user'>{{ reply.user }}</p>
-                            {% if user.is_authenticated %}
-                            <p class="reply-button" data-id="{{comment.id}}" data-username="{{comment.user}}"><i class="fas fa-reply"></i>  პასუხი</p>
-                            {% endif %}
-                            <p class='comment-time'>{{ reply.created|date:"d/m/Y | H:i" }}</p>
-                        </div>
-                            <p style="word-wrap: break-word">{{ reply.body}}</p>
-                    </div>
-                </div>
-                {% endfor %}
-                </div>
+            <div class="comment-replies-check closed" data-id="{{comment.id}}">
+                <i class="fas fa-caret-down"></i>
+                პასუხების ჩვენება ({{comment.replies.all|length}})
+            </div>
             {% endif %}
         </div>
     {% endfor %}
 </div>
 
 <!--<i class="fas fa-caret-up"></i>-->
+
+
+
+<!--            <div class="comment-replies-box">-->
+<!--                {% for reply in comment.replies.all reversed%}-->
+<!--                <div class="comment">-->
+<!--                    <div class="comment-user-img" href="#user">-->
+<!--                        <img src="#" alt>-->
+<!--                    </div>-->
+<!--                    <div class="comment-body">-->
+<!--                        <div class="comment-info">-->
+<!--                            <p class='comment-user'>{{ reply.user }}</p>-->
+<!--                            {% if user.is_authenticated %}-->
+<!--                            <p class="reply-button" data-id="{{comment.id}}" data-username="{{reply.user}}"><i class="fas fa-reply"></i>  პასუხი</p>-->
+<!--                            {% endif %}-->
+<!--                            <p class='comment-time'>{{ reply.created|date:"d/m/Y | H:i" }}</p>-->
+<!--                        </div>-->
+<!--                            <p style="word-wrap: break-word">{{ reply.body}}</p>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                {% endfor %}-->
+<!--                </div>-->

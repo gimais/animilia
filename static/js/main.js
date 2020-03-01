@@ -105,29 +105,34 @@ function makeCommentBoxHTML(data) {
                     <div class="comment-body">
                         <div class="comment-info">
                             <p class='comment-user'>${data.username}</p>
-                            <p class='comment-time'>${data.time}</p>
+                            <p class="reply-button" data-id="${data.parent_id}" data-username="${data.username}"><i class="fas fa-reply"></i>  პასუხი</p>
+                            <p class='comment-time'>${convertTimeGeo(data.time)}</p>
                         </div>
-                            <p style="word-wrap: break-word">${data.textBody}</p>
+                            <p style="word-wrap: break-word">${data.body}</p>
                     </div>
                 </div>`;
     return html
 }
 
-function makeCommentTextAreaHTML(username,parent_id){
+function makeCommentTextAreaHTML(parent_id){
     var html = '';
     html += `<form class=\'comment-form\' style=\'padding: 15px 0\' method=\'POST\' data-id=\"${parent_id}\">`;
     html += `<input type="hidden" name="csrfmiddlewaretoken" value="${getCookie('csrftoken')}">`;
-    html += `<p> <textarea name="body" cols="40" rows="10" placeholder="კომენტარი" id="id_body">${username}, </textarea></p>`;
-    html += '<button type="reset">გაუქმება</button>';
+    html += '<p> <textarea name="body" cols="40" rows="10" placeholder="კომენტარი" id="id_body"></textarea></p>';
     html += '<button type="submit">გაგზავნა</button>';
+    html += '<button type="reset">გაუქმება</button>';
     html += '</form>';
     return html
 }
 
+function makeTextarea(textareObj,username){
+    textareObj.val(username+', ');
+    textareObj.trigger('focus');
+}
+
 function convertTimeGeo(date) {
     date = new Date(date*1000);
-    date = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}
-     ${(date.getHours()<10?'0':'') + date.getHours()}:${(date.getMinutes()<10?'0':'') + date.getMinutes()}`;
+    date = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()} | ${(date.getHours()<10?'0':'') + date.getHours()}:${(date.getMinutes()<10?'0':'') + date.getMinutes()}`;
     return date;
 }
 
@@ -140,8 +145,8 @@ $commentForm.submit(function(event){
         url: window.location.href+'comment/',
         data: $formDataSerialized,
         success: function (data) {
-            data.textBody = $(".comment-form textarea").val();
-            data.time = convertTimeGeo(new Date().getTime()/1000);
+            data.body = $(".comment-form textarea").val();
+            data.time = new Date().getTime()/1000;
             var html = makeCommentBoxHTML(data);
             $(".comments-box").prepend(html);
             $commentForm.trigger('reset');
@@ -153,16 +158,75 @@ $commentForm.submit(function(event){
 });
 
 
-$(".reply-button").on('click',function () {
+$(".comment").on('click','.reply-button',function () {
     var button = $(this);
     var parent_id = button.data('id');
     var username = button.data('username');
-    var formHTML = makeCommentTextAreaHTML(username,parent_id);
+    var formHTML = makeCommentTextAreaHTML(parent_id);
     var parent = button.parents('.comment:last');
     if(parent.find('.comment-form').length===0){
-        parent.append(formHTML);
+        var reply_button = parent.find('.comment-replies-check');
+        if(reply_button.length === 1) {
+            if (reply_button.hasClass('done')) {
+                if (reply_button.hasClass('closed')) {getChildComments(reply_button,parent_id)}
+                parent.append(formHTML);
+                makeTextarea(parent.find('.comment-form textarea'),username)
+            } else
+                getChildComments(reply_button,parent_id,1,formHTML,username);
+        } else {
+            parent.append(formHTML);
+            makeTextarea(parent.find('.comment-form textarea'),username);
+        }
+    } else {
+        makeTextarea(parent.find('.comment-form textarea'),username);
     }
 });
+
+function getChildComments(that,parent_id,purpose=0,htmlcode=null,username=null){
+    var commentClosed = '<i class="fas fa-caret-down"></i>'+that.text().replace('დამალვა','ჩვენება');
+    var commentsOpened = that.text().replace('ჩვენება','დამალვა') +'<i class="fas fa-caret-up"></i>';
+    if(!that.hasClass('done')){
+        that.html('მოიცადეთ...');
+        that.toggleClass('closed opened done');
+        $.ajax({
+        method: "GET",
+        url: window.location.origin+'/anime/check_comments/'+parent_id,
+        data: {
+            'skip':0,
+        },
+        success: function (data) {
+            that.html(commentsOpened);
+            data.time = convertTimeGeo(new Date().getTime()/1000);
+            var html = '';
+            if(!that.parent().has('.comment-replies-box').length){
+               html += '<div class="comment-replies-box">';
+               for(let i=data.length-1;i>=0;i--){
+                  html += makeCommentBoxHTML(data[i]);
+               }
+               html += '</div>';
+                that.parent().append(html);
+                if(purpose){
+                    that.parent().append(htmlcode);
+                    makeTextarea(that.parent().find('.comment-form textarea'),username);
+                }
+            }
+        },
+        error: function (data) {
+            console.log('error - pasuxebi am komentarze ar arsebobs',data);
+        },
+    })
+    }else{
+        if(that.hasClass('opened')){
+            that.html(commentClosed);
+            that.parent().find('.comment-replies-box').hide();
+        }else{
+            that.html(commentsOpened);
+            that.parent().find('.comment-replies-box').show();
+        }
+        that.toggleClass('opened closed')
+    }
+}
+
 
 $('.comment').on("click", ".comment-form button[type=reset]", function() {
     $(this).parent().remove();
@@ -177,8 +241,8 @@ $('.comment').on("click", ".comment-form button[type=submit]", function(event) {
         url: window.location.href+'comment/',
         data: $formDataSerialized + `&parent_id=${that.data('id')}`,
         success: function (data) {
-            data.textBody = that.find('textarea').val();
-            data.time = convertTimeGeo(new Date().getTime()/1000);
+            data.body = that.find('textarea').val();
+            data.time = new Date().getTime()/1000;
             var html = '';
             if(that.parent().has('.comment-replies-box').length){
                 html = makeCommentBoxHTML(data);
@@ -189,6 +253,9 @@ $('.comment').on("click", ".comment-form button[type=submit]", function(event) {
                html += '</div>';
                that.parent().append(html);
             }
+            var replies_box = that.parent().find('.comment-replies-check');
+            if(replies_box.hasClass('closed'))
+                getChildComments(replies_box,that.data('id'));
             that.remove();
         },
         error: function (data) {
@@ -197,17 +264,7 @@ $('.comment').on("click", ".comment-form button[type=submit]", function(event) {
     })
 });
 
-// $('.showmore.comments').on('click',function () {
-//         var $formDataSerialized = $(this).serialize();
-//         $.ajax({
-//         method: "GET",
-//         url: window.location.href+'get_comments/',
-//         data: $formDataSerialized,
-//         success: function (data) {
-//             console.log(data)
-//         },
-//         error: function (data) {
-//             console.log(data);
-//         },
-//     })
-// });
+$('.comment-replies-check').on('click',function () {
+    var that = $(this);
+    getChildComments(that,that.data('id'));
+});

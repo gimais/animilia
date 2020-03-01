@@ -5,7 +5,6 @@ from anime.models import Anime, AnimeSeries, Comment
 from .forms import CommentForm
 from django.http import JsonResponse
 
-
 def page_view(request,slug):
     template_name = 'anime/page.html'
     anime = get_object_or_404(Anime,slug=slug)
@@ -24,7 +23,6 @@ def add_comment(request,slug):
             anime = Anime.objects.get(slug=slug) # anime object from current page
             form = CommentForm(request.POST)
             if form.is_valid():
-                # parent_id = None
                 try:
                     parent_id = int(request.POST.get('parent_id'))
                 except:
@@ -51,3 +49,20 @@ def add_comment(request,slug):
                 return JsonResponse({'status':'400'}, status=400)
         else:
             return render(request,'anime/page.html')
+
+
+def check_comments(request,int):
+    if request.is_ajax():
+        try:
+            replies = Comment.objects.filter(parent=int,active=True)
+        except:
+            replies = None
+
+        if replies:
+            result = []
+            for reply in replies:
+                result.append(reply.get_reply_comment_info())
+            return JsonResponse(result, status=200,safe=False)
+        else:
+            return JsonResponse({'error':'ar aqvs pasuxebi!!'},status=400)
+    return JsonResponse({'error': 'moxda shecdoma!!'}, status=400)

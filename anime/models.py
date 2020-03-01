@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import F
@@ -113,10 +112,11 @@ class AnimeSeries(models.Model):
 
 class Comment(models.Model):
     anime = models.ForeignKey(Anime,on_delete=models.CASCADE,related_name='comments')
-    user = models.ForeignKey(User,on_delete=models.SET_NULL,null=True)
+    user = models.ForeignKey(User,on_delete=models.SET_NULL,null=True,related_name='users')
     body = models.TextField()
-    # like = models.PositiveSmallIntegerField(default=0,editable=False,verbose_name='ლაიქები')
-    # dislike = models.PositiveSmallIntegerField(default=0, editable=False, verbose_name='დისლაიქები')
+    like = models.ManyToManyField(User,blank=True,editable=False,verbose_name='ლაიქები',related_name='likes')
+    dislike = models.ManyToManyField(User,blank=True,editable=False,verbose_name='დისლაიქები',related_name='dislikes')
+    spoiler = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     active = models.BooleanField(default=True)
     parent = models.ForeignKey('self',on_delete=models.CASCADE,null=True,blank=True,related_name='replies')
@@ -125,6 +125,24 @@ class Comment(models.Model):
         ordering = ['-created']
         verbose_name = 'კომენტარი'
         verbose_name_plural = 'კომენტარი'
+
+    def get_reply_comment_info(self):
+
+        # likes = self.like
+
+        return {
+            'comment_id':self.pk,
+            'user_id':self.user.pk,
+            'username':self.user.username,
+            'user_avatar':'aq iqneba avatar',
+            'time':datetime.timestamp(self.created),
+            'parent_id':self.parent.pk,
+            'body':self.body,
+            'has_spoiler':self.spoiler,
+            'likes':0,
+            'dislikes':0,
+            # 'vote_permission':
+        }
 
     def __str__(self):
         return '{}-ის კომენტარი'.format(self.user)
