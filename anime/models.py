@@ -3,9 +3,6 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import F
 
-# Create your models here.
-from django.db.models import Count
-
 # commaseparatedintegerfield
 
 class Category(models.Model):
@@ -62,13 +59,10 @@ class Anime(models.Model):
 
         super(Anime, self).save(*args, **kwargs)
 
-        if self._state.adding:
+        if self._state.adding: # yovel anime damatebaze categoriebis ricxvshi damateba
             for category in self.categories.all():
                 Category.objects.filter(pk=category.pk).update(posts=F('posts')+1)
 
-    def delete(self, *args, **kwargs):
-        print('waishala')
-        super(Anime,self).delete(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -108,41 +102,3 @@ class AnimeSeries(models.Model):
             return '{} - {}'.format(self.anime,self.row)
         else:
             return str(self.anime)
-
-
-class Comment(models.Model):
-    anime = models.ForeignKey(Anime,on_delete=models.CASCADE,related_name='comments')
-    user = models.ForeignKey(User,on_delete=models.SET_NULL,null=True,related_name='users')
-    body = models.TextField()
-    like = models.ManyToManyField(User,blank=True,editable=False,verbose_name='ლაიქები',related_name='likes')
-    dislike = models.ManyToManyField(User,blank=True,editable=False,verbose_name='დისლაიქები',related_name='dislikes')
-    spoiler = models.BooleanField(default=False)
-    created = models.DateTimeField(auto_now_add=True)
-    active = models.BooleanField(default=True)
-    parent = models.ForeignKey('self',on_delete=models.CASCADE,null=True,blank=True,related_name='replies')
-
-    class Meta:
-        ordering = ['-created']
-        verbose_name = 'კომენტარი'
-        verbose_name_plural = 'კომენტარი'
-
-    def get_reply_comment_info(self):
-
-        # likes = self.like
-
-        return {
-            'comment_id':self.pk,
-            'user_id':self.user.pk,
-            'username':self.user.username,
-            'user_avatar':'aq iqneba avatar',
-            'time':datetime.timestamp(self.created),
-            'parent_id':self.parent.pk,
-            'body':self.body,
-            'has_spoiler':self.spoiler,
-            'likes':0,
-            'dislikes':0,
-            # 'vote_permission':
-        }
-
-    def __str__(self):
-        return '{}-ის კომენტარი'.format(self.user)

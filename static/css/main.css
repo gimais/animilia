@@ -367,7 +367,6 @@ header{
 }
 
 .top-nav {
-    text-transform: uppercase;
     list-style-type: none;
     padding: 0;
     display:inline-block;
@@ -393,6 +392,24 @@ header{
     text-align: center;
     padding: 16px 28px;
     text-decoration: none;
+}
+
+.top-nav li a span{
+    font-size: 11px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 0;
+    text-align: center;
+}
+
+.fas.fa-sign-out-alt{
+    font-size: 30px;
+    position: absolute;
+    width: 100%;
+    left: 1px;
+    top: 26px;
+    text-align: center;
 }
 
 #mob-home{
@@ -869,6 +886,7 @@ div#login-focus:hover {
 
 .comments-box.clearfix:before {
     clear: both;
+    margin-top: 65px;
 }
 
 .comment-form textarea {
@@ -984,14 +1002,38 @@ div#login-focus:hover {
     border-radius: 2px;
     margin: 5px 0;
     cursor: pointer;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
 }
 
 .comment-replies-check:hover{
     color: #973116;
 }
 
+.comment-replies-check.closed:before {
+    content: "\f0d7";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 900;
+}
+
+.comment-replies-check.opened:before {
+    content: "\f0d8";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 900;
+}
+
 i.fas.fa-caret-down:hover {
     color: #973116;
+}
+
+div.comment-right-buttons{
+    float: right;
+    margin-left: 5px;
+    font-size: 19px;
+    cursor: pointer;
 }
 
 /*================================*/

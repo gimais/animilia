@@ -1,6 +1,13 @@
-// ANIMILIA JAVASCRIPT CODE
 // jQuery 3.4.1
 
+function escapeHTML(txt) {
+    return txt
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/'/g, "&#039;")
+         .replace(/"/g, "&quot;")
+         .replace(/>/g, "&gt;");
+}
 
 $('#mob-menu').click(function () {
         $('nav').toggleClass('open');
@@ -68,6 +75,8 @@ function getCookie(cname) {
   return "";
 }
 
+var request_user_id = $('.top-nav li a[href="/account/profile/"]').data('id');
+
 function csrfSafeMethod(method) {
     // these HTTP methods do not require CSRF protection
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
@@ -96,21 +105,35 @@ $('.episode-select-button').on('click',function () {
 });
 
 
-function makeCommentBoxHTML(data) {
+function makeCommentBoxHTML(data,reply=false) {
     var html = '';
-    html += `<div class="comment">
+    html += `<div class="comment${reply?' clearfix':''}">
                     <div class="comment-user-img" href="#user">
                         <img src="#" alt>
                     </div>
                     <div class="comment-body">
                         <div class="comment-info">
-                            <p class='comment-user'>${data.username}</p>
-                            <p class="reply-button" data-id="${data.parent_id}" data-username="${data.username}"><i class="fas fa-reply"></i>  პასუხი</p>
-                            <p class='comment-time'>${convertTimeGeo(data.time)}</p>
-                        </div>
-                            <p style="word-wrap: break-word">${data.body}</p>
-                    </div>
-                </div>`;
+                            <p class='comment-user'>${escapeHTML(data.username)}</p>`;
+    if(typeof request_user_id !== "undefined" && !data.deleted){
+        html += `<p class="reply-button" data-it="${data.parent_id}" data-id="${data.comment_id}" data-username="${escapeHTML(data.username)}"><i class="fas fa-reply"></i>  პასუხი</p>`;
+    }
+    if (typeof request_user_id !== "undefined" && data.user_id===request_user_id && !data.deleted){
+        if(data.dislikes === 0 && data.likes === 0) {
+            html += `<div class="comment-right-buttons" id='edit-comment' style="color: #333333;"><i class="fas fa-edit"></i></div>`;}
+         html += `<div class="comment-right-buttons" id='remove-comment' style="color: #333333;"><i class="fas fa-trash"></i></div>`;
+    }
+    if(!data.deleted){
+        html += `<div class="comment-right-buttons" id='dislike-comment' style="color: #ab3717;"><i class="far fa-thumbs-down">${data.dislikes}</i></div>
+                <div class="comment-right-buttons" id='like-comment' style="color: #ff2e01;" ><i class="far fa-thumbs-up"></i>${data.likes}</div>`
+    }
+        html+= `<p class='comment-time'>${convertTimeGeo(data.time)}</p>
+            </div>`;
+    if(data.deleted){
+         html+= `<p style="border: 1px solid;text-align: center">ეს კომენტარი წაშლილია!</p>`
+    }else{
+        html+= `<p style="word-wrap: break-word;"">${escapeHTML(data.body)}</p>`
+    }
+    html+= `</div></div>`;
     return html
 }
 
@@ -126,13 +149,18 @@ function makeCommentTextAreaHTML(parent_id){
 }
 
 function makeTextarea(textareObj,username){
-    textareObj.val(username+', ');
-    textareObj.trigger('focus');
+    textareObj.val(username+', ').focus();
+    window.scroll({
+        top: textareObj.offset().top - (screen.height/2),
+        left: 0,
+        behavior: 'smooth'
+    });
 }
+
 
 function convertTimeGeo(date) {
     date = new Date(date*1000);
-    date = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()} | ${(date.getHours()<10?'0':'') + date.getHours()}:${(date.getMinutes()<10?'0':'') + date.getMinutes()}`;
+    date = `${(date.getDate()<10?'0':'') + date.getDate()}/${((date.getMonth()+1)<10?'0':'') + (date.getMonth()+1)}/${date.getFullYear()} | ${(date.getHours()<10?'0':'') + date.getHours()}:${(date.getMinutes()<10?'0':'') + date.getMinutes()}`;
     return date;
 }
 
@@ -142,12 +170,13 @@ $commentForm.submit(function(event){
     var $formDataSerialized = $(this).serialize();
     $.ajax({
         method: "POST",
-        url: window.location.href+'comment/',
-        data: $formDataSerialized,
+        url: window.location.origin+'/account/comment/',
+        data: $formDataSerialized+'&id='+$('.item-page').data('id'),
         success: function (data) {
             data.body = $(".comment-form textarea").val();
             data.time = new Date().getTime()/1000;
-            var html = makeCommentBoxHTML(data);
+            data.parent_id = data.comment_id;
+            var html = makeCommentBoxHTML(data,true);
             $(".comments-box").prepend(html);
             $commentForm.trigger('reset');
         },
@@ -158,39 +187,33 @@ $commentForm.submit(function(event){
 });
 
 
-$(".comment").on('click','.reply-button',function () {
+$('.comments-box').on('click','.reply-button',function () {
     var button = $(this);
-    var parent_id = button.data('id');
+    var parent_id = button.data('it') || button.data('id');
     var username = button.data('username');
     var formHTML = makeCommentTextAreaHTML(parent_id);
-    var parent = button.parents('.comment:last');
-    if(parent.find('.comment-form').length===0){
-        var reply_button = parent.find('.comment-replies-check');
-        if(reply_button.length === 1) {
-            if (reply_button.hasClass('done')) {
-                if (reply_button.hasClass('closed')) {getChildComments(reply_button,parent_id)}
-                parent.append(formHTML);
-                makeTextarea(parent.find('.comment-form textarea'),username)
-            } else
-                getChildComments(reply_button,parent_id,1,formHTML,username);
-        } else {
-            parent.append(formHTML);
-            makeTextarea(parent.find('.comment-form textarea'),username);
-        }
-    } else {
-        makeTextarea(parent.find('.comment-form textarea'),username);
+    var lastComment = button.parents('.comment:last');
+    if(lastComment.find('.comment-form').length===0){
+        lastComment.append(formHTML)
+    }
+    var commentForm = lastComment.find('.comment-form');
+    commentForm.find('textarea').val(username+', ').focus();
+    var checkRepliesButton = lastComment.find('.comment-replies-check');
+    if(checkRepliesButton.length === 1) {
+        if(checkRepliesButton.hasClass('closed'))
+            getChildComments(checkRepliesButton,parent_id);
     }
 });
 
-function getChildComments(that,parent_id,purpose=0,htmlcode=null,username=null){
-    var commentClosed = '<i class="fas fa-caret-down"></i>'+that.text().replace('დამალვა','ჩვენება');
-    var commentsOpened = that.text().replace('ჩვენება','დამალვა') +'<i class="fas fa-caret-up"></i>';
+function getChildComments(that,parent_id,purpose=NaN,htmlcode=null,username=null){
+    var commentClosed = that.text().replace('დამალვა','ჩვენება');
+    var commentsOpened = that.text().replace('ჩვენება','დამალვა');
     if(!that.hasClass('done')){
         that.html('მოიცადეთ...');
         that.toggleClass('closed opened done');
         $.ajax({
         method: "GET",
-        url: window.location.origin+'/anime/check_comments/'+parent_id,
+        url: window.location.origin+'/account/check_comments/'+parent_id,
         data: {
             'skip':0,
         },
@@ -198,65 +221,107 @@ function getChildComments(that,parent_id,purpose=0,htmlcode=null,username=null){
             that.html(commentsOpened);
             data.time = convertTimeGeo(new Date().getTime()/1000);
             var html = '';
-            if(!that.parent().has('.comment-replies-box').length){
-               html += '<div class="comment-replies-box">';
-               for(let i=data.length-1;i>=0;i--){
-                  html += makeCommentBoxHTML(data[i]);
-               }
-               html += '</div>';
-                that.parent().append(html);
-                if(purpose){
-                    that.parent().append(htmlcode);
-                    makeTextarea(that.parent().find('.comment-form textarea'),username);
-                }
-            }
+
+            for(let i=data.length-1;i>=0;i--)
+              html += makeCommentBoxHTML(data[i]);
+
+            that.parent().find('.comment-replies-box').append(html);
+            that.parent().find('.comment-replies-box').show();
         },
         error: function (data) {
             console.log('error - pasuxebi am komentarze ar arsebobs',data);
         },
-    })
+        complete:function () {
+            if(that.parent().find('.comment-form').length){
+                window.scroll({
+                    top: that.parent().find('.comment-form textarea').offset().top - screen.height/2 + 50,
+                    left: 0,
+                    behavior: 'smooth'
+                });
+            }
+        }
+    }) // ajax end block
     }else{
         if(that.hasClass('opened')){
             that.html(commentClosed);
-            that.parent().find('.comment-replies-box').hide();
+            that.parent().find('.comment-replies-box').hide(200);
         }else{
             that.html(commentsOpened);
-            that.parent().find('.comment-replies-box').show();
+            that.parent().find('.comment-replies-box').show(200);
         }
         that.toggleClass('opened closed')
     }
 }
 
+$('.comments-box').on('click','.comment-replies-check',function () {
+    var that = $(this);
+    getChildComments(that,that.data('id'));
+});
 
-$('.comment').on("click", ".comment-form button[type=reset]", function() {
+$('.comments-box').on("click", ".comment .comment-form button[type=reset]", function(e) {
+    e.preventDefault();
     $(this).parent().remove();
 });
 
-$('.comment').on("click", ".comment-form button[type=submit]", function(event) {
+
+// GASASWOREBELI
+$('.comments-box').on("click", ".comment .comment-form button[type=submit]", function(event) {
     event.preventDefault();
     var that = $(this).parent();
     var $formDataSerialized = that.serialize();
     $.ajax({
         method: "POST",
-        url: window.location.href+'comment/',
+        url: window.location.origin+'/account/comment/',
         data: $formDataSerialized + `&parent_id=${that.data('id')}`,
         success: function (data) {
             data.body = that.find('textarea').val();
             data.time = new Date().getTime()/1000;
+            data.parent_id = that.data('id');
             var html = '';
             if(that.parent().has('.comment-replies-box').length){
                 html = makeCommentBoxHTML(data);
                 that.parent().children('.comment-replies-box').append(html)
             }else {
-               html += '<div class="comment-replies-box">';
-               html += makeCommentBoxHTML(data);
+                html+= `<div class="comment-replies-check closed" data-id="${that.data('id')}">
+<!--                            <i class="fas fa-caret-down" aria-hidden="true"></i>-->
+                            პასუხების ჩვენება (0)
+                            </div>
+                            <div class="comment-replies-box">`;
+               // html += makeCommentBoxHTML(data);
                html += '</div>';
                that.parent().append(html);
             }
             var replies_box = that.parent().find('.comment-replies-check');
+
+            replies_box.text(replies_box.text().replace(/\d+/g,parseInt(replies_box.text().match(/\d+/g))+1));
+
             if(replies_box.hasClass('closed'))
                 getChildComments(replies_box,that.data('id'));
+
             that.remove();
+        },
+        error: function () {
+            that.remove();
+        },
+    })
+});
+
+$('.comments-box').on('click','.comment #remove-comment',function () {
+    var that = $(this);
+    var id = that.parent().find('.reply-button').data('id');
+    $.ajax({
+        method: "POST",
+        url: window.location.origin+'/account/comment/delete/',
+        data: {id:id},
+        success: function (data) {
+            if(that.parents('.comment').attr('class')==='comment clearfix'){
+                that.parents('.comment').fadeOut(300, function() { $(this).remove(); })
+            }else{
+                data.username = that.parent().find('.comment-user').text();
+                data.deleted = true;
+                data.time = new Date().getTime()/1000;
+                that.closest('.comment').hide(100, function() { $(this).html(makeCommentBoxHTML(data)).show(200); })
+            }
         },
         error: function (data) {
             console.log(data);
@@ -264,7 +329,64 @@ $('.comment').on("click", ".comment-form button[type=submit]", function(event) {
     })
 });
 
-$('.comment-replies-check').on('click',function () {
+$('.comment').on('click','#edit-comment',function () {
     var that = $(this);
-    getChildComments(that,that.data('id'));
+    alert('jer repliebia gasarkvevi!!')
+    // var id = that.parent().find('.reply-button').data('id');
+    // var commentBox = that.closest('.comment');
+    // commentBox.find('.reply-button').hide();
+    // commentBox.find('.comment-right-buttons').hide();
+    // commentBox.find('p').hide();
+    // $.ajax({
+    //     method: "POST",
+    //     url: window.location.origin+'/account/comment/edit/',
+    //     data: {id:id},
+    //     success: function (data) {
+    //         // if(that.parents('.comment').attr('class')==='comment clearfix'){
+    //         //     that.parents('.comment').fadeOut(300, function() { $(this).remove(); })
+    //         // }else{
+    //         //     data.username = that.parent().find('.comment-user').text();
+    //         //     data.deleted = true;
+    //         //     data.time = new Date().getTime()/1000;
+    //         //     that.closest('.comment').hide(100, function() { $(this).html(makeCommentBoxHTML(data)).show(200); })
+    //         // }
+    //         alert('Sheicvala')
+    //     },
+    //     error: function (data) {
+    //         console.log(data);
+    //     },
+    // })
+});
+
+
+$('.comment').on('click','#like-comment',function () {
+    var that = $(this);
+    var id = that.parent().find('.reply-button').data('id');
+    $.ajax({
+        method: "POST",
+        url: window.location.origin+'/account/comment/like/',
+        data: {id:id},
+        success: function (data) {
+            that.html(`<i class="fas fa-thumbs-up" aria-hidden="true"></i>`+(parseInt(that.text())+1));
+        },
+        error: function (data) {
+            console.log(data);
+        },
+    })
+});
+
+$('.comment').on('click','#dislike-comment',function () {
+    var that = $(this);
+    var id = that.parent().find('.reply-button').data('id');
+    $.ajax({
+        method: "POST",
+        url: window.location.origin+'/account/comment/dislike/',
+        data: {id:id},
+        success: function (data) {
+            that.html(`<i class="fas fa-thumbs-down" aria-hidden="true"></i>`+(parseInt(that.text())+1));
+        },
+        error: function (data) {
+            console.log(data);
+        },
+    })
 });

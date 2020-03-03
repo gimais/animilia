@@ -22,4 +22,12 @@ urlpatterns = [
     path('password_reset/done/', views.PasswordResetDoneView.as_view(), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset/done/', views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+
+    path('comment/', local_view.add_comment, name='comment'),
+    path('check_comments/<int:int>', local_view.check_comments, name='comment_check'),
+    path('comment/delete/', local_view.delete_comment, name='comment_delete'),
+    path('comment/edit/', local_view.edit_comment, name='comment_edit'),
+
+    path('comment/like/', local_view.like_comment, name='comment_like'),
+    path('comment/dislike/', local_view.dislike_comment, name='comment_dislike'),
 ]

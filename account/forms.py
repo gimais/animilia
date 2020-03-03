@@ -5,6 +5,8 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, Pass
 from django.contrib.auth.models import User
 from django.core.validators import MinLengthValidator,MaxLengthValidator
 
+from account.models import Comment
+
 
 class SignUpForm(UserCreationForm):
 
@@ -129,3 +131,14 @@ class MyPasswordChangeForm(PasswordChangeForm):
     )
 
     field_order = ['old_password', 'new_password1', 'new_password2']
+
+
+class CommentForm(forms.ModelForm):
+    body = forms.CharField(
+        label = "",
+        widget = forms.Textarea(attrs={'placeholder':'კომენტარი'})
+    )
+
+    class Meta:
+        model = Comment
+        fields = ('body',)

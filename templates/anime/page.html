@@ -3,7 +3,7 @@
 
 {% block content %}
     <div class="container">
-        <div class="item-page clearfix">
+        <div class="item-page clearfix" data-id="{{ anime.id }}">
                 <img src="/media/{{ anime.poster }}"  alt="სურათი არ არის">
             <div class="item-page-info">
                 <div class="item-page-head">
@@ -80,9 +80,192 @@
                     $('.item-page-episodes').find(`.episode-select-button[data-id=${pageCookie}]`).addClass('active');
                 }
             }
-        </script>
     {% endif %}
-    {% if user.is_authenticated %}
-    {% endif %}
+{#    {% if user.is_authenticated %}#}
+{#        var $commentForm = $('.comment-form');#}
+{#        $commentForm.submit(function(event){#}
+{#            event.preventDefault();#}
+{#            var $formDataSerialized = $(this).serialize();#}
+{#            $.ajax({#}
+{#                method: "POST",#}
+{#                url: window.location.href+'comment/',#}
+{#                data: $formDataSerialized,#}
+{#                success: function (data) {#}
+{#                    data.body = $(".comment-form textarea").val();#}
+{#                    data.time = new Date().getTime()/1000;#}
+{#                    var html = makeCommentBoxHTML(data,'new');#}
+{#                    $(".comments-box").prepend(html);#}
+{#                    $commentForm.trigger('reset');#}
+{#                },#}
+{#                error: function (data) {#}
+{#                    console.log(data);#}
+{#                },#}
+{#            })#}
+{#        });#}
+{##}
+{#        function makeCommentTextAreaHTML(parent_id){#}
+{#            var html = '';#}
+{#            html += `<form class=\'comment-form\' style=\'padding: 15px 0\' method=\'POST\' data-id=\"${parent_id}\">`;#}
+{#            html += `<input type="hidden" name="csrfmiddlewaretoken" value="${getCookie('csrftoken')}">`;#}
+{#            html += '<p> <textarea name="body" cols="40" rows="10" placeholder="კომენტარი" id="id_body"></textarea></p>';#}
+{#            html += '<button type="submit">გაგზავნა</button>';#}
+{#            html += '<button type="reset">გაუქმება</button>';#}
+{#            html += '</form>';#}
+{#            return html#}
+{#        }#}
+{##}
+{#        function makeTextarea(textareObj,username){#}
+{#            textareObj.val(username+', ');#}
+{#            textareObj.trigger('focus');#}
+{#        }#}
+{##}
+{#        $(".comment").on('click','.reply-button',function () {#}
+{#        var button = $(this);#}
+{#        var parent_id = button.data('id');#}
+{#        var username = button.data('username');#}
+{#        var formHTML = makeCommentTextAreaHTML(parent_id);#}
+{#        var parent = button.parents('.comment:last');#}
+{#        if(parent.find('.comment-form').length===0){#}
+{#            var replies_button = parent.find('.comment-replies-check');#}
+{#            if(replies_button.length === 1) {#}
+{#                if (replies_button.hasClass('done')) {#}
+{#                    if (replies_button.hasClass('closed')) {getChildComments(replies_button,parent_id)}#}
+{#                    parent.append(formHTML);#}
+{#                    makeTextarea(parent.find('.comment-form textarea'),username)#}
+{#                    } else#}
+{#                        getChildComments(replies_button,parent_id,1,formHTML,username);#}
+{#                } else {#}
+{#                parent.append(formHTML);#}
+{#                makeTextarea(parent.find('.comment-form textarea'),username);}#}
+{#            } else {#}
+{#                makeTextarea(parent.find('.comment-form textarea'),username);#}
+{#            }#}
+{#        });#}
+{##}
+{#        $('.comment').on("click", ".comment-form button[type=reset]", function() {#}
+{#            $(this).parent().remove();#}
+{#        });#}
+{##}
+{#        $('.comment').on("click", ".comment-form button[type=submit]", function(event) {#}
+{#            event.preventDefault();#}
+{#            var that = $(this).parent();#}
+{#            var $formDataSerialized = that.serialize();#}
+{#            $.ajax({#}
+{#                method: "POST",#}
+{#                url: window.location.href+'comment/',#}
+{#                data: $formDataSerialized + `&parent_id=${that.data('id')}`,#}
+{#                success: function (data) {#}
+{#                    data.body = that.find('textarea').val();#}
+{#                    data.time = new Date().getTime()/1000;#}
+{#                    var html = '';#}
+{#                    if(that.parent().has('.comment-replies-box').length){#}
+{#                        html = makeCommentBoxHTML(data,'reply');#}
+{#                        that.parent().children('.comment-replies-box').append(html)#}
+{#                    }else {#}
+{#                       html += '<div class="comment-replies-box">';#}
+{#                       html += makeCommentBoxHTML(data,'reply');#}
+{#                       html += '</div>';#}
+{#                       that.parent().append(html);#}
+{#                    }#}
+{#                    var replies_box = that.parent().find('.comment-replies-check');#}
+{##}
+{#                    if(replies_box.hasClass('closed'))#}
+{#                        getChildComments(replies_box,that.data('id'));#}
+{##}
+{#                    that.remove();#}
+{#                },#}
+{#                error: function () {#}
+{#                    that.remove();#}
+{#                    alert('შენს კომენტარზე პასუხს ვერ გააკეთებ!')#}
+{#                },#}
+{#            })#}
+{#        });#}
+{##}
+{#    {% endif %}#}
+{##}
+{#    function convertTimeGeo(date) {#}
+{#        date = new Date(date*1000);#}
+{#        date = `${(date.getDate()<10?'0':'') + date.getDate()}/${((date.getMonth()+1)<10?'0':'') + (date.getMonth()+1)}/${date.getFullYear()} | ${(date.getHours()<10?'0':'') + date.getHours()}:${(date.getMinutes()<10?'0':'') + date.getMinutes()}`;#}
+{#        return date;#}
+{#    }#}
+{##}
+{#    function makeCommentBoxHTML(data,purpose) {#}
+{#        /*#}
+{#        new - new comment#}
+{#        get - getReplies#}
+{#        reply - replying to#}
+{#        */#}
+{#        console.log(data);#}
+{#        var html = '';#}
+{#        html += `<div class="comment">#}
+{#                        <div class="comment-user-img" href="#user">#}
+{#                            <img src="#" alt>#}
+{#                        </div>#}
+{#                        <div class="comment-body">#}
+{#                            <div class="comment-info">#}
+{#                                <p class='comment-user'>${data.username}</p>`;#}
+{#        if (data.parent_id !== undefined && purpose==='get'){#}
+{#            html+= `<p class="reply-button" data-id="${data.parent_id}" data-username="${data.username}"><i class="fas fa-reply"></i>  პასუხი</p>`#}
+{#        }else if(purpose==='new' || purpose==='reply'){#}
+{#            html+= 'sheni komentaria'#}
+{#        }#}
+{#               html+= `<p class='comment-time'>${convertTimeGeo(data.time)}</p>#}
+{#                </div>#}
+{#                    <p style="word-wrap: break-word">${data.body}</p>#}
+{#            </div>#}
+{#        </div>`;#}
+{#        return html#}
+{#    }#}
+{##}
+{#    function getChildComments(that,parent_id,purpose=0,htmlcode=null,username=null){#}
+{#        var commentClosed = '<i class="fas fa-caret-down"></i>'+that.text().replace('დამალვა','ჩვენება');#}
+{#        var commentsOpened = that.text().replace('ჩვენება','დამალვა') +'<i class="fas fa-caret-up"></i>';#}
+{#        if(!that.hasClass('done')){#}
+{#            that.html('მოიცადეთ...');#}
+{#            that.toggleClass('closed opened done');#}
+{#            $.ajax({#}
+{#            method: "GET",#}
+{#            url: window.location.origin+'/anime/check_comments/'+parent_id,#}
+{#            data: {#}
+{#                'skip':0,#}
+{#            },#}
+{#            success: function (data) {#}
+{#                that.html(commentsOpened);#}
+{#                data.time = convertTimeGeo(new Date().getTime()/1000);#}
+{#                var html = '';#}
+{#                if(!that.parent().has('.comment-replies-box').length){#}
+{#                   html += '<div class="comment-replies-box">';#}
+{#                   for(let i=data.length-1;i>=0;i--){#}
+{#                      html += makeCommentBoxHTML(data[i],'get');#}
+{#                   }#}
+{#                   html += '</div>';#}
+{#                    that.parent().append(html);#}
+{#                    if(purpose===1){ // purpose 1 - repliebis damatebis mere textarea-s damateba,gamoviyene0 imito repliebis rom append gvian mushaobda#}
+{#                        that.parent().append(htmlcode);#}
+{#                        makeTextarea(that.parent().find('.comment-form textarea'),username);#}
+{#                    }#}
+{#                }#}
+{#            },#}
+{#            error: function (data) {#}
+{#                console.log('error - pasuxebi am komentarze ar arsebobs',data);#}
+{#            },#}
+{#        })#}
+{#        }else{#}
+{#            if(that.hasClass('opened')){#}
+{#                that.html(commentClosed);#}
+{#                that.parent().find('.comment-replies-box').hide();#}
+{#            }else{#}
+{#                that.html(commentsOpened);#}
+{#                that.parent().find('.comment-replies-box').show();#}
+{#            }#}
+{#            that.toggleClass('opened closed')#}
+{#        }#}
+{#    }#}
+{##}
+{#    $('.comment-replies-check').on('click',function () {#}
+{#        var that = $(this);#}
+{#        getChildComments(that,that.data('id'));#}
+{#    });#}
+
     </script>
 {% endblock %}

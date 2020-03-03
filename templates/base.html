@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="{% static "css/normalize.css" %}">
   <link rel="stylesheet" href="{% static "css/main.css" %}">
 
+    <script src="https://kit.fontawesome.com/98d783368d.js" crossorigin="anonymous"></script>
     {% block extra %}{% endblock %}
   <meta name="theme-color" content="#973116">
 </head>
@@ -49,8 +50,11 @@
                     </li>
                     <li><a href="{% url 'signup' %}">რეგისტრაცია</a></li>
                 {% else %}
-                    <li><a class='active' href="{% url 'profile' %}">{{user}}</a></li>
-                    <li><a href="{% url 'logout' %}?next={{ request.path }}">გასვლა</a></li>
+                    <li><a class='active' href="{% url 'profile' %}" data-id="{{ user.id }}">{{user}}</a></li>
+                    <li><a href="{% url 'logout' %}?next={{ request.path }}" style="padding: 35px 40px;position: relative;">
+                        <span>გასვლა </span>
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a></li>
 
                 {% endif %}
             </ul>
@@ -59,14 +63,16 @@
     {% if messages %}
       <div class="wrapper">
         {% for msg in messages %}
-            {% if 'green' in msg.extra_tags %}
+            {% if 'welcome' in msg.extra_tags %}
                 <div class='flash-message' style="background: #973116">{{ msg }}</div>
-            {% elif 'red' in msg.extra_tags %}
+            {% elif 'failedAuth' in msg.extra_tags %}
                 <div class='flash-message' style="background: red">{{ msg }}</div>
-            {% elif 'gray' in msg.extra_tags %}
+            {% elif 'registered' in msg.extra_tags %}
                 <div class='flash-message' style="background: tomato">{{ msg }}</div>
-            {% elif 'maimuni' in msg.extra_tags %}
-                <div class='flash-message' style="background: greenyellow">{{ msg }}</div>
+            {% elif 'error' in msg.extra_tags %}
+                <div class='flash-message' style="background: red">{{ msg }}</div>
+            {% elif 'nonAuth' in msg.extra_tags %}
+                <div class='flash-message' style="background: red">{{ msg }}</div>
             {% endif %}
         {% endfor %}
         </div>
