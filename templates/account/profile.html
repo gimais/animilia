@@ -1,10 +1,194 @@
 {% extends "base.html" %}
 {% block title %}ჩემი პროფილი{% endblock %}
+{% load static %}
+{% load account_tags %}
+{% block extra %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.2/croppie.css" />
+{% endblock %}
+
+
+{% block script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.2/croppie.js"></script>
+<script>
+
+var $avatar_updated = {{ user.settings.avatar_updated|date_to_timestamp:3 }};
+
+$('#clear-image').on('click',function () {
+    if(confirm('ნამდვილად გსურთ ავატარის წაშლა?\nთუ თქვენ ბოლო 3 დღეში ავატარი ატვირთული გქონდათ,' +
+        'ვერ ატვირთავთ ახალ ავატარს!')) {
+        $.ajax({
+            url: "/account/avatar_update/",
+            type: "POST",
+            data: {'type':0},
+            success: function (data) {
+                $('#active-avatar').attr('src','/static/img/no-avatar.jpg');
+                $(this).hide();
+            },
+            error: function () {
+                alert('მოხდა შეცდომა!გთხოვთ,მოგვიანებით სცადეთ!')
+            }
+        });
+        $(this).hide();
+    }
+});
+
+$('.change-profile-img').on('click',function () {
+    var now = new Date();
+    if(!(now.getTime()/1000 >= $avatar_updated))
+        alert(`ავატარის გამოცვლა შეგიძლიათ ყოველ 3 დღეში ერთხელ.\nშეცვლას შეძლებთ ${convertTimeGeo($avatar_updated)}-ზე`);
+    else
+    $('input[name=avatar]').click();
+});
+
+$(document).ready(function () {
+    $('.cr-slider-wrap').prependTo($('.cr-slider-wrap').parent());
+});
+
+var $uploadCrop;
+
+function readFile(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            $('.upload-demo').addClass('ready');
+            $uploadCrop.croppie('bind', {
+                url: e.target.result
+            })
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+    else {
+        alert("ბოდიშით - თქვენ ბრაუზერს არ აქვს FileReader API-ის მხარდაჭერა.გთხოვთ,რომ გაანახლოთ ბრაუზერი.");
+    }
+}
+
+$uploadCrop = $('#upload-demo').croppie({
+    viewport: {
+        width: 200,
+        height: 200,
+        type: 'square'
+    },
+    {#enableExif: true#}
+});
+
+$('input[name=avatar]').on('change', function () {
+    readFile(this);
+    {#$(this).hide();#}
+    $('#avatarCroppieModal').css('display','block');
+});
+
+$('.close').on('click',function () {
+    $('#avatarCroppieModal').css('display','none');
+});
+
+$('.upload-result').on('click', function (e) {
+    e.preventDefault();
+    $(this).text('მოიცადეთ...');
+    $uploadCrop.croppie('result', {
+        type: 'blob',
+        size: 'viewport',
+        format: 'jpeg',
+        quality: 0.95,
+    }).then(function (img) {
+        var formData = new FormData();
+        formData.append('data', img);
+        $.ajax({
+            url: "/account/avatar_update/",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                $('#avatarCroppieModal').css('display','none');
+                $('#active-avatar').attr('src', "/media/"+data.new_avatar);
+                $avatar_updated = data.time;
+                console.log($avatar_updated);
+            },
+            error:function () {
+                alert('მოხდა შეცდომა,გთხოვთ მოგვიანებით სცადეთ!')
+            }
+        });
+    });
+});
+
+$(window).on('click',function (e) {
+    if(e.target.id === "avatarCroppieModal"){
+        $('#avatarCroppieModal').css('display','none');
+    }
+})
+
+</script>
+{% endblock %}
 
 {% block content %}
     <div class="container">
-        <span>{{ username }}</span>
-        <br>
-        <a href="{% url 'password_change' %}">პაროლის შეცვლა</a>
+    <div>{{ p_form.errors.avatar }}</div>
+        <div class="profile-page">
+        <div class="profile-main clearfix">
+            <div class="profile-avatar-container ">
+                    <div class="profile-img">
+                        <i class="fas fa-times-circle" {% if user.profile.avatar == 'no-avatar.jpg' %}style="display: none"{% endif %} id="clear-image"></i>
+                        <img id="active-avatar" src="/media/{{ user.profile.avatar }}" alt>
+{#                        <input style="display: none" type="checkbox" name="avatar-clear" id="avatar-clear_id">#}
+
+                        <div id="avatarCroppieModal">
+                          <!-- Modal content -->
+                          <div class="modal-content">
+                            <span class="close">&times;</span>
+
+                            <div class="demo-wrap upload-demo">
+                                <div class="grid">
+                                    <div class="col-1-2">
+                                        <div class="upload-demo-wrap">
+                                            <div id="upload-demo"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                              <button class="upload-result">დადასტურება</button>
+                          </div>
+                        </div>
+                    </div>
+                    <input type="file" style="display: none" name="avatar" accept="image/jpeg, image/png, image/jpg" id="id_avatar">
+{#                    <input type="hidden" name="avatar_url" id="id_avatar_url">#}
+                    <div class="change-profile-img">ავატარის ატვირთვა <i class="fas fa-upload"></i></div>
+                </div>
+            <div class="profile-display">
+                    <p id="profile-username">{{ user.username }}</p>
+                    <p id="profile-group"> group</p>
+            </div>
+        </div>
+        <div class="profile-edit">
+           <div class="profile-header">პროფილის დეტალები</div>
+            <form method="POST" class="profile-details">
+                {% csrf_token %}
+{#                {{ u_form }}#}
+{#                {{ p_form }}#}
+
+{#                <div class="profile-details clearfix">#}
+                    {{ p_form }}
+{#                </div>#}
+                <button type="submit" class="form-submit">შენახვა</button>
+            </form>
+        </div>
+{#            <div class="profile-info">#}
+{#                <p id="profile-username">{{ user }}</p>#}
+{#                <p id="profile-gender">#}
+{#                    <select name="gender">#}
+{#                        <option value="" disabled selected>სქესი</option>#}
+{#z                        <option value="m">მამრობითი</option>#}
+{#                        <option value="f">მდედრობითი</option>#}
+{#                    </select>#}
+{#                </p>#}
+{#                <p>#}
+{#                    <input type="date" min="1940-01-01" max="2019-12-31">#}
+{#                </p>#}
+{#            </div>#}
+{##}
+{#            <div class="password-container">#}
+{#                {% include 'registration/password_change_form.html' %}#}
+{#            </div>#}
+        </div>
     </div>
 {% endblock %}

@@ -2,7 +2,6 @@ from django.shortcuts import render
 from anime.models import Anime
 from django.db import models
 
-
 # Create your views here.
 
 def indexView(request):

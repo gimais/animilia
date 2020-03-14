@@ -54,6 +54,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# FILE_UPLOAD_HANDLERS = [
+#     'django.core.files.uploadhandler.MemoryFileUploadHandler',
+#     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+# ]
+
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 ROOT_URLCONF = 'animilia.urls'
@@ -143,3 +148,6 @@ STATIC_ROOT = '/static/'
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+
+
+PASSWORD_RESET_TIMEOUT_DAYS = 1

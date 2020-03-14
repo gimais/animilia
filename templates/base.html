@@ -12,11 +12,11 @@
   <link rel="icon" sizes="192x192" href="{% static "icon.png" %}">
     <link rel="icon" sizes="144x144" href="{% static "icon-144.png" %}">
 
+    {% block extra %}{% endblock %}
   <link rel="stylesheet" href="{% static "css/normalize.css" %}">
   <link rel="stylesheet" href="{% static "css/main.css" %}">
 
     <script src="https://kit.fontawesome.com/98d783368d.js" crossorigin="anonymous"></script>
-    {% block extra %}{% endblock %}
   <meta name="theme-color" content="#973116">
 </head>
 
@@ -32,7 +32,7 @@
                 <a class="logo" href="/"></a>
                 <a class="web-name"></a>
             </div>
-            <div id="mob-menu">menu</div>
+{#            <div id="mob-menu">menu</div>#}
             <ul class="top-nav">
                 <li><a id="mob-home" href="/">მთავარი გვერდი</a></li>
 {#                <li><a href="#menu2">menu2</a></li>#}
@@ -50,7 +50,16 @@
                     </li>
                     <li><a href="{% url 'signup' %}">რეგისტრაცია</a></li>
                 {% else %}
-                    <li><a class='active' href="{% url 'profile' %}" data-id="{{ user.id }}">{{user}}</a></li>
+                    {% if user.is_superuser %}
+                        <li><a href="/admin" >Admin</a></li>
+                    {% endif %}
+                    <li><a class='active' href="{% url 'profile' %}" data-id="{{ user.id }}">{{user.username}}</a></li>
+
+{#                    <li><a href="#parametrebi" style="padding: 35px 40px;position: relative;">#}
+{#                        <span>პარამ. </span>#}
+{#                        <i class="fas fa-user-cog"></i>#}
+{#                    </a></li>#}
+
                     <li><a href="{% url 'logout' %}?next={{ request.path }}" style="padding: 35px 40px;position: relative;">
                         <span>გასვლა </span>
                         <i class="fas fa-sign-out-alt"></i>
@@ -82,9 +91,9 @@
         {% endblock %}
     </section>
 {#    <div class="push"></div>#}
-    <footer>
-                დახმარებისთვის დარეკეთ 112-ში!
-    </footer>
+{#    <footer>#}
+{#                დახმარებისთვის დარეკეთ 112-ში!#}
+{#    </footer>#}
   <script src="{% static "js/vendor/modernizr-3.8.0.min.js" %}"></script>
   <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
   <script>window.jQuery || document.write('<script src="/static/js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
