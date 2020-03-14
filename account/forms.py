@@ -6,10 +6,6 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator,MaxLengthValidator
 
 from django.utils import timezone
-from urllib3 import PoolManager
-from urllib3.exceptions import HTTPError
-from json import loads
-import re
 from account.models import Comment, Profile
 from account.validators import SignUpMaxLengthValidator
 
