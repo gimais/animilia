@@ -1,13 +1,10 @@
 {% extends 'base.html' %}
-{% block title %}პაროლის შეცვლა{% endblock %}
+{% block title %}Email-ის შეცვლა{% endblock %}
 {% block logout_redirect %}/{% endblock %}
 {% block content %}
     <div class="container">
-        <div class="form-title">პაროლის შეცვლა</div>
+        <div class="form-title">Email-ის შეცვლა</div>
         <form method="POST" class="form-container">{% csrf_token %}
-{#            {% for error in form.errors %}#}
-{#                {{ error|escape }}#}
-{#            {% endfor %}#}
             {% if form.errors %}
                 {% for field in form %}
                 <ul class="errorlist">

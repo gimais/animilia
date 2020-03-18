@@ -1,13 +1,28 @@
 from django import forms
+from django.contrib.auth.password_validation import MinimumLengthValidator
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordResetForm, \
-    PasswordChangeForm, SetPasswordForm, UserChangeForm
+    PasswordChangeForm, SetPasswordForm
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
-from django.core.validators import MinLengthValidator,MaxLengthValidator
-
+from django.core.validators import MinLengthValidator
+from django.utils.translation import ngettext
 from django.utils import timezone
 from account.models import Comment, Profile
 from account.validators import SignUpMaxLengthValidator
+
+
+def validate(self, password, user=None):
+    if len(password) < self.min_length:
+        raise forms.ValidationError(
+            ngettext(
+                "ეს პაროლი მოკლეა. ის უნდა შეიცავდეს მინიმუმ %(min_length)d სიმბოლოს.",
+                "ეს პაროლი მოკლეა. ის უნდა შეიცავდეს მინიმუმ %(min_length)d სიმბოლოს.",
+                self.min_length
+            ),
+            code='password_too_short',
+            params={'min_length': self.min_length},
+        )
+
+MinimumLengthValidator.validate = lambda self,password,user:validate(self,password,user)
 
 
 class SignUpForm(UserCreationForm):
@@ -32,10 +47,10 @@ class SignUpForm(UserCreationForm):
     )
     password2 = forms.CharField(
         min_length=4,
-        label='gwgw',
+        label='',
         widget=forms.PasswordInput(attrs={'class':'form-input','placeholder':'გაიმეორეთ პაროლი'}),
         strip=False,
-        help_text="შეიყვანეთ იგივე პაროლი.",
+        help_text="",
     )
 
     def clean_email(self):
@@ -46,7 +61,6 @@ class SignUpForm(UserCreationForm):
 
     class Meta:
         model = User
-
 
         User.username_validator.message = "ნიკი შეიძლება შეიცავდეს მხოლოდ ასოებს,ციფრებსა და @/./+/-/_ სიმბოლოებს."
         User._meta.get_field('username').validators[1] = SignUpMaxLengthValidator(16)
@@ -72,15 +86,6 @@ class MyAuthenticationForm(AuthenticationForm):
         ),
         'inactive': "ეს ანგარიში არააქტიურია!",
     }
-    # username = UsernameField(
-    #     widget=forms.TextInput(attrs={'class': 'form-input','autofocus': True,'placeholder':'ნიკი'}),
-    #     label='',
-    # )
-    # password = forms.CharField(
-    #     label='',
-    #     strip=False,
-    #     widget=forms.PasswordInput(attrs={'autocomplete': 'current-password','class': 'form-input','placeholder':'პაროლი'}),
-    # )
 
 class MyPasswordResetForm(PasswordResetForm):
     email = forms.EmailField(
@@ -107,10 +112,6 @@ class MySetPasswordForm(SetPasswordForm):
 
 
 class MyPasswordChangeForm(PasswordChangeForm):
-
-    def __init__(self, user, *args, **kwargs):
-        super().__init__(user, *args, **kwargs)
-
     error_messages = {
         'password_mismatch': ('მოცემული პაროლები არ ემთხვევა.'),
         'password_incorrect': ("ძველი პაროლი არასწორია. გთხოვთ,თავიდან სცადოთ."),
@@ -119,8 +120,8 @@ class MyPasswordChangeForm(PasswordChangeForm):
     old_password = forms.CharField(
         label='',
         strip=False,
-        widget=forms.PasswordInput(attrs={'autocomplete': 'current-password','required':False,
-                                          'class': 'form-input','placeholder':'ძველი პაროლი'}),
+        widget=forms.PasswordInput(attrs={'autocomplete': 'current-password','class': 'form-input',
+                                          'placeholder':'ძველი პაროლი'}),
     )
 
     new_password1 = forms.CharField(
@@ -149,69 +150,111 @@ class CommentForm(forms.ModelForm):
         fields = ('body',)
 
 
+class UpdateUsernameForm(forms.ModelForm):
 
-
-
-class UpdateUserForm(UserChangeForm):
-    username = forms.CharField(required=False)
-    email = None
-    first_name = None
-    last_name = None
-    password = None
-
+    error_messages = {
+        'not_changed': "თქვენ ეს ნიკი ისედაც გაქვთ!",
+        # 'already_exists':'ეს ნიკი დაკავებულია!',
+        'deadline':'ნიკის შეცვლა შეგიძლიათ ყოველ 7 დღეში ერთხელ!'
+    }
     class Meta:
         model = User
         fields = ('username',)
 
-    def __init__(self, *args, **kwargs):
-        self.user = kwargs.get('instance', None)
-        super(UpdateUserForm, self).__init__(*args, **kwargs)
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(UpdateUsernameForm, self).__init__(*args, **kwargs)
+
 
     def clean_username(self):
+        old_username = self.user.username
         username = self.cleaned_data.get('username')
-        print(username,self.user)
-        if username != self.user.username:
-            updated_time_difference = (timezone.now() - self.user.settings.username_updated).total_seconds()
-            if updated_time_difference >= 1209600:
-                self.user.settings.username_updated = timezone.now()
-            else:
-                raise ValidationError('ნიკის შეცვლა შეგიძლიათ ყოველ 14 დღეში ერთხელ')
+        print(username,old_username)
+
+        # if User.objects.filter(username=username).exists():
+            # print('arsebobs ukve')
+            # raise forms.ValidationError(
+            #     self.error_messages['already_exists'],
+            #     code='already_exists',
+            # )
+
+        if username == old_username:
+            raise forms.ValidationError(
+                self.error_messages['not_changed'],
+                code='not_changed',
+            )
+
+        updated_time_difference = (timezone.now() - self.user.settings.username_updated).total_seconds()
+        if updated_time_difference < 604800:
+            raise forms.ValidationError(
+                self.error_messages['deadline'],
+                code='deadline',
+            )
 
         return username
 
-
-    # def clean_email(self):
-    #     print(self.cleaned_data.get('email'))
-    #     username = self.cleaned_data.get('username')
-    #     email = self.cleaned_data.get('email')
-    #
-    #     if email and User.objects.filter(email=email).exclude(username=username).count():
-    #         raise forms.ValidationError('ეს EMAIL უკვე გამოყენებულია!')
-    #     return email
-
-    # def save(self, commit=True):
-    #     user = super().save(commit=False)
-    #     # username = self.cleaned_data.get('username',None)
-    #     # user.email = self.cleaned_data['email']
-    #
-    #     if commit:
-    #         user.save()
-
+    def save(self, commit=True):
+        username = self.cleaned_data["username"]
+        self.user.username = username
+        self.user.settings.username_updated = timezone.now()
+        if commit:
+            self.user.save()
+            # sheizleba ar daimaxsovos
+        return self.user
 
 class UpdateProfileForm(forms.ModelForm):
-    # avatar = None
     gender = forms.Select()
-    birth = forms.DateField(required=False,widget=forms.DateInput(attrs={'min':'1940-01-01','type':'date'}))
-
+    birth = None
 
     class Meta:
         model = Profile
         fields = ('gender', 'birth')
 
+class EmailChangeForm(forms.Form):
+    """
+    A form that lets a user change set their email while checking for a change in the
+    e-mail.
+    """
+    error_messages = {
+        'email_mismatch': "მოცემული Email-ები არ ემთხვევა ერთმანეთს!",
+        'not_changed': "ეს Email ისედაც გაქვთ!",
+    }
 
-# class UpdateAvatarForm(forms.ModelForm):
-#
-#     class Meta:
-#         model = Profile
-#         fields = ('avatar',)
-#
+    new_email1 = forms.EmailField(max_length=254,widget=forms.EmailInput(
+        attrs={'class':'form-input','placeholder':'ახალი Email'}))
+
+    new_email2 = forms.EmailField(max_length=254,widget=forms.EmailInput(
+        attrs={'class':'form-input','placeholder':'გაიმეორეთ ახალი Email'}))
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(EmailChangeForm, self).__init__(*args, **kwargs)
+
+    def clean_new_email1(self):
+        old_email = self.user.email
+        new_email1 = self.cleaned_data.get('new_email1')
+        if new_email1 and old_email:
+            if new_email1 == old_email:
+                raise forms.ValidationError(
+                    self.error_messages['not_changed'],
+                    code='not_changed',
+                )
+        return new_email1
+
+    def clean_new_email2(self):
+        new_email1 = self.cleaned_data.get('new_email1')
+        new_email2 = self.cleaned_data.get('new_email2')
+        if new_email1 and new_email2:
+            if new_email1 != new_email2:
+                raise forms.ValidationError(
+                    self.error_messages['email_mismatch'],
+                    code='email_mismatch',
+                )
+        return new_email2
+
+    def save(self, commit=True):
+        email = self.cleaned_data["new_email1"]
+        self.user.email = email
+        if commit:
+            self.user.save()
+        return self.user

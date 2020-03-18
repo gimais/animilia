@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block title %}HOME{% endblock %}
+{% block logout_redirect %}/{% endblock %}
 
 {% block content %}
     <div class="container">
             {% if animes_list %}
                 <div class="items-list">
-        {#            {% csrf_token %}#}
                     {% for anime in animes_list %}
 
                         <div class="item">

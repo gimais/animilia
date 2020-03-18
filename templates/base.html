@@ -60,7 +60,7 @@
 {#                        <i class="fas fa-user-cog"></i>#}
 {#                    </a></li>#}
 
-                    <li><a href="{% url 'logout' %}?next={{ request.path }}" style="padding: 35px 40px;position: relative;">
+                    <li><a href="{% url 'logout' %}?next={% block logout_redirect %}{% endblock %}" style="padding: 35px 40px;position: relative;">
                         <span>გასვლა </span>
                         <i class="fas fa-sign-out-alt"></i>
                     </a></li>

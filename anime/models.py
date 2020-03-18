@@ -42,7 +42,6 @@ class Anime(models.Model):
     categories = models.ManyToManyField(Category,related_name='categories',verbose_name='ჟანრები')
     type = models.PositiveSmallIntegerField(choices=TYPES,default=0,verbose_name='ტიპი')
     episodes = models.PositiveSmallIntegerField(verbose_name='ეპიზოდების რაოდენობა',default=1)
-    # comments = models.PositiveSmallIntegerField()
     rating = models.DecimalField(max_digits=5, decimal_places=1,default=0,verbose_name='რეიტინგი')
     updated = models.DateTimeField(auto_now=True)
     dubbed = models.PositiveSmallIntegerField(default=0,verbose_name='გახმოვანებული',editable=False)

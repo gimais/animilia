@@ -1,12 +1,14 @@
 from django.urls import path
 from . import views as local_view
 from django.contrib.auth import views
+from .decorators import anonymous_required
 from .forms import MyAuthenticationForm,MyPasswordResetForm,MyPasswordChangeForm
 
 # Forms
 views.LoginView.authentication_form = MyAuthenticationForm
 views.PasswordResetView.form_class = MyPasswordResetForm
 views.PasswordChangeView.form_class = MyPasswordChangeForm
+views.PasswordChangeView.success_url = '/account/profile'
 
 urlpatterns = [
     path('register/',local_view.signup_view,name='signup'),
@@ -15,14 +17,16 @@ urlpatterns = [
 
     path('profile/',local_view.profile_view,name='profile'),
     path('avatar_update/',local_view.avatar_update,name='avatar_update'),
+    path('username_update/',local_view.username_update,name='username_update'),
 
-    # path('password_change/', views.PasswordChangeView.as_view(), name='password_change'),
+    path('password_change/', views.PasswordChangeView.as_view(), name='password_change'),
     # path('password_change/done/', views.PasswordChangeDoneView.as_view(), name='password_change_done'),
 
-    path('email_change/<uidb64>/<token>/',local_view.ChangeEmailView.as_view(), name='activate_account'),
+    path('email_change/<uidb64>/<token>/',local_view.change_email_view, name='change_email'),
+    path('email_change/',local_view.change_email_request_view, name='change_email_request'),
 
-    path('password_reset/', views.PasswordResetView.as_view(), name='password_reset'),
-    path('password_reset/done/', views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('password_reset/', anonymous_required(views.PasswordResetView.as_view()), name='password_reset'),
+    path('password_reset/done/',anonymous_required(views.PasswordResetDoneView.as_view()), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset/done/', views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 

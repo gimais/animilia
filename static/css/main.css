@@ -11,6 +11,16 @@
    Base styles: opinionated defaults
    ========================================================================== */
 
+@font-face {
+    font-family: 'DejaVu Sans Condensed';
+    src: url('/static/fonts/dejavu-sans-condensed-webfont.eot'); /* IE9 Compat Modes */
+    src: url('/static/fonts/dejavu-sans-condensed-webfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('/static/fonts/dejavu-sans-condensed-webfont.woff2') format('woff2'), /* Super Modern Browsers */
+         url('/static/fonts/dejavu-sans-condensed-webfont.woff') format('woff'), /* Pretty Modern Browsers */
+         url('/static/fonts/dejavu-sans-condensed-webfont.ttf') format('truetype'), /* Safari, Android, iOS */
+         url('/static/fonts/dejavu-sans-condensed-webfont.svg#dejavu_sans_condensedregular') format('svg'); /* Legacy iOS */
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -135,17 +145,6 @@ textarea {
 *    causes content to wrap 1 word per line:
 *    https://medium.com/@jessebeach/beware-smushed-off-screen-accessible-text-5952a4c2cbfe
 */
-
-
-@font-face {
-    font-family: 'DejaVu Sans Condensed';
-    src: url('../fonts/dejavu-sans-condensed-webfont.eot'); /* IE9 Compat Modes */
-    src: url('../fonts/dejavu-sans-condensed-webfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-         url('../fonts/dejavu-sans-condensed-webfont.woff2') format('woff2'), /* Super Modern Browsers */
-         url('../fonts/dejavu-sans-condensed-webfont.woff') format('woff'), /* Pretty Modern Browsers */
-         url('../fonts/dejavu-sans-condensed-webfont.ttf') format('truetype'), /* Safari, Android, iOS */
-         url('../fonts/dejavu-sans-condensed-webfont.svg#dejavu_sans_condensedregular') format('svg'); /* Legacy iOS */
-}
 
 .sr-only {
   border: 0;
@@ -477,6 +476,9 @@ section:after {
 
 .form-container {
     margin-bottom: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 60%;
 }
 
 .container{
@@ -503,7 +505,7 @@ section:after {
 
 
 .form-input {
-  width: 50%;
+  width: 100%;
   border: 1px solid #ebebeb;
   border-radius: 5px;
   -moz-border-radius: 5px;
@@ -998,7 +1000,7 @@ div#login-focus:hover {
 }
 
 .comment-edit-form button,.comment-form button{
-    background: #333;
+    background: #973116;
     padding: 10px 15px;
     border: none;
     border-radius: 4px;
@@ -1010,7 +1012,7 @@ div#login-focus:hover {
 }
 
 .comment-edit-form button[type=reset],.comment-form button[type=reset]{
-    background-color: #973116;
+    background-color: #333;
 }
 
 .comment {
@@ -1101,7 +1103,7 @@ div#login-focus:hover {
     border: none;
 }
 
-.comment-replies-check{
+.comment-replies-check,.password-change-container{
     border: 1px solid #e2e2e2;
     padding: 5px;
     text-align: center;
@@ -1115,17 +1117,22 @@ div#login-focus:hover {
     user-select: none;
 }
 
-.comment-replies-check:hover{
+.password-change-container{
+    clear: both;
+    width: 100%;
+}
+
+.comment-replies-check:hover,.password-change-container:hover{
     color: #973116;
 }
 
-.comment-replies-check.closed:before {
+.comment-replies-check.closed:before,.password-change-container.closed:before {
     content: "\f0d7";
     font-family: "Font Awesome 5 Pro";
     font-weight: 900;
 }
 
-.comment-replies-check.opened:before {
+.comment-replies-check.opened:before,.password-change-container.opened:before  {
     content: "\f0d8";
     font-family: "Font Awesome 5 Pro";
     font-weight: 900;
@@ -1157,7 +1164,7 @@ div.comment-right-buttons{
 
 .profile-main.clearfix {
     padding: 10px 30px;
-    border-bottom: 3px solid #e2e2e2;
+    border-bottom: 2px solid #e2e2e2;
     margin-bottom: 8px;
 }
 
@@ -1208,16 +1215,28 @@ div.comment-right-buttons{
     content: '';
 }
 
-.profile-info,.password-container{
-    overflow: hidden;
+.password-container{
     margin: 10px;
     min-height: 100px;
     padding: 8px;
 }
 
-.profile-info{
-    border-bottom: 1px solid #973116;
+.password-container input{
+    margin:10px 0;
+    width: 100%;
 }
+
+.errorlist li{
+    color: red;
+    margin: 10px 0;
+    font-weight: 800;
+}
+
+.password-container .form-group{
+    width: 50%;
+    margin: auto;
+}
+
 
 .profile-avatar-container {
     float: left;
@@ -1228,12 +1247,17 @@ div.comment-right-buttons{
 #profile-username{
     padding: 2px 8px;
     display: inline-block;
-    font-size: 68px;
+    font-size: 47px;
     text-transform: uppercase;
 }
 
 #profile-group{
-    margin-left: 11px;
+    display: inline-block;
+    font-size: 19px;
+}
+
+.profile-display dd,.profile-display dt{
+    line-height: 2em;
 }
 
 .profile-display {
@@ -1245,6 +1269,7 @@ div.comment-right-buttons{
 
 .profile-edit {
     padding: 2px 28px;
+    clear: both;
 }
 
 .profile-details{
@@ -1252,54 +1277,96 @@ div.comment-right-buttons{
     padding: 2px 28px;
 }
 
-.profile-info select{
-    width: 100%;
-    padding: 15px 20px;
-    border-radius: 5px;
-    box-sizing: border-box;
-    border: 1px solid #ebebeb;
-    font-size: 14px;
-    font-weight: 500;
-    color: #222;
+/*.profile-info select{*/
+/*    width: 100%;*/
+/*    padding: 15px 20px;*/
+/*    border-radius: 5px;*/
+/*    box-sizing: border-box;*/
+/*    border: 1px solid #ebebeb;*/
+/*    font-size: 14px;*/
+/*    font-weight: 500;*/
+/*    color: #222;*/
+/*}*/
+
+select.birthselector {
+    width: 32.74%;
 }
 
-input[type=date] {
-    width: 32%;
-    padding: 16px 20px;
-    border-radius: 5px;
-    box-sizing: border-box;
-    border: 1px solid #ebebeb;
-    font-size: 14px;
-    font-weight: 500;
-    color: #222;
-}
-
-#profile-gender{
-    width: 32%;
+.profile-details-input{
+    width: 45%;
     float: left;
-    margin-right: 10px;
+    margin-bottom: 50px;
 }
 
-.profile-info label,.password-container label {
-    display: block;
+.profile-details-input select,.profile-details-input input{
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-sizing: border-box;
+    border: 1px solid #ebebeb;
+    font-size: 14px;
+    font-weight: 500;
+    color: #222;
+    cursor: pointer;
+}
+
+#id_gender{
+    width: 100%;
+}
+
+.profile-details-input #id_email,.profile-details-input #id_username,.profile-details-input #id_password{
+    width: 100%;
+    cursor: auto;
+    background-color: #aaaaaa;
+}
+
+p.username-info{
+    left: 5px;
+    bottom: -25px;
+    position: absolute;
+    color: red;
+    text-align: center;
     font-size: 15px;
-    padding: 5px;
-    width: 33%;
-    /*float: left;*/
+    font-weight: 800;
 }
 
-.password-container p{
-    float: left;
-    padding: 5px;
-    width: 33%;
+.change-button,.profile-details-input .cancel{
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    background-color: #333;
+    padding: 10px;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    text-decoration: none;
 }
 
-.password-container input{
-    width: 100%;
+a.change-button{
+    left: 0;
+    width: 50%;
+    text-align: center;
 }
+
+.profile-details-input .cancel{
+    right: 106px;
+    background-color: #973116;
+}
+
+
+.profile-details input{
+    display: block;
+}
+
+.profile-details label {
+    display: block;
+    margin-left: 12px;
+    margin-bottom: 9px;
+}
+
 
 .profile-page button{
-    margin: 0 47%;
+    clear: both;
+    margin-top: 25px;
 }
 
 /*================================*/
@@ -1689,4 +1756,32 @@ input[type=date] {
   color: #000;
   text-decoration: none;
   cursor: pointer;
+}
+
+
+
+.tooltip {
+    position: relative;
+    font-size: 25px;
+    float: right;
+    color: red;
+    cursor: default;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    background-color: #1b1a1a;
+    color: white;
+    text-align: center;
+    border-radius: 6px;
+    padding: 10px;
+    position: absolute;
+    z-index: 1;
+    opacity: 0.85;
+    font-size: 16px;
+    /*width: max-content;*/
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
 }

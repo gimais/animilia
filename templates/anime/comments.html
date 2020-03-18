@@ -1,12 +1,12 @@
 
 {% if user.is_authenticated %}
-<div class="comment-container">
     <form class='comment-form' method='POST'>
         {% csrf_token %}
         {{comment_form.as_p|safe}}
         <button type='submit'>გაგზავნა</button>
     </form>
-</div>
+{% else %}
+    komentari tu ginda regisrt=arfgerhwghw
 {% endif %}
 
 <div class="comments-box clearfix">

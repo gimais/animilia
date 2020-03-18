@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}ჩემი პროფილი{% endblock %}
+{% block logout_redirect %}/{% endblock %}
 {% load static %}
 {% load account_tags %}
 {% block extra %}
@@ -9,9 +10,65 @@
 
 {% block script %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.2/croppie.js"></script>
-<script>
+
+<script type="text/javascript">
+
+$(document).ready(function () {
+    $('.cr-slider-wrap').prependTo($('.cr-slider-wrap').parent());
+
+    $("select[name='birth-day']").append(getDaysSelectOptionsHTML(31,22));
+    $("select[name='birth-month']").append(getMonthsSelectOptionsHTML());
+    $("select[name='birth-year']").append(getYearsSelectOptionsHTML(1940,2019));
+
+    var pickedDate = [{{ user.profile.birth.day }},{{ user.profile.birth.month }},{{ user.profile.birth.year }}];
+
+    $(`select[name='birth-day'] option[value=${pickedDate[0]}]`).attr('selected','');
+    $(`select[name='birth-month'] option[value=${pickedDate[1]}]`).attr('selected','');
+    $(`select[name='birth-year'] option[value=${pickedDate[2]}]`).attr('selected','');
+
+});
 
 var $avatar_updated = {{ user.settings.avatar_updated|date_to_timestamp:3 }};
+var $username_updated = {{ user.settings.username_updated|date_to_timestamp:7 }};
+
+$('.profile-details-input').on('click','#submit-username-button',function (e) {
+    e.preventDefault();
+    var that = $(this);
+    var username = $('a[href="/account/profile/"]');
+    var new_username = that.parent().find('input[name=username]').val();
+    if(username.text() === new_username)
+        $('.username-info').html('თქვენ ეს ნიკი ისედაც გაქვთ!');
+    else if(new_username.length<3)
+        $('.username-info').html('ნიკი მინიმუმ 3 სიმბოლოსგან უნდა შედგებოდეს!');
+    else if(new_username.length>16)
+        $('.username-info').html('ნიკი მაქსიმუმ 16 სიმბოლოსგან უნდა შედგებოდეს!');
+    else{
+        var now = new Date();
+        if(!(now.getTime()/1000 >= $username_updated))
+            alert(`ნიკის შეცვლა შეგიძლიათ ყოველ 7 დღეში ერთხელ.\nშეცვლას შეძლებთ ${convertTimeGeo($username_updated)}-ზე`);
+        else if (confirm('ნამდვილად გსურთ ნიკის შეცვლა?!\nნიკის კვლავ შეცვლას შეძლებთ 7 დღის შემდეგ!')) {
+            $.ajax({
+                method: "POST",
+                url: window.location.origin + '/account/username_update/',
+                data: {username: new_username},
+                accepts: "application/json; charset=utf-8",
+                success: function (data) {
+                    $('.username-info').html(`<span style='color:#5ced5c;'>ნიკი შეიცვლა!</span>`);
+                    $('#profile-username').html(new_username);
+                    username.html(new_username);
+                    $username_updated = data.time;
+                },
+                error: function (response) {
+                    var html = '';
+                    response.responseJSON.errors.forEach(function (error) {
+                        html += (`<span>${error}</span><br>`);
+                    });
+                    $('.username-info').html(html);
+                }
+            });
+        }
+    }
+});
 
 $('#clear-image').on('click',function () {
     if(confirm('ნამდვილად გსურთ ავატარის წაშლა?\nთუ თქვენ ბოლო 3 დღეში ავატარი ატვირთული გქონდათ,' +
@@ -40,10 +97,6 @@ $('.change-profile-img').on('click',function () {
     $('input[name=avatar]').click();
 });
 
-$(document).ready(function () {
-    $('.cr-slider-wrap').prependTo($('.cr-slider-wrap').parent());
-});
-
 var $uploadCrop;
 
 function readFile(input) {
@@ -59,7 +112,7 @@ function readFile(input) {
         reader.readAsDataURL(input.files[0]);
     }
     else {
-        alert("ბოდიშით - თქვენ ბრაუზერს არ აქვს FileReader API-ის მხარდაჭერა.გთხოვთ,რომ გაანახლოთ ბრაუზერი.");
+        alert("სამწუხაროდ თქვენს ბრაუზერს არ აქვს FileReader API-ის მხარდაჭერა.გთხოვთ,რომ გაანახლოთ ბრაუზერი.");
     }
 }
 
@@ -74,7 +127,6 @@ $uploadCrop = $('#upload-demo').croppie({
 
 $('input[name=avatar]').on('change', function () {
     readFile(this);
-    {#$(this).hide();#}
     $('#avatarCroppieModal').css('display','block');
 });
 
@@ -103,7 +155,6 @@ $('.upload-result').on('click', function (e) {
                 $('#avatarCroppieModal').css('display','none');
                 $('#active-avatar').attr('src', "/media/"+data.new_avatar);
                 $avatar_updated = data.time;
-                console.log($avatar_updated);
             },
             error:function () {
                 alert('მოხდა შეცდომა,გთხოვთ მოგვიანებით სცადეთ!')
@@ -123,72 +174,113 @@ $(window).on('click',function (e) {
 
 {% block content %}
     <div class="container">
-    <div>{{ p_form.errors.avatar }}</div>
         <div class="profile-page">
-        <div class="profile-main clearfix">
-            <div class="profile-avatar-container ">
-                    <div class="profile-img">
-                        <i class="fas fa-times-circle" {% if user.profile.avatar == 'no-avatar.jpg' %}style="display: none"{% endif %} id="clear-image"></i>
-                        <img id="active-avatar" src="/media/{{ user.profile.avatar }}" alt>
-{#                        <input style="display: none" type="checkbox" name="avatar-clear" id="avatar-clear_id">#}
+            <div class="profile-main clearfix">
+                <div class="profile-avatar-container ">
+                        <div class="profile-img">
+                            <i class="fas fa-times-circle" {% if user.profile.avatar == 'no-avatar.jpg' %}style="display: none"{% endif %} id="clear-image"></i>
+                            <img id="active-avatar" src="/media/{{ user.profile.avatar }}" alt>
 
-                        <div id="avatarCroppieModal">
-                          <!-- Modal content -->
-                          <div class="modal-content">
-                            <span class="close">&times;</span>
+                            <div id="avatarCroppieModal">
+                              <!-- Modal content -->
+                              <div class="modal-content">
+                                <span class="close">&times;</span>
 
-                            <div class="demo-wrap upload-demo">
-                                <div class="grid">
-                                    <div class="col-1-2">
-                                        <div class="upload-demo-wrap">
-                                            <div id="upload-demo"></div>
+                                <div class="demo-wrap upload-demo">
+                                    <div class="grid">
+                                        <div class="col-1-2">
+                                            <div class="upload-demo-wrap">
+                                                <div id="upload-demo"></div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                  <button class="upload-result">დადასტურება</button>
+                              </div>
                             </div>
-                              <button class="upload-result">დადასტურება</button>
-                          </div>
                         </div>
+                        <input type="file" style="display: none" name="avatar" accept="image/*" id="id_avatar">
+                        <div class="change-profile-img">ავატარის ატვირთვა <i class="fas fa-upload"></i></div>
                     </div>
-                    <input type="file" style="display: none" name="avatar" accept="image/jpeg, image/png, image/jpg" id="id_avatar">
-{#                    <input type="hidden" name="avatar_url" id="id_avatar_url">#}
-                    <div class="change-profile-img">ავატარის ატვირთვა <i class="fas fa-upload"></i></div>
-                </div>
-            <div class="profile-display">
+                <div class="profile-display">
                     <p id="profile-username">{{ user.username }}</p>
-                    <p id="profile-group"> group</p>
+                    <p id="profile-group">group</p>
+                    <div class="item-page-row" style="border-top:2px solid #e2e2e2;padding:15px 10px;">
+                        <dl style="width: 50%;float: left">
+                            <dt>რეგისტრაციის თარიღი:</dt>
+                                <dd>{{ user.date_joined|date:"d.m.Y" }}</dd>
+                            <dt>ჯგუფი:</dt>
+                            {% if user.is_superuser %}
+                                <dd>ადმინისტრატორი</dd>
+                            {% elif user.is_staff %}
+                                <dd>მოდერატორი</dd>
+                            {% else %}
+                                <dd>მაყურებელი</dd>
+                            {% endif %}
+                        </dl>
+                        <dl style="width: 50%;float: left;">
+                            <dt>სქესი:</dt>
+                            {% if user.profile.gender == 0 %}
+                                <dd>მამრობოთი</dd>
+                            {% elif user.profile.gender == 1 %}
+                                <dd>მდედრობითი</dd>
+                            {% else %}
+                                <dd>მითითებული არ არის</dd>
+                            {% endif %}
+                            <dt>დაბადების თარიღი:</dt>
+                            {% if user.profile.birth %}
+                                <dd>{{ user.profile.birth }}</dd>
+                            {% else %}
+                                <dd>მითითებული არ არის</dd>
+                            {% endif %}
+                        </dl>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="profile-edit">
-           <div class="profile-header">პროფილის დეტალები</div>
-            <form method="POST" class="profile-details">
-                {% csrf_token %}
-{#                {{ u_form }}#}
-{#                {{ p_form }}#}
-
-{#                <div class="profile-details clearfix">#}
-                    {{ p_form }}
-{#                </div>#}
-                <button type="submit" class="form-submit">შენახვა</button>
-            </form>
-        </div>
-{#            <div class="profile-info">#}
-{#                <p id="profile-username">{{ user }}</p>#}
-{#                <p id="profile-gender">#}
-{#                    <select name="gender">#}
-{#                        <option value="" disabled selected>სქესი</option>#}
-{#z                        <option value="m">მამრობითი</option>#}
-{#                        <option value="f">მდედრობითი</option>#}
-{#                    </select>#}
-{#                </p>#}
-{#                <p>#}
-{#                    <input type="date" min="1940-01-01" max="2019-12-31">#}
-{#                </p>#}
-{#            </div>#}
-{##}
-{#            <div class="password-container">#}
-{#                {% include 'registration/password_change_form.html' %}#}
-{#            </div>#}
+            <div class="profile-edit">
+                <div class="profile-header">პარამეტრები</div>
+                <div class="profile-details-input" style="position:relative">
+                    <label for="id_email">Email</label>
+                    <input  type="text" id="id_email" name="email" value="{{ user.email }}" readonly>
+                    <button  class="change-button" title="ემაილის შესაცვლელად,თქვენს Email-ზე მოვა ლინკი (გადაამოწმეთ სპამებიც)" id="change-email-button">შეცვლა</button>
+                </div>
+                <div class="profile-details-input" style="position:relative;float: right">
+                    <label for="id_email">ნიკი</label>
+                    <input type="text" id="id_username" name="username" value="{{ user.username }}" readonly>
+                    <button class="change-button" id="change-username-button">შეცვლა</button>
+                    <p class="username-info"></p>
+                </div>
+                <div class="profile-details-input" style="position:relative">
+                    <a class="change-button" href="{% url 'password_change' %}">პაროლის შეცვლა</a>
+                </div>
+            </div>
+            <div class="profile-edit">
+               <div class="profile-header">პროფილის დეტალები</div>
+                <form method="POST" class="profile-details">
+                    {% csrf_token %}
+                    <div class="profile-details-input">
+                         <div class="tooltip">&lowast;
+                          <span class="tooltiptext">გთხოვთ შეავსოთ და მონაცემებში არ მოიტყუოთ. სტატისტიკისთვის გვჭირდება ^_^</span>
+                        </div>
+                        <label for="id_gender">სქესი</label>
+                        {{ p_form.gender }}
+                    </div>
+                    <div class="profile-details-input" style="float:right;">
+                        <label>დაბადების თარიღი</label>
+                        <select name="birth-day" class="birthselector">
+                                <option value="0">---------</option>
+                        </select>
+                        <select name="birth-month" class="birthselector">
+                            <option value="0">---------</option>
+                        </select>
+                        <select name="birth-year" class="birthselector">
+                            <option value="0">---------</option>
+                        </select>
+                        <input type="hidden" id="id_birth" name="birth" value="{{ user.profile.birth|date:"Y-m-d" }}">
+                    </div>
+                    <button type="submit" class="form-submit">შენახვა</button>
+                </form>
+            </div>
         </div>
     </div>
 {% endblock %}

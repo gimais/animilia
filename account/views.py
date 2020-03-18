@@ -1,13 +1,12 @@
 import datetime
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserChangeForm
-from PIL import Image
+
+from django.contrib.auth.backends import UserModel
+from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth.models import User
-from django.contrib.auth.views import PasswordChangeView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import login
-from django.utils.encoding import force_text
-from django.utils.http import urlsafe_base64_decode
+from django.core.exceptions import ValidationError
+from django.utils.encoding import force_text, force_bytes
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.views.decorators.cache import never_cache
 
 from .tokens import email_change_token
 from django.urls import reverse
@@ -16,12 +15,11 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
-from django.views.generic.base import View
 
-from account.forms import SignUpForm, MyAuthenticationForm, CommentForm, MyPasswordChangeForm,\
-    UpdateProfileForm,UpdateUserForm
+from account.forms import SignUpForm, MyAuthenticationForm, CommentForm,\
+    UpdateProfileForm, UpdateUsernameForm, EmailChangeForm
 from anime.models import Anime
-from .models import Comment, Profile
+from .models import Comment
 
 ERROR = {'error':'მოხდა შეცდომა!'}
 
@@ -60,31 +58,46 @@ def profile_view(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
             profile_form = UpdateProfileForm(request.POST,request.FILES,instance=request.user.profile)
-            user_form = UpdateUserForm(request.POST,instance=request.user)
-            u_valid = False
-            p_valid = False
+            # user_form = UpdateUserForm(request.POST,instance=request.user)
+            # u_valid = False
+            # p_valid = False
             if profile_form.is_valid():
                 profile_form.save()
-                p_valid = True
-            if user_form.is_valid():
-                user_form.save()
-                u_valid = True
-            if p_valid and u_valid:
+                # p_valid = True
+            # if user_form.is_valid():
+            #     user_form.save()
+            #     u_valid = True
+            # if p_valid and u_valid:
                 return HttpResponseRedirect(reverse('profile'))
         else:
             profile_form = UpdateProfileForm(instance=request.user.profile)
-            user_form = UpdateUserForm(instance=request.user)
+            # user_form = UpdateUserForm(instance=request.user)
         context = {
             'p_form':profile_form,
-            'u_form':user_form
+            # 'u_form':user_form,
         }
         return render(request, 'account/profile.html', context)
     else:
         return redirect('home')
 
 
+def username_update(request):
+    if request.user.is_authenticated and request.is_ajax() and request.method == "POST":
+        username_form = UpdateUsernameForm(user=request.user,data=request.POST)
+        if username_form.is_valid():
+            username_form.save()
+            return JsonResponse({'success':'true',
+                                 'time': datetime.datetime.timestamp(
+                                     request.user.settings.username_updated + datetime.timedelta(days=7)),
+                                 },status=200)
+        else:
+            return JsonResponse({'success':'false',
+                                 'errors':username_form.errors['username']}, status=400)
+    else:
+        return JsonResponse({'status':'false','info':'მოხდა შეცდომა!'},status=400)
+
 def avatar_update(request):
-    if request.user.is_authenticated:
+    if request.user.is_authenticated and request.is_ajax():
         if request.method == 'POST':
             is_type = request.POST.get('type',None)
             if is_type is not None:
@@ -94,6 +107,7 @@ def avatar_update(request):
                 return JsonResponse({'success': True,'info':'ავატარი წაიშალა!'}, status=200)
             avatar = request.FILES.get('data',None)
             if avatar:
+                from PIL import Image
                 check_avatar = Image.open(avatar)
                 if check_avatar.format!="JPEG" or check_avatar.size[0] > 200 or check_avatar.size[1] > 200:
                     return JsonResponse({'success':True,'info':'არ აკმაყოფილებს პირობებს!'})
@@ -116,12 +130,56 @@ def avatar_update(request):
                                      }, status=200)
             else:
                 return JsonResponse({'success': False,'info':'მოხდა შეცდომა!'},status=400)
-        else:
-            pass
+
         return render(request, 'account/profile.html')
     else:
         return redirect('home')
 
+
+
+def change_email_request_view(request):
+    if request.user.is_authenticated and request.is_ajax():
+        from django.template.loader import render_to_string
+        current_site = get_current_site(request)
+        mail_subject = 'Email-is shecvla'
+        message = render_to_string('registration/account_email_change_email.html', {
+            'user': request.user,
+            'domain': current_site.domain,
+            'uid': urlsafe_base64_encode(force_bytes(request.user.pk)).decode(),
+            'token': email_change_token.make_token(request.user),
+        })
+        request.user.email_user(mail_subject,message)
+        return JsonResponse({'success':'true'},status=200)
+    else:
+        return redirect('home')
+
+
+
+@never_cache
+def change_email_view(request,uidb64,token):
+    if request.user.is_authenticated:
+        try:
+            uid = force_text(urlsafe_base64_decode(uidb64))
+            user = UserModel._default_manager.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist,ValidationError):
+            user = None
+
+        if user is not None and email_change_token.check_token(user,token):
+            if user == request.user:
+                if request.method == "POST":
+                    email_form = EmailChangeForm(user=user,data=request.POST)
+                    if email_form.is_valid():
+                        email_form.save()
+                        return redirect('profile')
+                else:
+                    email_form = EmailChangeForm(user=user)
+                return render(request,'registration/account_email_change_form.html',{'form':email_form})
+            else:
+                return redirect('profile')
+        else:
+            return render(request,'registration/invalid.html')
+    else:
+        return redirect('home')
 
 # COMMENT SYSTEM
 
@@ -136,10 +194,10 @@ def add_comment(request):
                 parent_comment = None
 
             if parent_comment:
-                anime = Anime.objects.get(id=parent_comment.anime.id)
+                # anime = Anime.objects.get(id=parent_comment.anime.id)
 
                 reply_comment = form.save(commit=False)
-                reply_comment.anime = anime
+                reply_comment.anime = parent_comment.anime
                 reply_comment.parent = parent_comment
                 reply_comment.user = request.user
                 reply_comment.save()
@@ -194,7 +252,7 @@ def check_replies(request,int):
         if replies:
             result = list()
             for reply in replies:
-                result.append(reply.get_reply_comment_info())
+                result.append(reply.get_reply_comment_info(request.user.pk))
             return JsonResponse(result, status=200,safe=False)
         else:
             return JsonResponse({'error':'პასუხები არ არსებობს!'},status=400)
@@ -205,6 +263,7 @@ def delete_comment(request):
     if request.user.is_authenticated:
         try:
             comment_id = Comment.objects.get(id=request.POST.get('id',False))
+            # Comment.objects.select_related('user').get(id=1)
         except (TypeError, ValueError, OverflowError,Comment.DoesNotExist):
             comment_id = None
 
@@ -236,6 +295,7 @@ def edit_comment(request):
     if request.user.is_authenticated:
         try:
             comment_id = Comment.objects.get(id=request.POST.get('id',False))
+            # Comment.objects.prefetch_related('like').get(id=1)
         except (TypeError, ValueError, OverflowError,Comment.DoesNotExist):
             comment_id = None
 
@@ -274,6 +334,7 @@ def like_comment(request):
     if request.user.is_authenticated:
         try:
             comment_id = Comment.objects.get(id=request.POST.get('id',False))
+            # Comment.objects.prefetch_related('like','dislike').get(id=1)
         except (TypeError, ValueError, OverflowError,Comment.DoesNotExist):
             comment_id = None
 
@@ -301,6 +362,7 @@ def dislike_comment(request):
     if request.user.is_authenticated:
         try:
             comment_id = Comment.objects.get(id=request.POST.get('id',False))
+            # Comment.objects.prefetch_related('like', 'dislike').get(id=1)
         except (TypeError, ValueError, OverflowError,Comment.DoesNotExist,Comment.MultipleObjectsReturned):
             comment_id = None
 
@@ -322,20 +384,3 @@ def dislike_comment(request):
             return JsonResponse({'error':'მოხდა შეცდომა!'}, status=400)
     else:
         return JsonResponse({'error': "არაავტორიზებული მოთხოვნა!"}, status=401)
-
-
-class ChangeEmailView(View):
-    def get(self, request, uidb64, token):
-        try:
-            uid = force_text(urlsafe_base64_decode(uidb64))
-            user = User.objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-            user = None
-
-        if user is not None and email_change_token.check_token(user, token):
-            user.email = user.settings.new_email
-            user.save()
-            return redirect('profile')
-        else:
-            # invalid link
-            return render(request, 'registration/invalid.html')

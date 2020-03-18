@@ -131,9 +131,9 @@ function makeCommentBoxHTML(data,reply=false) {
     }
     if(!data.deleted){
         html += `<div class="comment-dl-buttons">
-                    <div class="comment-right-buttons" id='dislike-comment' style="color: #ab3717;"><i class="far fa-thumbs-down">${data.dislikes?data.dislikes:0}</i></div>
-                    <div class="comment-right-buttons" id='like-comment' style="color: #ff2e01;" ><i class="far fa-thumbs-up"></i>${data.likes?data.likes:0}</div>
-                </div>`
+                    <div class="comment-right-buttons" id='dislike-comment' style="color: #ab3717;"><i class="fa${data.voted === 1 ? 's' : 'r'} fa-thumbs-down">${data.dislikes ? data.dislikes : 0}</i></div>
+                    <div class="comment-right-buttons" id='like-comment' style="color: #ff2e01;" ><i class="fa${data.voted === 0 ? 's' : 'r'} fa-thumbs-up"></i>${data.likes ? data.likes : 0}</div>
+                </div>`;
     }
         html+= `<p class='comment-time'>${convertTimeGeo(data.time)}</p>
             </div>`;
@@ -486,4 +486,82 @@ $('.showmore').on('click',function () {
             console.log('meti comment ar aris');
         },
     })
+});
+
+
+function getYearsSelectOptionsHTML(startYear,EndYear) {
+    var html = '';
+    for(let i=EndYear;i>=startYear;i--){
+       html += '<option value="' + i + '">' + i + '</option>';
+    }
+    return html
+}
+
+function getMonthsSelectOptionsHTML() {
+    const monthNames = [ "იანვარი", "თებერვალი", "მარტი", "აპრილი", "მაისი", "ივნისი",
+                        "ივლისი", "აგვისტო", "სექტემბერი", "ოქტომბერი", "ნოემბერი", "დეკემბერი"];
+    var html = "";
+    for (let i = 1; i <= monthNames.length; i++) {
+        html += '<option value="' + i + '">' + monthNames[i-1] + '</option>';
+    }
+    return html
+}
+
+function getDaysSelectOptionsHTML(days) {
+    var html = '';
+    for(let i=1;i<=days;i++){
+       html += '<option value="' + i + '">' + i + '</option>';
+    }
+    return html
+}
+
+$('.profile-edit button[type=submit]').on('click',function (e) {
+    e.preventDefault();
+    var selectedDay = parseInt($("select[name='birth-day'] option:selected").val());
+    var selectedMon = parseInt($("select[name='birth-month'] option:selected").val());
+    var selectedYea = parseInt($("select[name='birth-year'] option:selected").val());
+    if(selectedDay!==0 && selectedMon !== 0 && selectedYea !== 0)
+        $('input[name=birth]').val(selectedYea+'-'+selectedMon+'-'+selectedDay);
+    else
+        $('input[name=birth]').val(null);
+
+    $('.profile-details').submit();
+});
+
+
+$('.profile-details-input').on('click','#change-username-button',function (e) {
+    e.preventDefault();
+    var that = $(this);
+    var parent = that.parent();
+    var inputEl = parent.find('input');
+    var username = inputEl.val();
+    that.css('background-color','#333');
+    inputEl.attr('readonly',null);
+    inputEl.css('background-color','#FFF');
+    inputEl.focus().val('').val(username);
+    that.text('დადასტურება');
+    parent.append(`<button type="reset" class="cancel">გაუქმება</button>`);
+    that.attr('id','submit-username-button');
+}).on('click','.cancel',function (e) {
+    e.preventDefault();
+    var that = $(this);
+    var parent = that.parent();
+    var inputEl = parent.find('input');
+    inputEl.attr('readonly','');
+    inputEl.css('background-color','#aaaa');
+    inputEl.val($('a[href="/account/profile/"]').text());
+    parent.find('#change-username-button').text('შეცვლა');
+    that.remove();
+}).on('click','#change-email-button',function (e) {
+    e.preventDefault();
+    $.ajax({
+        method: "GET",
+        url: window.location.origin + '/account/email_change/',
+        success: function () {
+            alert('მოთხოვნა გაიგზავნა თქვენს Email-ზე,გთხოვთ გადაამოწმოთ! შეამოწმეთ Spam ფაილიც!')
+        },
+        error: function () {
+            alert('მოხდა შეცდომა! თავიდან სცადეთ!');
+        }
+    });
 });

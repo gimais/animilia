@@ -35,7 +35,12 @@ class Comment(models.Model):
             'childs_count':self.replies.count(),
         }
 
-    def get_reply_comment_info(self):
+    def get_reply_comment_info(self,request_user):
+        vote = None
+        if self.like.filter(pk=request_user).exists():
+            vote = 0
+        elif self.dislike.filter(pk=request_user).exists():
+            vote = 1
 
         if self.active:
             return {
@@ -49,6 +54,7 @@ class Comment(models.Model):
                 'has_spoiler':self.spoiler,
                 'likes':self.like.count(),
                 'dislikes':self.dislike.count(),
+                'voted': vote,
             }
         else:
             return {
@@ -59,14 +65,14 @@ class Comment(models.Model):
             }
 
     def __str__(self):
-        return '{}-ის კომენტარი'.format(self.user)
+        return '{}-ის კომენტარი'.format(self.body)
 
 
 
 class Profile(models.Model):
     TYPES = (
-        (0,'კაცი'),
-        (1,'ქალი')
+        (0,'მამრობითი'),
+        (1,'მდედრობითი')
     )
 
     user = models.OneToOneField(User,on_delete=models.CASCADE)
@@ -95,8 +101,6 @@ class Settings(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     username_updated = models.DateTimeField(auto_now_add=True)
     avatar_updated = models.DateTimeField(default=sub_three_days)
-    email_updated = models.BooleanField(default=False)
-    new_email = models.EmailField()
 
     class Meta:
         verbose_name = 'პარამეტრები'
