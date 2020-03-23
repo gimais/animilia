@@ -12,35 +12,37 @@
 <div class="comments-box clearfix">
 {#<!--    <div class="showmore comments">კომენტარები</div>-->#}
     {% for comment in comments %}
+        {% with requser=request.user %}
         <div class="comment clearfix">
 {#            <div class="admin"></div>#}
-            <div class="comment-user-img" href="#user">
-                <img src="/media/{{ comment.user.profile.avatar }}" alt>
-            </div>
+            <a class="comment-user-img" href="/profile/{{ comment.user_id }}">
+                <img src="/media/{{ comment.avatar }}" alt>
+            </a>
             <div class="comment-body">
                 <div class="comment-info">
-                    <p class='comment-user {% if comment.user == request.user %}mine{% endif %}'>{{ comment.user }}</p>
+                    <a class='comment-user {% if comment.user_id == requser.pk %}mine{% endif %}' href="/profile/{{ comment.user_id }}">{{ comment.username }}</a>
                 {% if user.is_authenticated %}
-                    {% if comment.user.id == request.user.id %}
-                        {% if comment.like.count == 0 and comment.dislike.count == 0 and comment.replies.count == 0 %}
+                    {% if comment.user_id == request.user.pk %}
+                        {% if comment.like_count == 0 and comment.dislike_count == 0 and comment.replies_count == 0 %}
                         <div class="comment-right-buttons" id='edit-comment' style="color: #333333;"><i class="fas fa-edit"></i></div>
                         {% endif %}
                         <div class="comment-right-buttons" id='remove-comment' style="color: #333333;"><i class="fas fa-trash"></i></div>
                     {% endif %}
-                    <p class="reply-button" data-id="{{comment.id}}" data-username="{{comment.user}}"><i class="fas fa-reply"></i>  პასუხი</p>
+                    <p class="reply-button" data-id="{{comment.id}}" data-username="{{comment.username}}"><i class="fas fa-reply"></i>  პასუხი</p>
                 {% endif %}
+                {% endwith %}
                 <div class="comment-dl-buttons">
-                    <div class="comment-right-buttons" id='dislike-comment' style="color: #ab3717;"><i class="{% if user in comment.dislike.all  %}fas{% else %} far{% endif %} fa-thumbs-down"></i>{{ comment.dislike.count }}</div>
-                    <div class="comment-right-buttons" id='like-comment' style="color: #ff2e01;" ><i class="{% if user in comment.like.all  %}fas{% else %} far{% endif %} fa-thumbs-up"></i>{{ comment.like.count }}</div>
+                    <div class="comment-right-buttons" id='dislike-comment' style="color: #ab3717;"><i class="{% if comment.has_dislike  %}fas{% else %} far{% endif %} fa-thumbs-down"></i>{{ comment.dislike_count }}</div>
+                    <div class="comment-right-buttons" id='like-comment' style="color: #ff2e01;" ><i class="{% if comment.has_like  %}fas{% else %} far{% endif %} fa-thumbs-up"></i>{{ comment.like_count }}</div>
                 </div>
                     <p class='comment-time'>{{ comment.created|date:"d/m/Y | H:i" }}</p>
                 </div>
                     <p style="word-break: break-word;">{{ comment.body}}</p>
             </div>
-            {% if comment.replies.all %}
+            {% if comment.replies_count %}
             <div class="comment-replies-check closed" data-id="{{comment.id}}">
 {#                <i class="fas fa-caret-down"></i>#}
-                პასუხების ჩვენება ({{comment.replies.count}})
+                პასუხების ჩვენება ({{comment.replies_count}})
             </div>
                 <div class="comment-replies-box" style="display: none"></div>
             {% endif %}

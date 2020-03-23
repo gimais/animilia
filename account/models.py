@@ -1,8 +1,25 @@
 from datetime import datetime,timedelta
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Count,Exists,OuterRef,Subquery
 from django.utils import timezone
 from anime.models import Anime
+
+
+class CommentManager(models.Manager):
+    def with_annotates(self,user_pk):
+        profiles = Profile.objects.filter(user_id=OuterRef('user_id'))
+        user = User.objects.filter(pk=OuterRef('user_id'))
+        has_like = User.objects.get(pk=user_pk).likes.filter(id=OuterRef('id'))
+        has_dislike = User.objects.get(pk=user_pk).dislikes.filter(id=OuterRef('id'))
+        return self.get_queryset().annotate(avatar=Subquery(profiles.values('avatar')[:1]),
+                                            username=Subquery(user.values('username')[:1]),
+                                            has_like=Exists(has_like),
+                                            has_dislike=Exists(has_dislike),
+                                            like_count=Count('like',distinct=True),
+                                            dislike_count=Count('dislike', distinct=True),
+                                            replies_count=Count('replies'),
+                                            )
 
 class Comment(models.Model):
     anime = models.ForeignKey(Anime,on_delete=models.CASCADE,related_name='comments')
@@ -14,6 +31,8 @@ class Comment(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     active = models.BooleanField(default=True)
     parent = models.ForeignKey('self',on_delete=models.CASCADE,null=True,blank=True,related_name='replies')
+
+    objects = CommentManager()
 
     class Meta:
         ordering = ['-id']

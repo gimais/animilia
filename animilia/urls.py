@@ -18,6 +18,7 @@ from django.contrib.admin.forms import AdminAuthenticationForm
 from django.urls import path,include
 from django.conf.urls.static import static
 from django.conf import settings
+from account.views import profile_preview
 
 AdminAuthenticationForm.error_messages = {
     'invalid_login':
@@ -30,5 +31,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include('home.urls')),
     path('account/',include('account.urls')),
+    path('profile/<int:id>/',profile_preview,name='profile_preview'),
     path('anime/',include('anime.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

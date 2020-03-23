@@ -1000,7 +1000,7 @@ div#login-focus:hover {
 }
 
 .comment-edit-form button,.comment-form button{
-    background: #973116;
+    background: #333;
     padding: 10px 15px;
     border: none;
     border-radius: 4px;
@@ -1012,7 +1012,7 @@ div#login-focus:hover {
 }
 
 .comment-edit-form button[type=reset],.comment-form button[type=reset]{
-    background-color: #333;
+    background-color: #973116;
 }
 
 .comment {
@@ -1048,6 +1048,7 @@ div#login-focus:hover {
     color:#ff2e01;
     font-size: 18px;
     display: inline-block;
+    text-decoration: none;
 }
 
 .comment-info > .comment-time{

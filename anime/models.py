@@ -69,7 +69,7 @@ class Anime(models.Model):
 
 
 class AnimeSeries(models.Model):
-    anime = models.ForeignKey(Anime,on_delete=models.CASCADE,verbose_name='ანიმე',limit_choices_to={'type':0})
+    anime = models.ForeignKey(Anime,on_delete=models.CASCADE,verbose_name='ანიმე',limit_choices_to={'type':0},related_name='series')
     url = models.CharField(max_length=100,verbose_name='ვიდეოს ლინკი')
     row = models.PositiveSmallIntegerField(default=1,verbose_name='მერამდენე ეპიზოდია',editable=False)
 

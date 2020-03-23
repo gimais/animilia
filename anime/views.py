@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 
-from anime.models import Anime, AnimeSeries
+from anime.models import Anime
 from account.forms import CommentForm
 
 
@@ -11,14 +11,14 @@ ERROR = {'error':'მოხდა შეცდომა!'}
 
 def page_view(request,slug):
     template_name = 'anime/page.html'
-    anime = get_object_or_404(Anime,slug=slug)
-    episodes = AnimeSeries.objects.filter(anime=anime)
-    comments = anime.comments.filter(active=True,parent__isnull=True)
+    anime = get_object_or_404(Anime.objects.prefetch_related('series','categories'),slug=slug)
+    comments = anime.comments.with_annotates(request.user.pk).\
+        prefetch_related('like','dislike','replies').\
+        filter(active=True,parent__isnull=True)
     paginator = Paginator(comments,6)
     comments = paginator.get_page(1)
     comment_form = CommentForm
     return render(request,template_name,{'anime':anime,
-                                         'episodes':episodes,
                                          'comments':comments,
                                          'max_page':paginator.num_pages,
                                          'comment_form': comment_form,

@@ -9,12 +9,11 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views.decorators.cache import never_cache
 
 from .tokens import email_change_token
-from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-from django.http import HttpResponseRedirect, JsonResponse
-from django.shortcuts import render, redirect
+from django.http import JsonResponse, Http404
+from django.shortcuts import render, redirect, get_object_or_404
 
 from account.forms import SignUpForm, MyAuthenticationForm, CommentForm,\
     UpdateProfileForm, UpdateUsernameForm, EmailChangeForm
@@ -30,12 +29,12 @@ def login_view(request):
         if form.is_valid():
             login(request, form.get_user())
             messages.success(request,'გამარჯობა, {}'.format(form.get_user()),extra_tags='welcome')
-            return HttpResponseRedirect(next_page)
+            return redirect(next_page)
         else:
             messages.error(request, 'ნიკი ან პაროლი არასწორია. თავიდან სცადეთ!',extra_tags='failedAuth')
-            return HttpResponseRedirect(next_page)
+            return redirect(next_page)
     else:
-        return HttpResponseRedirect(next_page)
+        return redirect(next_page)
 
 def signup_view(request):
     if request.user.is_anonymous:
@@ -58,17 +57,9 @@ def profile_view(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
             profile_form = UpdateProfileForm(request.POST,request.FILES,instance=request.user.profile)
-            # user_form = UpdateUserForm(request.POST,instance=request.user)
-            # u_valid = False
-            # p_valid = False
             if profile_form.is_valid():
                 profile_form.save()
-                # p_valid = True
-            # if user_form.is_valid():
-            #     user_form.save()
-            #     u_valid = True
-            # if p_valid and u_valid:
-                return HttpResponseRedirect(reverse('profile'))
+                return redirect('profile')
         else:
             profile_form = UpdateProfileForm(instance=request.user.profile)
             # user_form = UpdateUserForm(instance=request.user)
@@ -79,6 +70,14 @@ def profile_view(request):
         return render(request, 'account/profile.html', context)
     else:
         return redirect('home')
+
+
+def profile_preview(request,id):
+    if isinstance(id,int):
+        user = get_object_or_404(User.objects.select_related('profile'),pk=id)
+    else:
+        return Http404
+    return render(request,'account/profile_preview.html',{'user':user})
 
 
 def username_update(request):
