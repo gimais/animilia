@@ -62,10 +62,8 @@ def profile_view(request):
                 return redirect('profile')
         else:
             profile_form = UpdateProfileForm(instance=request.user.profile)
-            # user_form = UpdateUserForm(instance=request.user)
         context = {
             'p_form':profile_form,
-            # 'u_form':user_form,
         }
         return render(request, 'account/profile.html', context)
     else:

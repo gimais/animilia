@@ -1,4 +1,3 @@
-
 {% if user.is_authenticated %}
     <form class='comment-form' method='POST'>
         {% csrf_token %}
@@ -6,13 +5,24 @@
         <button type='submit'>გაგზავნა</button>
     </form>
 {% else %}
-    komentari tu ginda regisrt=arfgerhwghw
+    {% block extra %}
+        <style>
+            .comments-box.clearfix:before {
+                clear: both;
+                margin-top: 10px;
+            }
+        </style>
+    {% endblock %}
+    <div class="no-auth">
+        <p>კომენტარის გასაკეთებლად საჭიროა ავტორიზაცია,
+            თუ არ ხართ ავტორიზებული შეგიძლიათ გაიაროთ <a href="{% url 'signup' %}">რეგისტრაცია</a>
+        <p>
+    </div>
 {% endif %}
 
 <div class="comments-box clearfix">
-{#<!--    <div class="showmore comments">კომენტარები</div>-->#}
     {% for comment in comments %}
-        {% with requser=request.user %}
+        {% with requester=user %}
         <div class="comment clearfix">
 {#            <div class="admin"></div>#}
             <a class="comment-user-img" href="/profile/{{ comment.user_id }}">
@@ -20,9 +30,9 @@
             </a>
             <div class="comment-body">
                 <div class="comment-info">
-                    <a class='comment-user {% if comment.user_id == requser.pk %}mine{% endif %}' href="/profile/{{ comment.user_id }}">{{ comment.username }}</a>
+                    <a class='comment-user {% if comment.user_id == requester.pk %}mine{% endif %}' href="/profile/{{ comment.user_id }}">{{ comment.username }}</a>
                 {% if user.is_authenticated %}
-                    {% if comment.user_id == request.user.pk %}
+                    {% if comment.user_id == requester.pk %}
                         {% if comment.like_count == 0 and comment.dislike_count == 0 and comment.replies_count == 0 %}
                         <div class="comment-right-buttons" id='edit-comment' style="color: #333333;"><i class="fas fa-edit"></i></div>
                         {% endif %}
@@ -52,23 +62,3 @@
 {% if comments.has_next %}
 <div class="showmore" data-page="1" data-max="{{ max_page }}">მეტი</div>
 {% endif %}
-
-{#<!--            <div class="comment-replies-box">-->#}
-{#<!--                {% for reply in comment.replies.all reversed%}-->#}
-{#<!--                <div class="comment">-->#}
-{#<!--                    <div class="comment-user-img" href="#user">-->#}
-{#<!--                        <img src="#" alt>-->#}
-{#<!--                    </div>-->#}
-{#<!--                    <div class="comment-body">-->#}
-{#<!--                        <div class="comment-info">-->#}
-{#<!--                            <p class='comment-user'>{{ reply.user }}</p>-->#}
-{#<!--                            {% if user.is_authenticated %}-->#}
-{#<!--                            <p class="reply-button" data-id="{{comment.id}}" data-username="{{reply.user}}"><i class="fas fa-reply"></i>  პასუხი</p>-->#}
-{#<!--                            {% endif %}-->#}
-{#<!--                            <p class='comment-time'>{{ reply.created|date:"d/m/Y | H:i" }}</p>-->#}
-{#<!--                        </div>-->#}
-{#<!--                            <p style="word-wrap: break-word">{{ reply.body}}</p>-->#}
-{#<!--                    </div>-->#}
-{#<!--                </div>-->#}
-{#<!--                {% endfor %}-->#}
-{#<!--                </div>-->#}

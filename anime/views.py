@@ -12,9 +12,19 @@ ERROR = {'error':'მოხდა შეცდომა!'}
 def page_view(request,slug):
     template_name = 'anime/page.html'
     anime = get_object_or_404(Anime.objects.prefetch_related('series','categories'),slug=slug)
-    comments = anime.comments.with_annotates(request.user.pk).\
-        prefetch_related('like','dislike','replies').\
-        filter(active=True,parent__isnull=True)
+    if request.user.is_authenticated:
+        comments = anime.comments.with_annotates_auth(request.user.pk).\
+            prefetch_related('like','dislike','replies').\
+            filter(active=True,parent__isnull=True)
+    else:
+        comments = anime.comments.with_annotates_anony(). \
+            prefetch_related('like', 'dislike', 'replies'). \
+            filter(active=True, parent__isnull=True)
+    # if request.session.get('anime',False) != False:
+    #     request.session['anime'].append(anime.pk)
+    # else:
+    #     request.session['anime'] = {anime.pk:}
+    # anime.increase_view_count(request.session)
     paginator = Paginator(comments,6)
     comments = paginator.get_page(1)
     comment_form = CommentForm

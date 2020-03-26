@@ -23,7 +23,6 @@ $('#login-focus').on('click',function () {
 HOVERED_ON_LOGO = 0;
 
 $('.logo').hover(function () {
-        $('.web-name').toggleClass('web-name-focus');
 
         HOVERED_ON_LOGO+=1;
 
@@ -131,14 +130,14 @@ function makeCommentBoxHTML(data,reply=false) {
     }
     if(!data.deleted){
         html += `<div class="comment-dl-buttons">
-                    <div class="comment-right-buttons" id='dislike-comment' style="color: #ab3717;"><i class="fa${data.voted === 1 ? 's' : 'r'} fa-thumbs-down">${data.dislikes ? data.dislikes : 0}</i></div>
+                    <div class="comment-right-buttons" id='dislike-comment' style="color: #ab3717;"><i class="fa${data.voted === 1 ? 's' : 'r'} fa-thumbs-down"></i>${data.dislikes ? data.dislikes : 0}</div>
                     <div class="comment-right-buttons" id='like-comment' style="color: #ff2e01;" ><i class="fa${data.voted === 0 ? 's' : 'r'} fa-thumbs-up"></i>${data.likes ? data.likes : 0}</div>
                 </div>`;
     }
         html+= `<p class='comment-time'>${convertTimeGeo(data.time)}</p>
             </div>`;
     if(data.deleted){
-         html+= `<p style="border: 1px solid black;text-align: center;color: #ff2e01;height: 29px;line-height: 25px;">ეს კომენტარი წაშლილია!</p>`
+         html+= `<p class="deleted-comment">ეს კომენტარი წაშლილია!</p>`
     }else{
         html+= `<p style="word-wrap: break-word;"">${escapeHTML(data.body)}</p>`
     }
@@ -547,10 +546,12 @@ $('.profile-details-input').on('click','#change-username-button',function (e) {
     var that = $(this);
     var parent = that.parent();
     var inputEl = parent.find('input');
+    var submitButton = parent.find('#submit-username-button');
     inputEl.attr('readonly','');
     inputEl.css('background-color','#aaaa');
     inputEl.val($('a[href="/account/profile/"]').text());
-    parent.find('#change-username-button').text('შეცვლა');
+    submitButton.text('შეცვლა');
+    submitButton.attr('id','change-username-button');
     that.remove();
 }).on('click','#change-email-button',function (e) {
     e.preventDefault();

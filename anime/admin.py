@@ -28,7 +28,7 @@ class AnimeSeriesAdmin(admin.ModelAdmin):
     list_filter = ("anime",)
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ("name", "posts",)
+    list_display = ("name",)
 
 
 admin.site.register(Category,CategoryAdmin)

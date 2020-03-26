@@ -205,8 +205,8 @@ $(window).on('click',function (e) {
                 <div class="profile-display">
                     <p id="profile-username">{{ user.username }}</p>
                     <p id="profile-group">group</p>
-                    <div class="item-page-row" style="border-top:2px solid #e2e2e2;padding:15px 10px;">
-                        <dl style="width: 50%;float: left">
+                    <div class="profile-row">
+                        <dl>
                             <dt>რეგისტრაციის თარიღი:</dt>
                                 <dd>{{ user.date_joined|date:"d.m.Y" }}</dd>
                             <dt>ჯგუფი:</dt>
@@ -218,7 +218,7 @@ $(window).on('click',function (e) {
                                 <dd>მაყურებელი</dd>
                             {% endif %}
                         </dl>
-                        <dl style="width: 50%;float: left;">
+                        <dl>
                             <dt>სქესი:</dt>
                             {% if user.profile.gender == 0 %}
                                 <dd>მამრობოთი</dd>
@@ -251,7 +251,7 @@ $(window).on('click',function (e) {
                     <p class="username-info"></p>
                 </div>
                 <div class="profile-details-input" style="position:relative">
-                    <a class="change-button" href="{% url 'password_change' %}">პაროლის შეცვლა</a>
+                    <a class="change-pass-button" href="{% url 'password_change' %}">პაროლის შეცვლა</a>
                 </div>
             </div>
             <div class="profile-edit">

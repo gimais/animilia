@@ -11,7 +11,9 @@
                         <div class="item">
                             <a href = "/anime/{{ anime.slug }}">
                                 <div style="position: relative">
-                                    <img src={% if anime.poster %}"/media/{{ anime.poster }}" {% else %} "https://gicg.com.sg/wp-content/plugins/learnpress/assets/images/no-image.png" style='height:396px;'{% endif %} alt="სურათი არ არის">
+                                    <div class="home-item-image">
+                                        <img src={% if anime.poster %}"/media/{{ anime.poster }}" {% else %} "https://gicg.com.sg/wp-content/plugins/learnpress/assets/images/no-image.png" style='height:396px;'{% endif %} alt="პოსტერი">
+                                    </div>
                                     <div class='age' style="padding: {% if anime.age >= 10 %}10px {% endif %} 5px">{{ anime.age }}+</div>
                                     <div class="info">
                                         <div class='name'>{{ anime.name }}</div>

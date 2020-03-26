@@ -7,7 +7,7 @@ from django.db.models import F
 
 class Category(models.Model):
     name = models.CharField(max_length=18,unique=True)
-    posts = models.PositiveSmallIntegerField(default=0,editable=False)
+    # posts = models.PositiveSmallIntegerField(default=0,editable=False)
 
     class Meta:
         db_table = 'categories'
@@ -53,15 +53,26 @@ class Anime(models.Model):
         verbose_name = 'ანიმე'
         verbose_name_plural = 'ანიმეები'
 
+    # def increase_view_count(self,session):
+    #     session = session.get('page_views',False)
+    #     if session != False:
+    #         if self.pk in session:
+    #             print('iyo bolo 1 saatshi da ar unda moematos view')
+    #         else:
+    #             print('ar iyo da unda daematos')
+    #     else:
+    #         print('vapshe ar aqvs page_views key')
+
+
     def save(self, *args, **kwargs):
         if self.type==1:
             self.episodes = 1
 
         super(Anime, self).save(*args, **kwargs)
 
-        if self._state.adding: # yovel anime damatebaze categoriebis ricxvshi damateba
-            for category in self.categories.all():
-                Category.objects.filter(pk=category.pk).update(posts=F('posts')+1)
+        # if self._state.adding: # yovel anime damatebaze categoriebis ricxvshi damateba
+        #     for category in self.categories.all():
+        #         Category.objects.filter(pk=category.pk).update(posts=F('posts')+1)
 
 
     def __str__(self):

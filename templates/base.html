@@ -25,50 +25,49 @@
         გთხოვთ, რომ <a href="https://browsehappy.com/">გაანახლოთ ბრაუზერი</a> .</p>
   <![endif]-->
 
-    <header></header>
-    <nav>
-        <div class="top-menu">
-            <div class="top-logo">
-                <a class="logo" href="/"></a>
-                <a class="web-name"></a>
-            </div>
-{#            <div id="mob-menu">menu</div>#}
-            <ul class="top-nav">
-                <li><a id="mob-home" href="/">მთავარი გვერდი</a></li>
-{#                <li><a href="#menu2">menu2</a></li>#}
-{#                <li><a href="#menu3">menu3</a></li>#}
-                {% if user.is_anonymous %}
-                    <li>
-                        <div id="login-focus">შესვლა</div>
-                            <form class="login-form" method="post" action="{% url 'login' %}?next={{ request.path }}">
-                                {% csrf_token %}
-                                <input type="text" name="username" class="form-input pad" autofocus placeholder="ნიკი" autocapitalize="none" autocomplete="off" maxlength="150" required>
-                                <input type="password" name="password" autocomplete="current-password" class="form-input pad" placeholder="პაროლი" required id="id_password">
-                                <input type="submit" value="შესვლა">
-                                <a  href="{% url 'password_reset' %}">არ მახსოვს პაროლი...</a>
-                            </form>
-                    </li>
-                    <li><a href="{% url 'signup' %}">რეგისტრაცია</a></li>
-                {% else %}
-                    {% if user.is_superuser %}
-                        <li><a href="/admin" >Admin</a></li>
+    <header>
+        <div class="top-background"></div>
+        <nav>
+            <div class="top-menu">
+                <div class="top-logo">
+                    <a class="logo" href="/"></a>
+                    <a class="web-name"></a>
+                </div>
+                <ul class="top-nav">
+                    <li><a id="mob-home" href="/">მთავარი გვერდი</a></li>
+                    {% if user.is_anonymous %}
+                        <li>
+                            <div id="login-focus">შესვლა</div>
+                                <form class="login-form" method="post" action="{% url 'login' %}?next={{ request.path }}">
+                                    {% csrf_token %}
+                                    <input type="text" name="username" class="form-input pad" autofocus placeholder="ნიკი" autocapitalize="none" autocomplete="off" required>
+                                    <input type="password" name="password" autocomplete="current-password" class="form-input pad" placeholder="პაროლი" required id="id_password">
+                                    <input type="submit" value="შესვლა">
+                                    <a  href="{% url 'password_reset' %}">არ მახსოვს პაროლი...</a>
+                                </form>
+                        </li>
+                        <li><a href="{% url 'signup' %}">რეგისტრაცია</a></li>
+                    {% else %}
+                        {% if user.is_superuser %}
+                            <li><a href="/admin" >Admin</a></li>
+                        {% endif %}
+                        <li><a class='active' href="{% url 'profile' %}" data-id="{{ user.id }}">{{user.username}}</a></li>
+
+    {#                    <li><a href="#parametrebi" style="padding: 35px 40px;position: relative;">#}
+    {#                        <span>პარამ. </span>#}
+    {#                        <i class="fas fa-user-cog"></i>#}
+    {#                    </a></li>#}
+
+                        <li><a href="{% url 'logout' %}?next={% block logout_redirect %}{% endblock %}" style="padding: 35px 40px;position: relative;">
+                            <span>გასვლა </span>
+                            <i class="fas fa-sign-out-alt"></i>
+                        </a></li>
+
                     {% endif %}
-                    <li><a class='active' href="{% url 'profile' %}" data-id="{{ user.id }}">{{user.username}}</a></li>
-
-{#                    <li><a href="#parametrebi" style="padding: 35px 40px;position: relative;">#}
-{#                        <span>პარამ. </span>#}
-{#                        <i class="fas fa-user-cog"></i>#}
-{#                    </a></li>#}
-
-                    <li><a href="{% url 'logout' %}?next={% block logout_redirect %}{% endblock %}" style="padding: 35px 40px;position: relative;">
-                        <span>გასვლა </span>
-                        <i class="fas fa-sign-out-alt"></i>
-                    </a></li>
-
-                {% endif %}
-            </ul>
-        </div>
-    </nav>
+                </ul>
+            </div>
+        </nav>
+    </header>
     {% if messages %}
       <div class="wrapper">
         {% for msg in messages %}

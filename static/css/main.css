@@ -299,12 +299,19 @@ nav{
 }
 
 
-header{
-       background: url('/static/img/background.jpg') bottom 74% center;
+.top-background{
+   background: url('/static/img/background.jpg') bottom 74% center;
     height: 190px;
     position: relative;
     background-size: cover;
 }
+
+/*header{*/
+/*   background: url('/static/img/background.jpg') bottom 74% center;*/
+/*    height: 190px;*/
+/*    position: relative;*/
+/*    background-size: cover;*/
+/*}*/
 
 /*#mob-menu{*/
 /*    display: none;*/
@@ -332,21 +339,18 @@ header{
     background: url('/static/img/logo_focus.png');
 }
 
-.logo-focus{
-    background: url('/static/img/logo_focus.png') no-repeat;
+.logo:hover + .web-name {
+    background: url('/static/img/name_focus.png') no-repeat;
 }
 
+
 .web-name{
-    background: url(/static/img/name.png) no-repeat;
+    background: url('/static/img/name.png') no-repeat;
     height: 43px;
     width: 139px;
     display: inline-block;
     margin-left: 110px;
     margin-top: 10px;
-}
-
-.web-name-focus {
-    background: url('/static/img/name_focus.png') no-repeat;
 }
 
 .top-menu{
@@ -901,8 +905,17 @@ div#login-focus:hover {
     margin-bottom: 7px;
 }
 
+.profile-row{
+    border-top: 2px solid #e2e2e2;
+    padding: 15px 10px;
+}
 
-.item-page-row dt {
+.profile-row dl{
+    width: 50%;
+    float: left;
+}
+
+.item-page-row dt,.profile-row dt {
     float: left;
     clear: left;
     margin-right: 8px;
@@ -912,11 +925,12 @@ div#login-focus:hover {
     font-size: 15px;
 }
 
-.item-page-row dd{
+
+.item-page-row dd,.profile-row dd{
     line-height: 1.5em;
     font-size: 15px;
 }
-.item-page-row dd > li{
+.item-page-row dd > li,.profile-row dd >li{
     display: inline-block;
 }
 
@@ -945,7 +959,7 @@ div#login-focus:hover {
     text-align: center;
     cursor: pointer;
     padding: 9px 5px 0;
-    margin: 0 9px 16px 0;
+    margin: 3px;
     background: #292018;
     color: #ffffff;
     min-width: 33px;
@@ -966,6 +980,7 @@ div#login-focus:hover {
     padding-top: 25px;
     height: 0;
 }
+
 .item-player iframe {
     position: absolute;
     top: 0;
@@ -974,21 +989,39 @@ div#login-focus:hover {
     height: 100%;
 }
 
-.admin{
-    content: "";
-    background: url(https://i.pinimg.com/originals/fb/10/e1/fb10e16ce8776e6b7e4d4213a16d4344.jpg);
-    opacity: 0.5;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    position: absolute;
-    z-index: -1;
+/*.admin{*/
+/*    content: "";*/
+/*    background: url(https://i.pinimg.com/originals/fb/10/e1/fb10e16ce8776e6b7e4d4213a16d4344.jpg);*/
+/*    opacity: 0.5;*/
+/*    top: 0;*/
+/*    left: 0;*/
+/*    bottom: 0;*/
+/*    right: 0;*/
+/*    position: absolute;*/
+/*    z-index: -1;*/
+/*}*/
+
+.no-auth{
+    text-align: center;
+    padding: 15px;
+    border: 1px solid;
+}
+
+.no-auth:after{
+    margin-bottom: 50px;
 }
 
 .comments-box.clearfix:before {
     clear: both;
     margin-top: 65px;
+}
+
+.deleted-comment{
+    border: 1px solid black;
+    text-align: center;
+    color: #ff2e01;
+    height: 29px;
+    line-height: 25px;
 }
 
 .comment-edit-form textarea,.comment-form textarea {
@@ -1023,8 +1056,8 @@ div#login-focus:hover {
 .comment-user-img {
     width: 90px;
     height: 90px;
-    display: inline-block;
-    vertical-align: middle;
+    display: block;
+    float: left;
 }
 
 .comment-user-img img{
@@ -1257,16 +1290,36 @@ div.comment-right-buttons{
     font-size: 19px;
 }
 
-.profile-display dd,.profile-display dt{
-    line-height: 2em;
-}
-
 .profile-display {
     width: calc(100% - 220px);
     float: left;
     max-height: 230px;
     margin-left: 20px;
 }
+
+/*.profile-row dl{*/
+/*    float: left;*/
+/*    width: 50%;*/
+/*}*/
+/*.profile-row dl:after{*/
+/*    clear: both;*/
+/*    float: none;*/
+/*}*/
+
+/*.profile-row{*/
+/*    border-top: 2px solid #e2e2e2;*/
+/*    padding: 15px 10px;*/
+/*}*/
+
+/*.profile-row dd,.profile-row dt{*/
+/*    line-height: 2em;*/
+/*}*/
+
+/*.profile-row dt{*/
+/*    color: #ab3717;*/
+/*    font-weight: 600;*/
+/*    font-size: 15px;*/
+/*}*/
 
 .profile-edit {
     padding: 2px 28px;
@@ -1289,14 +1342,10 @@ div.comment-right-buttons{
 /*    color: #222;*/
 /*}*/
 
-select.birthselector {
-    width: 32.74%;
-}
-
 .profile-details-input{
     width: 45%;
     float: left;
-    margin-bottom: 50px;
+    margin-bottom: 20px;
 }
 
 .profile-details-input select,.profile-details-input input{
@@ -1342,10 +1391,17 @@ p.username-info{
     text-decoration: none;
 }
 
-a.change-button{
-    left: 0;
+a.change-pass-button {
+    background-color: #333;
+    padding: 10px;
+    border-radius: 4px;
+    color: #fff;
+    margin-bottom: 10px;
     width: 50%;
+    cursor: pointer;
     text-align: center;
+    float: left;
+    text-decoration: none;
 }
 
 .profile-details-input .cancel{
@@ -1471,9 +1527,14 @@ a.change-button{
 
 @media (max-width: 768px) {
 
-    header{
+
+    .top-background{
         height: 0;
     }
+
+    /*header{*/
+    /*    height: 0;*/
+    /*}*/
 
     .logo{
         display: none;
@@ -1577,6 +1638,13 @@ a.change-button{
 
 }
 
+@media screen and (max-width: 620px) {
+    .profile-row dl {
+        width: 100%;
+        float: none;
+    }
+
+}
 @media screen and (max-width: 515px) {
 
     .clearfix:after {
@@ -1587,7 +1655,6 @@ a.change-button{
         float: none;
         width: 100%;
     }
-
 
     .item-page{
         padding: 5px;
@@ -1601,6 +1668,26 @@ a.change-button{
         padding: 8px 0;
     }
 
+    .profile-avatar-container,.profile-display,.profile-row dl,.profile-row,.item,.profile-details-input{
+        float: none;
+        width:100%;
+    }
+
+    .profile-display,.item-page-img,.item-page-info,.item img,.profile-page {
+        width: 100%;
+        margin: 0;
+        padding: 2px;
+    }
+
+    a.change-pass-button,select.birthselector {
+        width: 100%;
+        margin-top: 8px;
+    }
+
+    .tooltip{
+        display: none;
+    }
+
 }
 
 @media screen and (max-width: 480px) {
@@ -1609,15 +1696,14 @@ a.change-button{
         content: "480px";
     }
 
-
     .signup-content {
         padding: 50px 25px;
     }
 
-    .item{
-        float: none;
-        width: 100%;
-    }
+    /*.item{*/
+    /*    float: none;*/
+    /*    width: 100%;*/
+    /*}*/
 }
 
 @media screen and (max-width: 414px) {
@@ -1625,22 +1711,33 @@ a.change-button{
     .clearfix:after {
         content: "414px";
     }
+    /*8888888888888888888888888888888888888888888*/
+    /*.profile-avatar-container,.profile-display,.profile-row dl,.profile-row{*/
+    /*    float: none;*/
+    /*    width:100%;*/
+    /*}*/
 
-    .profile-avatar-container{
-        float: none;
-        margin-right:0;
-        width:auto;
-        border:0;
-        border-bottom:2px solid #000;
-    }
+    /*.profile-display,.item-page-img,.item-page-info,.item img,.profile-page {*/
+    /*    width: 100%;*/
+    /*    margin: 0;*/
+    /*    padding: 2px;*/
+    /*}*/
 
-    .item-page-img {
-        width: 100%;
-    }
+    /*.profile-main.clearfix {*/
+    /*    padding: 0;*/
+    /*}*/
 
-    .item-page-info {
-        width: 100%;
-    }
+    /*.tooltip{*/
+    /*    display: none;*/
+    /*}*/
+    /*ewrhetjhrwgtghren*/
+    /*.item-page-img {*/
+    /*    width: 100%;*/
+    /*}*/
+
+    /*.item-page-info {*/
+    /*    width: 100%;*/
+    /*}*/
 
     .signup-content {
         padding: 50px 25px;
@@ -1680,9 +1777,13 @@ a.change-button{
         margin: 0;
     }
 
-    header{
+    .top-background{
         height: 280px;
     }
+
+    /*header{*/
+    /*    height: 280px;*/
+    /*}*/
 
     .logo {
         top: 265px;

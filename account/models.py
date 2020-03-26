@@ -7,7 +7,7 @@ from anime.models import Anime
 
 
 class CommentManager(models.Manager):
-    def with_annotates(self,user_pk):
+    def with_annotates_auth(self,user_pk):
         profiles = Profile.objects.filter(user_id=OuterRef('user_id'))
         user = User.objects.filter(pk=OuterRef('user_id'))
         has_like = User.objects.get(pk=user_pk).likes.filter(id=OuterRef('id'))
@@ -18,8 +18,16 @@ class CommentManager(models.Manager):
                                             has_dislike=Exists(has_dislike),
                                             like_count=Count('like',distinct=True),
                                             dislike_count=Count('dislike', distinct=True),
-                                            replies_count=Count('replies'),
-                                            )
+                                            replies_count=Count('replies'))
+
+    def with_annotates_anony(self):
+        profiles = Profile.objects.filter(user_id=OuterRef('user_id'))
+        user = User.objects.filter(pk=OuterRef('user_id'))
+        return self.get_queryset().annotate(avatar=Subquery(profiles.values('avatar')[:1]),
+                                            username=Subquery(user.values('username')[:1]),
+                                            like_count=Count('like', distinct=True),
+                                            dislike_count=Count('dislike', distinct=True),
+                                            replies_count=Count('replies'))
 
 class Comment(models.Model):
     anime = models.ForeignKey(Anime,on_delete=models.CASCADE,related_name='comments')
