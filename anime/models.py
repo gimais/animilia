@@ -21,7 +21,6 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-
 class Anime(models.Model):
     TYPES = (
         (0,'სერიალი'),
@@ -44,24 +43,18 @@ class Anime(models.Model):
     episodes = models.PositiveSmallIntegerField(verbose_name='ეპიზოდების რაოდენობა',default=1)
     rating = models.DecimalField(max_digits=5, decimal_places=1,default=0,verbose_name='რეიტინგი')
     updated = models.DateTimeField(auto_now=True)
+    views = models.IntegerField(default=0,editable=False)
     dubbed = models.PositiveSmallIntegerField(default=0,verbose_name='გახმოვანებული',editable=False)
     slug = models.SlugField(unique=True,verbose_name='ლინკი')
-
 
     class Meta:
         db_table = 'animes_list'
         verbose_name = 'ანიმე'
         verbose_name_plural = 'ანიმეები'
 
-    # def increase_view_count(self,session):
-    #     session = session.get('page_views',False)
-    #     if session != False:
-    #         if self.pk in session:
-    #             print('iyo bolo 1 saatshi da ar unda moematos view')
-    #         else:
-    #             print('ar iyo da unda daematos')
-    #     else:
-    #         print('vapshe ar aqvs page_views key')
+    def increase_view_count(self,cookies):
+        if cookies.get('_vEpAd',False) == False:
+            Anime.objects.filter(pk=self.pk).update(views=F('views') + 1)
 
 
     def save(self, *args, **kwargs):
@@ -70,14 +63,8 @@ class Anime(models.Model):
 
         super(Anime, self).save(*args, **kwargs)
 
-        # if self._state.adding: # yovel anime damatebaze categoriebis ricxvshi damateba
-        #     for category in self.categories.all():
-        #         Category.objects.filter(pk=category.pk).update(posts=F('posts')+1)
-
-
     def __str__(self):
         return self.name
-
 
 class AnimeSeries(models.Model):
     anime = models.ForeignKey(Anime,on_delete=models.CASCADE,verbose_name='ანიმე',limit_choices_to={'type':0},related_name='series')

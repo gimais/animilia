@@ -51,6 +51,11 @@ function activateClassButton(button){
        }
 }
 
+const cT = function () {
+    var date = new Date();
+    return date.getTime()
+};
+
 function setCookie(name, value, expire,path) {
         var date = new Date();
         date.setTime(date.getTime() + (expire*24*60*60*1000));
@@ -100,23 +105,23 @@ $('.episode-select-button').on('click',function () {
         if ($('.item-player').hasClass('hidden')) {
                 $('.item-player').removeClass('hidden');
         }
-        setCookie(locationURL.substring(28,locationURL.length-1),clickedButton.data('id'),10,locationURL.substring(22));
+        setCookie(locationURL.substring(28,locationURL.length-1),clickedButton.data('id'),20,locationURL.substring(22));
 });
 
 
 function makeCommentBoxHTML(data,reply=false) {
     var html = '';
     html += `<div class="comment${reply?' clearfix':''}">
-                    <div class="comment-user-img">
+                    <a class="comment-user-img" href="/profile/${data.user_id}">
                         <img src=${window.location.origin+'/media/'+data.avatar} alt>
-                    </div>
+                    </a>
                     <div class="comment-body">
                         <div class="comment-info">`;
 
     if(data.user_id === request_user_id){
-        html += `<p class='comment-user mine'>${escapeHTML(data.username)}</p>`;
+        html += `<a class='comment-user mine' href="/profile/${data.user_id}">${escapeHTML(data.username)}</a>`;
     }else{
-        html += `<p class='comment-user'>${escapeHTML(data.username)}</p>`;
+        html += `<a class='comment-user' href="/profile/${data.user_id}">${escapeHTML(data.username)}</a>`;
     }
 
     if(typeof request_user_id !== "undefined" && !data.deleted){

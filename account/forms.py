@@ -154,7 +154,6 @@ class UpdateUsernameForm(forms.ModelForm):
 
     error_messages = {
         'not_changed': "თქვენ ეს ნიკი ისედაც გაქვთ!",
-        # 'already_exists':'ეს ნიკი დაკავებულია!',
         'deadline':'ნიკის შეცვლა შეგიძლიათ ყოველ 7 დღეში ერთხელ!'
     }
     class Meta:
@@ -169,14 +168,6 @@ class UpdateUsernameForm(forms.ModelForm):
     def clean_username(self):
         old_username = self.user.username
         username = self.cleaned_data.get('username')
-        print(username,old_username)
-
-        # if User.objects.filter(username=username).exists():
-            # print('arsebobs ukve')
-            # raise forms.ValidationError(
-            #     self.error_messages['already_exists'],
-            #     code='already_exists',
-            # )
 
         if username == old_username:
             raise forms.ValidationError(
@@ -197,9 +188,10 @@ class UpdateUsernameForm(forms.ModelForm):
         username = self.cleaned_data["username"]
         self.user.username = username
         self.user.settings.username_updated = timezone.now()
+
         if commit:
             self.user.save()
-            # sheizleba ar daimaxsovos
+
         return self.user
 
 class UpdateProfileForm(forms.ModelForm):

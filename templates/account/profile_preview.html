@@ -14,36 +14,38 @@
             <div class="profile-display">
                 <p id="profile-username">{{ user.username }}</p>
                 <p id="profile-group">group</p>
-                <div class="item-page-row" style="border-top:2px solid #e2e2e2;padding:15px 10px;">
-                    <dl style="width: 50%;float: left">
-                        <dt>რეგისტრაციის თარიღი:</dt>
-                            <dd>{{ user.date_joined|date:"d.m.Y" }}</dd>
-                        <dt>ჯგუფი:</dt>
-                        {% if user.is_superuser %}
-                            <dd>ადმინისტრატორი</dd>
-                        {% elif user.is_staff %}
-                            <dd>მოდერატორი</dd>
-                        {% else %}
-                            <dd>მაყურებელი</dd>
-                        {% endif %}
-                    </dl>
-                    <dl style="width: 50%;float: left;">
-                        <dt>სქესი:</dt>
-                        {% if user.profile.gender == 0 %}
-                            <dd>მამრობოთი</dd>
-                        {% elif user.profile.gender == 1 %}
-                            <dd>მდედრობითი</dd>
-                        {% else %}
-                            <dd>მითითებული არ არის</dd>
-                        {% endif %}
-                        <dt>დაბადების თარიღი:</dt>
-                        {% if user.profile.birth %}
-                            <dd>{{ user.profile.birth }}</dd>
-                        {% else %}
-                            <dd>მითითებული არ არის</dd>
-                        {% endif %}
-                    </dl>
-                </div>
+<div class="profile-row">
+                        <dl>
+                            <dt>რეგისტრაციის თარიღი:</dt>
+                                <dd>{{ user.date_joined|date:"d.m.Y" }}</dd>
+                            <dt>ჯგუფი:</dt>
+                            {% if user.is_superuser %}
+                                <dd>ადმინისტრატორი</dd>
+                            {% elif user.is_staff %}
+                                <dd>მოდერატორი</dd>
+                            {% else %}
+                                <dd>მაყურებელი</dd>
+                            {% endif %}
+                            <dt>კომენტარები:</dt>
+                                <dd>{{ user.comments}}</dd>
+                        </dl>
+                        <dl>
+                            <dt>სქესი:</dt>
+                            {% if user.profile.gender == 0 %}
+                                <dd>მამრობოთი</dd>
+                            {% elif user.profile.gender == 1 %}
+                                <dd>მდედრობითი</dd>
+                            {% else %}
+                                <dd>მითითებული არ არის</dd>
+                            {% endif %}
+                            <dt>დაბადების თარიღი:</dt>
+                            {% if user.profile.birth %}
+                                <dd>{{ user.profile.birth }}</dd>
+                            {% else %}
+                                <dd>მითითებული არ არის</dd>
+                            {% endif %}
+                        </dl>
+                    </div>
             </div>
         </div>
     </div>

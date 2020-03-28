@@ -75,13 +75,13 @@
 {% block script %}
     <script>
     {% if anime.type == 0 %}
-        if (itemSlug.substring(0, 7) === '/anime/') {
-            var pageCookie = getCookie(itemSlug.substring(7));
-            if (pageCookie !== "") {
-                $('.item-page-episodes').find(`.episode-select-button[data-id=${pageCookie}]`).addClass('active');
-            }
+        var pageCookie = getCookie(itemSlug.substring(7));
+        if (pageCookie !== "") {
+            $('.item-page-episodes').find(`.episode-select-button[data-id=${pageCookie}]`).addClass('active');
         }
     {% endif %}
-        
+        if (getCookie('"_vEpAd"') === "") {
+            setCookie("_vEpAd",cT(),1/24,locationURL.substring(22));
+        }
     </script>
 {% endblock %}

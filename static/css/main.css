@@ -300,7 +300,7 @@ nav{
 
 
 .top-background{
-   background: url('/static/img/background.jpg') bottom 74% center;
+   background: url('/static/img/background.webp') bottom 74% center;
     height: 190px;
     position: relative;
     background-size: cover;

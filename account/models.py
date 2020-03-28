@@ -31,7 +31,7 @@ class CommentManager(models.Manager):
 
 class Comment(models.Model):
     anime = models.ForeignKey(Anime,on_delete=models.CASCADE,related_name='comments')
-    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='users')
+    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='comment')
     body = models.TextField()
     like = models.ManyToManyField(User,blank=True,editable=False,related_name='likes')
     dislike = models.ManyToManyField(User,blank=True,editable=False,related_name='dislikes')
@@ -104,7 +104,6 @@ class Profile(models.Model):
 
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     avatar = models.ImageField(upload_to='avatars/',default='no-avatar.jpg',blank=True,verbose_name='ავატარი')
-    # avatar_url = models.CharField(max_length=35,default='/static/img/no-avatar.jpg')
     gender = models.PositiveSmallIntegerField(choices=TYPES,blank=True,null=True,verbose_name='სქესი')
     birth = models.DateField(blank=True,null=True,verbose_name='დაბადების თარიღი')
 
