@@ -37,7 +37,7 @@ $('.logo').hover(function () {
                         alert('იცოდე ბოლო შანსია!!!');
                         break;
                 case 40:
-                        window.location = 'https://www.youtube.com/watch?v=G8iyI_-Amhw';
+                        window.location.assign('https://www.youtube.com/watch?v=G8iyI_-Amhw');
                         break;
         }
 });
@@ -94,8 +94,8 @@ $.ajaxSetup({
     }
 });
 
-const locationURL = document.location.href;
-const itemSlug = locationURL.substring(21,locationURL.length-1);
+const itemSlug = document.location.pathname;
+
 
 $('.episode-select-button').on('click',function () {
         var clickedButton = $(this);
@@ -105,7 +105,7 @@ $('.episode-select-button').on('click',function () {
         if ($('.item-player').hasClass('hidden')) {
                 $('.item-player').removeClass('hidden');
         }
-        setCookie(locationURL.substring(28,locationURL.length-1),clickedButton.data('id'),20,locationURL.substring(22));
+        setCookie(itemSlug.substring(7,itemSlug.length-1),clickedButton.data('id'),20,itemSlug);
 });
 
 

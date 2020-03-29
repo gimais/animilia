@@ -4,7 +4,6 @@ from django.contrib.auth.backends import UserModel
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.db.models import Count
 from django.utils.encoding import force_text, force_bytes
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views.decorators.cache import never_cache
@@ -17,7 +16,7 @@ from django.http import JsonResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 
 from account.forms import SignUpForm, MyAuthenticationForm, CommentForm,\
-    UpdateProfileForm, UpdateUsernameForm, EmailChangeForm
+    UpdateProfileForm, UpdateUsernameForm, EmailChangeForm,ShowProfileForm
 from anime.models import Anime
 from .models import Comment, Profile
 
@@ -57,14 +56,18 @@ def signup_view(request):
 def profile_view(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
-            profile_form = UpdateProfileForm(request.POST,request.FILES,instance=request.user.profile)
-            if profile_form.is_valid():
+            profile_form = UpdateProfileForm(request.POST,instance=request.user.profile)
+            settings_form = ShowProfileForm(request.POST,instance=request.user.settings)
+            if profile_form.is_valid() and settings_form.is_valid():
+                settings_form.save()
                 profile_form.save()
                 return redirect('profile')
         else:
             profile_form = UpdateProfileForm(instance=request.user.profile)
+            settings_form = ShowProfileForm(instance=request.user.settings)
         context = {
             'p_form':profile_form,
+            's_form':settings_form,
             'user':User.objects.prefetch_related('profile','settings').get(id=request.user.pk),
         }
         return render(request, 'account/profile.html', context)
@@ -74,7 +77,7 @@ def profile_view(request):
 
 def profile_preview(request,id):
     if isinstance(id,int):
-        user = get_object_or_404(User.objects.select_related('profile').annotate(comments=Count('comment')),pk=id)
+        user = get_object_or_404(User.objects.select_related('profile','settings'),pk=id)
     else:
         return Http404
     return render(request,'account/profile_preview.html',{'user':user})

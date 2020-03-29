@@ -127,6 +127,8 @@ class Settings(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     username_updated = models.DateTimeField(auto_now_add=True)
     avatar_updated = models.DateTimeField(default=sub_three_days)
+    show_birth = models.BooleanField(default=False)
+    show_gender = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = 'პარამეტრები'

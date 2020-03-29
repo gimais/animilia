@@ -1,5 +1,7 @@
 # Allow crawling of all content
 User-agent: *
-Disallow: /admin
+Disallow: /admin/
+Disallow: /account/profile/
+
 
 Sitemap: http://animilia.ge/sitemap.xml

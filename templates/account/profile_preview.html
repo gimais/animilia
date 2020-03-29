@@ -26,10 +26,9 @@
                             {% else %}
                                 <dd>მაყურებელი</dd>
                             {% endif %}
-                            <dt>კომენტარები:</dt>
-                                <dd>{{ user.comments}}</dd>
                         </dl>
                         <dl>
+                        {% if user.settings.show_gender %}
                             <dt>სქესი:</dt>
                             {% if user.profile.gender == 0 %}
                                 <dd>მამრობოთი</dd>
@@ -38,12 +37,15 @@
                             {% else %}
                                 <dd>მითითებული არ არის</dd>
                             {% endif %}
+                        {% endif %}
+                        {% if user.settings.show_birth %}
                             <dt>დაბადების თარიღი:</dt>
                             {% if user.profile.birth %}
                                 <dd>{{ user.profile.birth }}</dd>
                             {% else %}
                                 <dd>მითითებული არ არის</dd>
                             {% endif %}
+                        {% endif %}
                         </dl>
                     </div>
             </div>

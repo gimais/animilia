@@ -255,15 +255,17 @@ $(window).on('click',function (e) {
                 </div>
             </div>
             <div class="profile-edit">
+                 <div class="tooltip">&lowast;
+                  <span class="tooltiptext">გთხოვთ, მონაცემები შეავსოთ და არ მოიტყუოთ.<br> სტატისტიკისთვის გვჭირდება ^_^</span>
+                </div>
                <div class="profile-header">პროფილის დეტალები</div>
                 <form method="POST" class="profile-details">
                     {% csrf_token %}
                     <div class="profile-details-input">
-                         <div class="tooltip">&lowast;
-                          <span class="tooltiptext">გთხოვთ შეავსოთ და მონაცემებში არ მოიტყუოთ. სტატისტიკისთვის გვჭირდება ^_^</span>
-                        </div>
                         <label for="id_gender">სქესი</label>
                         {{ p_form.gender }}
+                        {{ s_form.show_gender }}
+                        <label for="id_show_gender" style="display: inline-block"> პროფილზე გამოჩენა</label>
                     </div>
                     <div class="profile-details-input" style="float:right;">
                         <label>დაბადების თარიღი</label>
@@ -276,6 +278,9 @@ $(window).on('click',function (e) {
                         <select name="birth-year" class="birthselector">
                             <option value="0">---------</option>
                         </select>
+                        <br>
+                        {{ s_form.show_birth }}
+                        <label for="id_show_birth" style="display: inline-block"> პროფილზე გამოჩენა</label>
                         <input type="hidden" id="id_birth" name="birth" value="{{ user.profile.birth|date:"Y-m-d" }}">
                     </div>
                     <button type="submit" class="form-submit">შენახვა</button>

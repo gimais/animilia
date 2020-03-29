@@ -6,8 +6,15 @@ from django.contrib.auth.models import User
 from django.core.validators import MinLengthValidator
 from django.utils.translation import ngettext
 from django.utils import timezone
-from account.models import Comment, Profile
+from account.models import Comment, Profile, Settings
 from account.validators import SignUpMaxLengthValidator
+from django.contrib.admin.forms import AdminAuthenticationForm
+
+AdminAuthenticationForm.error_messages = {
+    'invalid_login':
+        "გთხოვთ, შეიყვანოთ სწორი მომხმარებლის სახელი და პაროლი. "
+        "იქონიეთ მხედველობაში, რომ ორივე ველი ითვალისწინებს პატარა და დიდ ასოებს."
+}
 
 
 def validate(self, password, user=None):
@@ -201,6 +208,14 @@ class UpdateProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ('gender', 'birth')
+
+class ShowProfileForm(forms.ModelForm):
+    show_gender = forms.BooleanField(widget=forms.CheckboxInput(attrs={'style':'display:inline-block;'}),required=False)
+    show_birth = forms.BooleanField(widget=forms.CheckboxInput(attrs={'style': 'display:inline-block;'}),required=False)
+
+    class Meta:
+        model = Settings
+        fields = ('show_gender','show_birth',)
 
 class EmailChangeForm(forms.Form):
     """

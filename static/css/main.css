@@ -1359,8 +1359,13 @@ div.comment-right-buttons{
     cursor: pointer;
 }
 
+.birthselector{
+    margin-bottom: 10px;
+}
+
 #id_gender{
     width: 100%;
+    margin-bottom: 10px;
 }
 
 .profile-details-input #id_email,.profile-details-input #id_username,.profile-details-input #id_password{
@@ -1416,7 +1421,6 @@ a.change-pass-button {
 
 .profile-details label {
     display: block;
-    margin-left: 12px;
     margin-bottom: 9px;
 }
 
@@ -1536,11 +1540,7 @@ a.change-pass-button {
     /*    height: 0;*/
     /*}*/
 
-    .logo{
-        display: none;
-    }
-
-    .web-name{
+    .logo,.web-name,.tooltip {
         display: none;
     }
 
@@ -1684,10 +1684,6 @@ a.change-pass-button {
         margin-top: 8px;
     }
 
-    .tooltip{
-        display: none;
-    }
-
 }
 
 @media screen and (max-width: 480px) {
@@ -1699,11 +1695,6 @@ a.change-pass-button {
     .signup-content {
         padding: 50px 25px;
     }
-
-    /*.item{*/
-    /*    float: none;*/
-    /*    width: 100%;*/
-    /*}*/
 }
 
 @media screen and (max-width: 414px) {
@@ -1864,8 +1855,9 @@ a.change-pass-button {
 
 .tooltip {
     position: relative;
-    font-size: 25px;
-    float: right;
+    font-size: 20px;
+    float: left;
+    left: 200px;
     color: red;
     cursor: default;
 }
@@ -1881,7 +1873,7 @@ a.change-pass-button {
     z-index: 1;
     opacity: 0.85;
     font-size: 16px;
-    /*width: max-content;*/
+    width: max-content;
 }
 
 .tooltip:hover .tooltiptext {

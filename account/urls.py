@@ -20,7 +20,6 @@ urlpatterns = [
     path('username_update/',local_view.username_update,name='username_update'),
 
     path('password_change/', views.PasswordChangeView.as_view(), name='password_change'),
-    # path('password_change/done/', views.PasswordChangeDoneView.as_view(), name='password_change_done'),
 
     path('email_change/<uidb64>/<token>/',local_view.change_email_view, name='change_email'),
     path('email_change/',local_view.change_email_request_view, name='change_email_request'),

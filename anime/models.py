@@ -4,6 +4,8 @@ from django.db import models
 from django.db.models import F
 
 # commaseparatedintegerfield
+from django.urls import reverse
+
 
 class Category(models.Model):
     name = models.CharField(max_length=18,unique=True)
@@ -62,6 +64,9 @@ class Anime(models.Model):
             self.episodes = 1
 
         super(Anime, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return f'/anime/{self.slug}'
 
     def __str__(self):
         return self.name

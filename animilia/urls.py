@@ -14,17 +14,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.contrib.admin.forms import AdminAuthenticationForm
 from django.urls import path,include
 from django.conf.urls.static import static
 from django.conf import settings
 from account.views import profile_preview
+from templates.sitemaps import AnimeSitemap
+from django.contrib.sitemaps.views import sitemap
 
-AdminAuthenticationForm.error_messages = {
-    'invalid_login':
-        "გთხოვთ, შეიყვანოთ სწორი მომხმარებლის სახელი და პაროლი. "
-        "იქონიეთ მხედველობაში, რომ ორივე ველი ითვალისწინებს პატარა და დიდ ასოებს."
-        "ან ადმინი არ ხარ!!"
+sitemaps = {
+    'animes':AnimeSitemap,
 }
 
 urlpatterns = [
@@ -32,5 +30,6 @@ urlpatterns = [
     path('',include('home.urls')),
     path('account/',include('account.urls')),
     path('profile/<int:id>/',profile_preview,name='profile_preview'),
+    path('sitemap.xml', sitemap, {'sitemaps':sitemaps},name='sitemap'),
     path('anime/',include('anime.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
