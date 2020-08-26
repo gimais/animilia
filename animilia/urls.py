@@ -27,9 +27,9 @@ sitemaps = {
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',include('home.urls')),
+    # path('',include('home.urls')),
     path('account/',include('account.urls')),
     path('profile/<int:id>/',profile_preview,name='profile_preview'),
     path('sitemap.xml', sitemap, {'sitemaps':sitemaps},name='sitemap'),
-    path('anime/',include('anime.urls')),
+    path('',include('anime.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -122,7 +122,7 @@ def avatar_update(request):
                 settings.save()
 
                 # uploading and saving
-                avatar.name = request.user.username + '_{}'.format(settings.avatar_updated.date()) + '.jpg'
+                avatar.name = str(request.user.pk) + '_{}'.format(settings.avatar_updated.date()) + '.jpg'
                 profile.avatar = request.FILES.get('data')
                 profile.save()
 
@@ -341,12 +341,15 @@ def like_comment(request):
             if comment_id.dislike.filter(id=request.user.id).exists(): # თუ დისლაიქი აქვს კომს წაშალე დისლაქი და დაამატე ლაიქი
                 comment_id.dislike.remove(request.user)
                 comment_id.like.add(request.user)
+                return JsonResponse({'type': 2}, status=200)
             elif comment_id.like.filter(id=request.user.id).exists(): # თუ ლაიქი აქვს უკვე,ესეიგი ანლაიქი უნდა და წაშალე ლაიქი
                 comment_id.like.remove(request.user)
+                return JsonResponse({'type': 0}, status=200)
             else: # არაფერი ეწინააღმდეგება ,უბრალოდ დაამატე ლაიქი
                 comment_id.like.add(request.user)
+                return JsonResponse({'type': 1}, status=200)
 
-            return JsonResponse({'info': "like"}, status=200)
+            # return JsonResponse({'info': "like"}, status=200)
         else:
             return JsonResponse({'error':'dafiqsirda shecdoma!'}, status=400)
     else:
@@ -365,12 +368,13 @@ def dislike_comment(request):
             if comment_id.like.filter(id=request.user.id).exists():
                 comment_id.like.remove(request.user)
                 comment_id.dislike.add(request.user)
+                return JsonResponse({'type': 2}, status=200)
             elif comment_id.dislike.filter(id=request.user.id).exists():
                 comment_id.dislike.remove(request.user)
+                return JsonResponse({'type': 0}, status=200)
             else:
                 comment_id.dislike.add(request.user)
-
-            return JsonResponse({'info': "dislike"}, status=200)
+                return JsonResponse({'type': 1}, status=200)
         else:
             return JsonResponse({'error':'dafiqsirda shecdoma!'}, status=400)
     else:

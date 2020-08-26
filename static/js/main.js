@@ -407,6 +407,7 @@ $('.comments-box').on('click','.reply-button',function () {
             url: window.location.origin + '/account/comment/like/',
             data: {id: id},
             success: function (data) {
+                console.log(data.type);
                 if (data.type===1) {
                     that.hide(100, function() {
                         $(this).html(`<i class="fas fa-thumbs-up" aria-hidden="true"></i>` + (parseInt(that.text()) + 1)).show(200);

@@ -29,7 +29,8 @@ def validate(self, password, user=None):
             params={'min_length': self.min_length},
         )
 
-MinimumLengthValidator.validate = lambda self,password,user:validate(self,password,user)
+
+MinimumLengthValidator.validate = lambda self, password, user: validate(self, password, user)
 
 
 class SignUpForm(UserCreationForm):
@@ -38,24 +39,23 @@ class SignUpForm(UserCreationForm):
         super(SignUpForm, self).__init__(*args, **kwargs)
         self.fields['username'].widget.attrs.pop("autofocus", None)
 
-
     error_messages = {
         'password_mismatch': 'შეყვანილი პაროლები არ დაემთხვა!',
     }
 
-    email = forms.EmailField(max_length=254,widget=forms.EmailInput(
-        attrs={'class':'form-input','placeholder':'Email'}))
+    email = forms.EmailField(max_length=254, widget=forms.EmailInput(
+        attrs={'class': 'form-input', 'placeholder': 'Email'}))
     password1 = forms.CharField(
         min_length=4,
         label="",
         strip=False,
-        widget=forms.PasswordInput(attrs={'class':'form-input','placeholder':'პაროლი (მინ 4 სიმბოლო)'}),
+        widget=forms.PasswordInput(attrs={'class': 'form-input', 'placeholder': 'პაროლი (მინ 4 სიმბოლო)'}),
         help_text='',
     )
     password2 = forms.CharField(
         min_length=4,
         label='',
-        widget=forms.PasswordInput(attrs={'class':'form-input','placeholder':'გაიმეორეთ პაროლი'}),
+        widget=forms.PasswordInput(attrs={'class': 'form-input', 'placeholder': 'გაიმეორეთ პაროლი'}),
         strip=False,
         help_text="",
     )
@@ -75,12 +75,12 @@ class SignUpForm(UserCreationForm):
         MinLengthValidator.message = "სიგრძე მინიმუმ %(limit_value)d სიმბოლოსგან უნდა შედგებოდეს. (შეყვანილია %(show_value)d სიმბოლო)"
         User._meta.get_field('username').error_messages['unique'] = 'ეს ნიკი დაკავებულია!'
 
-        help_texts={
-            'username' : '',
+        help_texts = {
+            'username': '',
         }
         widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-input','placeholder':'ნიკი (მინ: 3 - მაქს: 16)'}),
-            'autofocus':None,
+            'username': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'ნიკი (მინ: 3 - მაქს: 16)'}),
+            'autofocus': None,
         }
 
         fields = ('username', 'email', 'password1', 'password2',)
@@ -94,12 +94,14 @@ class MyAuthenticationForm(AuthenticationForm):
         'inactive': "ეს ანგარიში არააქტიურია!",
     }
 
+
 class MyPasswordResetForm(PasswordResetForm):
     email = forms.EmailField(
         label='',
         max_length=254,
-        widget=forms.EmailInput(attrs={'autocomplete': 'email','class': 'form-input','placeholder':'Email'})
+        widget=forms.EmailInput(attrs={'autocomplete': 'email', 'class': 'form-input', 'placeholder': 'Email'})
     )
+
 
 class MySetPasswordForm(SetPasswordForm):
     error_messages = {
@@ -107,15 +109,16 @@ class MySetPasswordForm(SetPasswordForm):
     }
     new_password1 = forms.CharField(
         label='',
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password','class': 'form-input','placeholder':'ახალი პაროლი'}),
+        widget=forms.PasswordInput(
+            attrs={'autocomplete': 'new-password', 'class': 'form-input', 'placeholder': 'ახალი პაროლი'}),
         strip=False,
     )
     new_password2 = forms.CharField(
         label='',
         strip=False,
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password','class': 'form-input','placeholder':'გაიმეორეთ ახალი პაროლი'}),
+        widget=forms.PasswordInput(
+            attrs={'autocomplete': 'new-password', 'class': 'form-input', 'placeholder': 'გაიმეორეთ ახალი პაროლი'}),
     )
-
 
 
 class MyPasswordChangeForm(PasswordChangeForm):
@@ -127,29 +130,45 @@ class MyPasswordChangeForm(PasswordChangeForm):
     old_password = forms.CharField(
         label='',
         strip=False,
-        widget=forms.PasswordInput(attrs={'autocomplete': 'current-password','class': 'form-input',
-                                          'placeholder':'ძველი პაროლი'}),
+        widget=forms.PasswordInput(attrs={'autocomplete': 'current-password', 'class': 'form-input',
+                                          'placeholder': 'ძველი პაროლი'}),
     )
 
     new_password1 = forms.CharField(
         label='',
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password','class': 'form-input','placeholder':'ახალი პაროლი'}),
+        widget=forms.PasswordInput(
+            attrs={'autocomplete': 'new-password', 'class': 'form-input', 'placeholder': 'ახალი პაროლი'}),
         strip=False,
         # help_text=password_validation.password_validators_help_text_html(),
     )
     new_password2 = forms.CharField(
         label="",
         strip=False,
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password','class': 'form-input','placeholder':'გაიმეორეთ ახალი პაროლი'}),
+        widget=forms.PasswordInput(
+            attrs={'autocomplete': 'new-password', 'class': 'form-input', 'placeholder': 'გაიმეორეთ ახალი პაროლი'}),
     )
 
     field_order = ['old_password', 'new_password1', 'new_password2']
 
+class MySetPasswordForm(SetPasswordForm):
+    new_password1 = forms.CharField(
+        label='',
+        widget=forms.PasswordInput(
+            attrs={'autocomplete': 'new-password', 'class': 'form-input', 'placeholder': 'ახალი პაროლი'}),
+        strip=False,
+    )
+    new_password2 = forms.CharField(
+        label="",
+        strip=False,
+        widget=forms.PasswordInput(
+            attrs={'autocomplete': 'new-password', 'class': 'form-input', 'placeholder': 'გაიმეორეთ ახალი პაროლი'}),
+    )
+
 
 class CommentForm(forms.ModelForm):
     body = forms.CharField(
-        label = "",
-        widget = forms.Textarea(attrs={'placeholder':'კომენტარი'})
+        label="",
+        widget=forms.Textarea(attrs={'placeholder': 'კომენტარი'})
     )
 
     class Meta:
@@ -158,11 +177,11 @@ class CommentForm(forms.ModelForm):
 
 
 class UpdateUsernameForm(forms.ModelForm):
-
     error_messages = {
         'not_changed': "თქვენ ეს ნიკი ისედაც გაქვთ!",
-        'deadline':'ნიკის შეცვლა შეგიძლიათ ყოველ 7 დღეში ერთხელ!'
+        'deadline': 'ნიკის შეცვლა შეგიძლიათ ყოველ 7 დღეში ერთხელ!'
     }
+
     class Meta:
         model = User
         fields = ('username',)
@@ -170,7 +189,6 @@ class UpdateUsernameForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(UpdateUsernameForm, self).__init__(*args, **kwargs)
-
 
     def clean_username(self):
         old_username = self.user.username
@@ -201,6 +219,7 @@ class UpdateUsernameForm(forms.ModelForm):
 
         return self.user
 
+
 class UpdateProfileForm(forms.ModelForm):
     gender = forms.Select()
     birth = None
@@ -209,13 +228,17 @@ class UpdateProfileForm(forms.ModelForm):
         model = Profile
         fields = ('gender', 'birth')
 
+
 class ShowProfileForm(forms.ModelForm):
-    show_gender = forms.BooleanField(widget=forms.CheckboxInput(attrs={'style':'display:inline-block;'}),required=False)
-    show_birth = forms.BooleanField(widget=forms.CheckboxInput(attrs={'style': 'display:inline-block;'}),required=False)
+    show_gender = forms.BooleanField(widget=forms.CheckboxInput(attrs={'style': 'display:inline-block;'}),
+                                     required=False)
+    show_birth = forms.BooleanField(widget=forms.CheckboxInput(attrs={'style': 'display:inline-block;'}),
+                                    required=False)
 
     class Meta:
         model = Settings
-        fields = ('show_gender','show_birth',)
+        fields = ('show_gender', 'show_birth',)
+
 
 class EmailChangeForm(forms.Form):
     """
@@ -227,11 +250,11 @@ class EmailChangeForm(forms.Form):
         'not_changed': "ეს Email ისედაც გაქვთ!",
     }
 
-    new_email1 = forms.EmailField(max_length=254,widget=forms.EmailInput(
-        attrs={'class':'form-input','placeholder':'ახალი Email'}))
+    new_email1 = forms.EmailField(max_length=254, widget=forms.EmailInput(
+        attrs={'class': 'form-input', 'placeholder': 'ახალი Email'}))
 
-    new_email2 = forms.EmailField(max_length=254,widget=forms.EmailInput(
-        attrs={'class':'form-input','placeholder':'გაიმეორეთ ახალი Email'}))
+    new_email2 = forms.EmailField(max_length=254, widget=forms.EmailInput(
+        attrs={'class': 'form-input', 'placeholder': 'გაიმეორეთ ახალი Email'}))
 
     def __init__(self, user, *args, **kwargs):
         self.user = user

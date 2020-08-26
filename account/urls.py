@@ -2,12 +2,13 @@ from django.urls import path
 from . import views as local_view
 from django.contrib.auth import views
 from .decorators import anonymous_required
-from .forms import MyAuthenticationForm,MyPasswordResetForm,MyPasswordChangeForm
+from .forms import MyAuthenticationForm,MyPasswordResetForm,MyPasswordChangeForm,MySetPasswordForm
 
 # Forms
 views.LoginView.authentication_form = MyAuthenticationForm
 views.PasswordResetView.form_class = MyPasswordResetForm
 views.PasswordChangeView.form_class = MyPasswordChangeForm
+views.PasswordResetConfirmView.form_class = MySetPasswordForm
 views.PasswordChangeView.success_url = '/account/profile'
 
 urlpatterns = [

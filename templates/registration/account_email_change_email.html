@@ -1,5 +1,12 @@
 {% autoescape off %}
-    გამარჯობა {{ user.username }},
-    ემაილი სეცვწგჰეგეჰჰწ
+
+    Animilia.ge - Email-ის შეცვლა
+    მომხმარებლის {{ user.get_username }} Email-ის შესაცვლელად გადადით მოცემულ ბმულზე:
     http://{{ domain }}{% url 'change_email' uidb64=uid token=token %}
+
+    თუ ბმულზე გადასვლას ვერ ახერხებთ, დააკოპირეთ მოცემული ბმული სრულად,
+    ჩასვით ბრაუზერის სამისამართო ველში და ისე გადადით.
+
+    პატივისცემით,
+    Animilia
 {% endautoescape %}

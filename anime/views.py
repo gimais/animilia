@@ -9,6 +9,10 @@ from account.forms import CommentForm
 
 ERROR = {'error':'მოხდა შეცდომა!'}
 
+def indexView(request):
+    animes_list = Anime.objects.values('name','slug','age','rating','views','poster').all().order_by('-updated')
+    return render(request,'home.html',{'animes_list':animes_list})
+
 def page_view(request,slug):
     template_name = 'anime/page.html'
     anime = get_object_or_404(Anime.objects.prefetch_related('series','categories','comments'),slug=slug)

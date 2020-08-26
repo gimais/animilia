@@ -617,6 +617,13 @@ section:after {
     display: flex;
 }
 
+.info-page{
+    background-color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 18px;
+}
+
 .item{
 	cursor:pointer;
     position: relative;
