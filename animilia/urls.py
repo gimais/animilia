@@ -24,11 +24,12 @@ from django.contrib.sitemaps.views import sitemap
 sitemaps = {
     'animes':AnimeSitemap,
 }
-
+import debug_toolbar
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('account/',include('account.urls')),
     path('profile/<int:id>/',profile_preview,name='profile_preview'),
     path('sitemap.xml', sitemap, {'sitemaps':sitemaps},name='sitemap'),
     path('',include('anime.urls')),
+    path('__debug__/', include(debug_toolbar.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

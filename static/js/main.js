@@ -69,10 +69,10 @@ function getCookie(cname) {
   var ca = decodedCookie.split(';');
   for(var i = 0; i <ca.length; i++) {
     var c = ca[i];
-    while (c.charAt(0) == ' ') {
+    while (c.charAt(0) === ' ') {
       c = c.substring(1);
     }
-    if (c.indexOf(name) == 0) {
+    if (c.indexOf(name) === 0) {
       return c.substring(name.length, c.length);
     }
   }
@@ -144,7 +144,11 @@ function makeCommentBoxHTML(data,reply=false) {
     if(data.deleted){
          html+= `<p class="deleted-comment">ეს კომენტარი წაშლილია!</p>`
     }else{
-        html+= `<p style="word-wrap: break-word;"">${escapeHTML(data.body)}</p>`
+        if(data.has_spoiler) {
+            html += `<p style="word-wrap: break-word;"">${ifCommentContainsSpoiler(escapeHTML(data.body))}</p>`
+        }else{
+            html += `<p style="word-wrap: break-word;"">${escapeHTML(data.body)}</p>`
+        }
     }
     html+= '</div>';
 
@@ -164,6 +168,7 @@ function makeCommentTextAreaHTML(parent_id){
     html += `<form class=\'comment-form\' style=\'padding: 15px 0\' method=\'POST\' data-id=\"${parent_id}\">
             <input type="hidden" name="csrfmiddlewaretoken" value="${getCookie('csrftoken')}">
             <p> <textarea name="body" cols="40" rows="10" placeholder="კომენტარი" id="id_body"></textarea></p>
+            <button class="spoiler-button">სპოილერი</button>
             <button type="submit">გაგზავნა</button>
             <button type="reset">გაუქმება</button>
             </form>`;
@@ -175,6 +180,7 @@ function makeTextareaEdit(parent_id){
     html += `<form class=\'comment-edit-form\' style=\'padding: 15px 0\' method=\'POST\' data-id=\"${parent_id}\">
                 <input type="hidden" name="csrfmiddlewaretoken" value="${getCookie('csrftoken')}">
                 <p><textarea name="body" cols="40" rows="10" placeholder="კომენტარი" id="id_body"></textarea></p>
+                <button class="spoiler-button">სპოილერი</button>
                 <button type="submit">შეცვლა</button>
                 <button type="reset">გაუქმება</button>
                 </form>`;
@@ -242,10 +248,12 @@ var $commentForm = $('.comment-form');
 $commentForm.submit(function(event){
     event.preventDefault();
     var $formDataSerialized = $(this).serialize();
+    var hasSpoiler = $(this).find('button[type="submit"]').hasClass('has-spoiler');
+    console.log(hasSpoiler);
     $.ajax({
         method: "POST",
         url: window.location.origin+'/account/comment/',
-        data: $formDataSerialized+'&id='+$('.item-page').data('id'),
+        data: $formDataSerialized+'&id='+$('.item-page').data('id')+'&spoiler='+hasSpoiler,
         success: function (data) {
             data.body = $(".comment-form textarea").val();
             data.time = new Date().getTime()/1000;
@@ -261,8 +269,7 @@ $commentForm.submit(function(event){
     })
 });
 
-
-$('.comments-box').on('click','.reply-button',function () {
+$('.comments-box, .comment-form').on('click','.reply-button',function () {
     var button = $(this);
     var parent_id = button.data('it') || button.data('id');
     var username = button.data('username');
@@ -291,7 +298,7 @@ $('.comments-box').on('click','.reply-button',function () {
     $.ajax({
         method: "POST",
         url: window.location.origin+'/account/comment/',
-        data: $formDataSerialized + `&parent_id=${that.data('id')}`,
+        data: $formDataSerialized + `&parent_id=${that.data('id')}` + '&spoiler='+$(this).hasClass('has-spoiler'),
         success: function (data) {
             data.body = that.find('textarea').val();
             data.time = new Date().getTime()/1000;
@@ -367,11 +374,25 @@ $('.comments-box').on('click','.reply-button',function () {
     commentBox.find('#like-comment:first').hide();
     commentBox.find('#remove-comment:first').hide();
     commentBox.find('#dislike-comment:first').hide();
+    var textareaValue = "";
 
-    var textareValue = commentBox.find('p:not([class])').text();
+    if(that.parents('.comment-body').find('.spoiler').length > 0){
+        var text = that.parents('.comment-body').find('p');
+        var spoiler = '[spoiler]' + text.find('.spoiler')[0].innerHTML + '[/spoiler]';
+        var firstSpan = text.find('span')[0].innerHTML;
+        textareaValue = firstSpan + spoiler;
+
+        if(text.find('span').length > 1){
+            textareaValue += text.find('span')[1].innerHTML
+        }
+
+    }else{
+        textareaValue = commentBox.find('p:not([class])').text();
+    }
+
     commentBox.find('p:not([class])').hide();
     commentBox.append(makeTextareaEdit(id));
-    commentBox.find('.comment-edit-form textarea').focus().val(textareValue);
+    commentBox.find('.comment-edit-form textarea').focus().val(textareaValue);
 }).on('click','.comment .comment-edit-form button[type=reset]',function (e) {
     e.preventDefault();
     var parent = $(this).parent();
@@ -465,6 +486,21 @@ $('.comments-box').on('click','.reply-button',function () {
         })
     }else
         alert('რა იყო პიროვნების გაორება გაქვს?')
+}).on('click','.spoiler-button',function (e) {
+    e.preventDefault();
+    var tx = $(this).parent().find('textarea')[0];
+    var start = tx.selectionStart;
+    var end = tx.selectionEnd;
+    var sel = tx.value.substring(start, end);
+    tx.value = tx.value.substring(0, start) + '[spoiler]' + sel + '[/spoiler]' + tx.value.substring(end);
+    tx.focus();
+    tx.selectionEnd= end + 9;
+    $(this).parent().find('button[type="submit"]').addClass('has-spoiler');
+}).on('click','#reveal-spoiler',function (e) {
+    e.preventDefault();
+    $(this).parent().find('.spoiler').fadeIn(1000);
+    $(this).hide(200);
+    $(this).remove();
 });
 
 $('.showmore').on('click',function () {
@@ -572,3 +608,17 @@ $('.profile-details-input').on('click','#change-username-button',function (e) {
         }
     });
 });
+
+function ifCommentContainsSpoiler(text) {
+    var html = text;
+    if(text.includes('[spoiler]')){
+        var startTagIndex = text.indexOf('[spoiler]') + 9;
+        var endTagIndex = text.indexOf('[/spoiler]');
+        var spoilerText = text.substring(startTagIndex,endTagIndex);
+        html = `<span>` + text.substring(0,startTagIndex - 9)  + `</span>`
+            + `<span class="spoiler">` + spoilerText
+            + `</span><button id="reveal-spoiler">სპოილერი</button>`
+            + `<span>` + text.substring(endTagIndex+10,text.length) + `</span>`;
+    }
+    return html
+}

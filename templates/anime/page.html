@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Animilia - {{ anime.name }}{% endblock %}
+{% block title %}{{ anime.name }} - Animilia{% endblock %}
 {% block logout_redirect %}{{ request.path }}{% endblock %}
 {% block description %}{{ anime.name }} - ქართულად გახმოვანებული ანიმე{% endblock %}
 
@@ -75,6 +75,11 @@
 
 {% block script %}
     <script>
+        Array.prototype.forEach.call(document.getElementsByClassName('comment'), child => {
+            var com = $(child).find('.comment-body').find('p')[2];
+            com.innerHTML = ifCommentContainsSpoiler(com.innerHTML.trim());
+        });
+
     {% if anime.type == 0 %}
         var pageCookie = getCookie(itemSlug.substring(7,itemSlug.length-1));
         if (pageCookie !== "") {

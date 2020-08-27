@@ -2,6 +2,7 @@
     <form class='comment-form' method='POST'>
         {% csrf_token %}
         {{comment_form.as_p|safe}}
+        <button class="spoiler-button">სპოილერი</button>
         <button type='submit'>გაგზავნა</button>
     </form>
 {% else %}
@@ -47,7 +48,13 @@
                 </div>
                     <p class='comment-time'>{{ comment.created|date:"d/m/Y | H:i" }}</p>
                 </div>
-                    <p style="word-break: break-word;">{{ comment.body}}</p>
+                    <p style="word-break: break-word;">
+{#                        {% if comment.spoiler %}#}
+{#                            spoileri aqvs#}
+{#                        {% else %}#}
+                            {{ comment.body}}
+{#                        {% endif %}#}
+                    </p>
             </div>
             {% if comment.replies_count %}
             <div class="comment-replies-check closed" data-id="{{comment.id}}">

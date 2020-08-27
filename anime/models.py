@@ -57,7 +57,6 @@ class Anime(models.Model):
         if cookies.get('_vEpAd',False) == False:
             Anime.objects.filter(pk=self.pk).update(views=F('views') + 1)
 
-
     def save(self, *args, **kwargs):
         if self.type==1:
             self.episodes = 1

@@ -6,7 +6,7 @@ from .models import Comment,Profile
 class CommentAdmin(admin.ModelAdmin):
     list_display = ('user', 'body', 'anime', 'created', 'active')
     list_filter = ('active', 'created')
-    search_fields = ('user', 'body')
+    search_fields = ['user__username','body']
     actions = ['active_comments','inactive_comments']
 
     def active_comments(self, request, queryset):

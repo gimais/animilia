@@ -633,10 +633,6 @@ section:after {
     width:33.33%;
 }
 
-/*.item-img{*/
-/*    height: 396px;*/
-/*}*/
-
 .item img{
 	max-width: 100%;
 	height: auto;
@@ -1051,6 +1047,12 @@ div#login-focus:hover {
     float: right;
 }
 
+button.spoiler-button {
+    float: left;
+    background: #e0e0e0;
+    color: black;
+}
+
 .comment-edit-form button[type=reset],.comment-form button[type=reset]{
     background-color: #973116;
 }
@@ -1058,6 +1060,19 @@ div#login-focus:hover {
 .comment {
     border-bottom: 1px solid #e2e2e2;
     padding: 5px;
+}
+
+.spoiler{
+    display: none;
+    background: #f3f3f3;
+}
+
+#reveal-spoiler{
+    padding: 4px;
+    font-size: 12px;
+    background: #e2e2e2e2;
+    border-radius: 5px;
+    margin: 0 4px;
 }
 
 .comment-user-img {
@@ -1437,6 +1452,8 @@ a.change-pass-button {
     margin-top: 25px;
 }
 
+
+
 /*================================*/
 
 .show{
@@ -1789,7 +1806,6 @@ a.change-pass-button {
 
 }
 
-
 .upload-demo .upload-demo-wrap,
 .upload-demo .upload-result,
 .upload-demo.ready .upload-msg {
@@ -1857,8 +1873,6 @@ a.change-pass-button {
   text-decoration: none;
   cursor: pointer;
 }
-
-
 
 .tooltip {
     position: relative;

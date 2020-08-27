@@ -38,7 +38,7 @@ def page_view(request,slug):
 def more_comments(request):
     try:
         page = int(request.GET.get('skip',False))
-        anime = Anime.objects.select_related('comments').get(id=request.GET.get('id',None))
+        anime = Anime.objects.prefetch_related('comments').get(id=request.GET.get('id',None))
     except (Anime.DoesNotExist,Anime.MultipleObjectsReturned):
         anime = None
         page = None
