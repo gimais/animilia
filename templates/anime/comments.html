@@ -49,11 +49,7 @@
                     <p class='comment-time'>{{ comment.created|date:"d/m/Y | H:i" }}</p>
                 </div>
                     <p style="word-break: break-word;">
-{#                        {% if comment.spoiler %}#}
-{#                            spoileri aqvs#}
-{#                        {% else %}#}
                             {{ comment.body}}
-{#                        {% endif %}#}
                     </p>
             </div>
             {% if comment.replies_count %}

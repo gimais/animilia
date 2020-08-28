@@ -56,11 +56,11 @@ const cT = function () {
     return date.getTime()
 };
 
-function setCookie(name, value, expire,path) {
+function setCookie(name, value, expire) {
         var date = new Date();
         date.setTime(date.getTime() + (expire*24*60*60*1000));
         var expires = "expires="+ date.toUTCString();
-        document.cookie = name + "=" + value + ";" + expires + ";path=/" + path;
+        document.cookie = name + "=" + value + ";" + expires ;
 }
 
 function getCookie(cname) {
@@ -69,10 +69,10 @@ function getCookie(cname) {
   var ca = decodedCookie.split(';');
   for(var i = 0; i <ca.length; i++) {
     var c = ca[i];
-    while (c.charAt(0) === ' ') {
+    while (c.charAt(0) == ' ') {
       c = c.substring(1);
     }
-    if (c.indexOf(name) === 0) {
+    if (c.indexOf(name) == 0) {
       return c.substring(name.length, c.length);
     }
   }
@@ -105,7 +105,7 @@ $('.episode-select-button').on('click',function () {
         if ($('.item-player').hasClass('hidden')) {
                 $('.item-player').removeClass('hidden');
         }
-        setCookie(itemSlug.substring(7,itemSlug.length-1),clickedButton.data('id'),20,itemSlug);
+        setCookie(itemSlug.substring(7,itemSlug.length-1),clickedButton.data('id'),20);
 });
 
 
@@ -142,13 +142,9 @@ function makeCommentBoxHTML(data,reply=false) {
         html+= `<p class='comment-time'>${convertTimeGeo(data.time)}</p>
             </div>`;
     if(data.deleted){
-         html+= `<p class="deleted-comment">ეს კომენტარი წაშლილია!</p>`
+        html+= `<p class="deleted-comment">ეს კომენტარი წაშლილია!</p>`
     }else{
-        if(data.has_spoiler) {
-            html += `<p style="word-wrap: break-word;"">${ifCommentContainsSpoiler(escapeHTML(data.body))}</p>`
-        }else{
-            html += `<p style="word-wrap: break-word;"">${escapeHTML(data.body)}</p>`
-        }
+        html += `<p style="word-wrap: break-word;"">${ifCommentContainsSpoiler(escapeHTML(data.body))}</p>`
     }
     html+= '</div>';
 
@@ -269,6 +265,28 @@ $commentForm.submit(function(event){
     })
 });
 
+function ifCommentContainsSpoiler(text) {
+    while(text.includes('[spoiler]')) {
+        text = spoilerAlertBBToHTML(text);
+    }
+    return text
+}
+
+function spoilerAlertBBToHTML($str) {
+    $format_search = /\[spoiler\](.*?)\[\/spoiler\]/ig;
+    $format_replace = '<span class="spoiler">$1</span><button id="reveal-spoiler">სპოილერი</button>';
+
+    return $str.replace($format_search, $format_replace);
+}
+
+function spoilerALertHTMLToBB(text) {
+    while(text.includes('<span')) {
+        text = text.replace(/<span (.*?)>(.*?)<\/span>/gi, "[spoiler]$2[/spoiler]");
+        text = text.replace(/<button (.*?)>(.*?)<\/button>/gi,'');
+    }
+    return text
+}
+
 $('.comments-box, .comment-form').on('click','.reply-button',function () {
     var button = $(this);
     var parent_id = button.data('it') || button.data('id');
@@ -374,21 +392,7 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
     commentBox.find('#like-comment:first').hide();
     commentBox.find('#remove-comment:first').hide();
     commentBox.find('#dislike-comment:first').hide();
-    var textareaValue = "";
-
-    if(that.parents('.comment-body').find('.spoiler').length > 0){
-        var text = that.parents('.comment-body').find('p');
-        var spoiler = '[spoiler]' + text.find('.spoiler')[0].innerHTML + '[/spoiler]';
-        var firstSpan = text.find('span')[0].innerHTML;
-        textareaValue = firstSpan + spoiler;
-
-        if(text.find('span').length > 1){
-            textareaValue += text.find('span')[1].innerHTML
-        }
-
-    }else{
-        textareaValue = commentBox.find('p:not([class])').text();
-    }
+    var textareaValue = spoilerALertHTMLToBB(commentBox.find('p:not([class])').html());
 
     commentBox.find('p:not([class])').hide();
     commentBox.append(makeTextareaEdit(id));
@@ -397,30 +401,38 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
     e.preventDefault();
     var parent = $(this).parent();
     parent.parent().find('*').show();
+    $(parent).prev().find('#reveal-spoiler').hide();
     parent.remove();
 }).on('click','.comment .comment-edit-form button[type=submit]',function (e) {
     e.preventDefault();
     var parent = $(this).parent();
-    var $formSerialized = parent.serialize();
-    $.ajax({
-        method: "POST",
-        url: window.location.origin+'/account/comment/edit/',
-        data: $formSerialized+'&id='+$(this).parent().data('id'),
-        success: function (data) {
-            var newText = parent.find('textarea').val();
-            parent.parent().find('p:not([class])').text(newText);
-            parent.parent().find('.comment-time').text(convertTimeGeo(data.time));
-            parent.parent().find('*').show();
-            parent.remove();
-        },
-        error: function () {
-            parent.parent().find('*').show();
-            parent.remove();
-        },
-    })
+    var finText = parent.find('textarea').val();
+
+    if(spoilerALertHTMLToBB(parent.prev().find('p')[2].innerHTML) !== finText){
+        var $formSerialized = parent.serialize();
+
+        $.ajax({
+            method: "POST",
+            url: window.location.origin + '/account/comment/edit/',
+            data: $formSerialized + '&id=' + parent.data('id'),
+            success: function (data) {
+                parent.parent().find('p:not([class])').text(finText);
+                parent.parent().find('.comment-time').text(convertTimeGeo(data.time));
+                parent.parent().find('*').show();
+                parent.remove();
+            },
+            error: function () {
+                parent.parent().find('*').show();
+                parent.remove();
+            },
+        })
+    }else{
+        alert('შეცვლა არ მოხდა, რადგან ტექსტი არ შეცვლილა!')
+    }
 }).on('click','#like-comment',function () {
     var that = $(this);
     var parent = $(this).parent().parent();
+
     if (!parent.find('.comment-user').hasClass('mine')) {
         var id = parent.find('.reply-button').data('id');
         $.ajax({
@@ -498,7 +510,7 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
     $(this).parent().find('button[type="submit"]').addClass('has-spoiler');
 }).on('click','#reveal-spoiler',function (e) {
     e.preventDefault();
-    $(this).parent().find('.spoiler').fadeIn(1000);
+    $(this).prev('.spoiler').fadeIn(1000);
     $(this).hide(200);
     $(this).remove();
 });
@@ -608,17 +620,3 @@ $('.profile-details-input').on('click','#change-username-button',function (e) {
         }
     });
 });
-
-function ifCommentContainsSpoiler(text) {
-    var html = text;
-    if(text.includes('[spoiler]')){
-        var startTagIndex = text.indexOf('[spoiler]') + 9;
-        var endTagIndex = text.indexOf('[/spoiler]');
-        var spoilerText = text.substring(startTagIndex,endTagIndex);
-        html = `<span>` + text.substring(0,startTagIndex - 9)  + `</span>`
-            + `<span class="spoiler">` + spoilerText
-            + `</span><button id="reveal-spoiler">სპოილერი</button>`
-            + `<span>` + text.substring(endTagIndex+10,text.length) + `</span>`;
-    }
-    return html
-}

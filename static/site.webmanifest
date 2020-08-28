@@ -12,7 +12,7 @@
     "sizes": "144x144",
     "type": "image/png"
    }],
-  "start_url": "/?utm_source=homescreen",
-  "background_color": "#fafafa",
-  "theme_color": "#fafafa"
+  "start_url": "/",
+  "background_color": "#1c150f",
+  "theme_color": "#973116"
 }

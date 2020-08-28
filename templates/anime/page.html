@@ -8,12 +8,16 @@
         <div class="item-page clearfix" data-id="{{ anime.id }}">
                 <img class="item-page-img" src="/media/{{ anime.poster }}"  alt="სურათი არ არის">
             <div class="item-page-info">
-                <div class="item-page-head">
-                <h1>{{ anime.name }}</h1>
-                <h4> {{ anime.nameen }}</h4>
-                <h4> {{ anime.namejp }}</h4>
-                <h4> {{ anime.nameru }}</h4>
-{#                    <div shepasebis sistema></div>#}
+                <div class="item-page-head clearfix">
+                    <div class="item-page-left">
+                        <h1>{{ anime.name }}</h1>
+                        <h4> {{ anime.nameen }}</h4>
+                        <h4> {{ anime.namejp }}</h4>
+                        <h4> {{ anime.nameru }}</h4>
+                    </div>
+                    <div class="item-page-right">
+                        <span><i class="fas fa-star"></i> {{ anime.rating }}</span>
+                    </div>
                 </div>
                 <hr>
                 <div class="item-page-row">
@@ -76,7 +80,12 @@
 {% block script %}
     <script>
         Array.prototype.forEach.call(document.getElementsByClassName('comment'), child => {
-            var com = $(child).find('.comment-body').find('p')[2];
+            var com = $(child).find('.comment-body').find('p');
+            if(com.length > 2){
+                com = com[2]
+            }else{
+                com = com[1]
+            }
             com.innerHTML = ifCommentContainsSpoiler(com.innerHTML.trim());
         });
 
@@ -86,8 +95,8 @@
             $('.item-page-episodes').find(`.episode-select-button[data-id=${pageCookie}]`).addClass('active');
         }
     {% endif %}
-        if (getCookie('"_vEpAd"') === "") {
-            setCookie("_vEpAd",cT(),1/24,itemSlug);
+        if (getCookie("_vEpAd") === "") {
+            setCookie("_vEpAd",cT(),1/24);
         }
     </script>
 {% endblock %}

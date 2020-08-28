@@ -35,7 +35,7 @@ class Comment(models.Model):
     body = models.TextField()
     like = models.ManyToManyField(User,blank=True,editable=False,related_name='likes')
     dislike = models.ManyToManyField(User,blank=True,editable=False,related_name='dislikes')
-    spoiler = models.BooleanField(default=False)
+    # spoiler = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     active = models.BooleanField(default=True)
     parent = models.ForeignKey('self',on_delete=models.CASCADE,null=True,blank=True,related_name='replies')
@@ -56,7 +56,7 @@ class Comment(models.Model):
             'avatar': self.user.profile.avatar.name,
             'time': datetime.timestamp(self.created),
             'body': self.body,
-            'has_spoiler': self.spoiler,
+            # 'has_spoiler': self.spoiler,
             'likes': self.like.count(),
             'dislikes': self.dislike.count(),
             'childs_count':self.replies.count(),
@@ -78,7 +78,7 @@ class Comment(models.Model):
                 'time':datetime.timestamp(self.created),
                 'parent_id':self.parent.pk,
                 'body':self.body,
-                'has_spoiler':self.spoiler,
+                # 'has_spoiler':self.spoiler,
                 'likes':self.like.count(),
                 'dislikes':self.dislike.count(),
                 'voted': vote,

@@ -201,10 +201,10 @@ def add_comment(request):
                 reply_comment.anime = parent_comment.anime
                 reply_comment.parent = parent_comment
                 reply_comment.user = request.user
-                if request.POST.get('spoiler', False) == 'true':
-                    reply_comment.spoiler = True
-                else:
-                    reply_comment.spoiler = False
+                # if request.POST.get('spoiler', False) == 'true':
+                #     reply_comment.spoiler = True
+                # else:
+                #     reply_comment.spoiler = False
                 reply_comment.save()
 
                 response_data = {
@@ -212,7 +212,7 @@ def add_comment(request):
                     'avatar':request.user.profile.avatar.name,
                     'user_id':request.user.id, # ar washalooo ? edit da remove functiebistvis rom daadasturos js-shi
                     'comment_id':reply_comment.id,
-                    'has_spoiler': reply_comment.spoiler,
+                    # 'has_spoiler': reply_comment.spoiler,
                 }
                 status = 200
             else:
@@ -225,10 +225,10 @@ def add_comment(request):
                     comment = form.save(commit=False)
                     comment.anime = anime
                     comment.user = request.user
-                    if request.POST.get('spoiler', False) == 'true':
-                        comment.spoiler = True
-                    else:
-                        comment.spoiler = False
+                    # if request.POST.get('spoiler', False) == 'true':
+                    #     comment.spoiler = True
+                    # else:
+                    #     comment.spoiler = False
                     comment.save()
 
                     response_data = {
@@ -236,7 +236,7 @@ def add_comment(request):
                         'avatar':request.user.profile.avatar.name,
                         'user_id':request.user.id,
                         'comment_id':comment.id,
-                        'has_spoiler': comment.spoiler,
+                        # 'has_spoiler': comment.spoiler,
                     }
 
                     status = 200
