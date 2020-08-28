@@ -24,7 +24,7 @@ from django.contrib.sitemaps.views import sitemap
 sitemaps = {
     'animes':AnimeSitemap,
 }
-import debug_toolbar
+# import debug_toolbar
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('account/',include('account.urls')),
