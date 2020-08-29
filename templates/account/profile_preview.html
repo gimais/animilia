@@ -13,21 +13,21 @@
             </div>
             <div class="profile-display">
                 <p id="profile-username">{{ user.username }}</p>
-                <p id="profile-group">group</p>
-<div class="profile-row">
-                        <dl>
-                            <dt>რეგისტრაციის თარიღი:</dt>
-                                <dd>{{ user.date_joined|date:"d.m.Y" }}</dd>
-                            <dt>ჯგუფი:</dt>
-                            {% if user.is_superuser %}
-                                <dd>ადმინისტრატორი</dd>
-                            {% elif user.is_staff %}
-                                <dd>მოდერატორი</dd>
-                            {% else %}
-                                <dd>მაყურებელი</dd>
-                            {% endif %}
-                        </dl>
-                        <dl>
+                <p id="profile-group">{{ user.groups.all.0 }}</p>
+                <div class="profile-row">
+                    <dl>
+                        <dt>რეგისტრაციის თარიღი:</dt>
+                            <dd>{{ user.date_joined|date:"d.m.Y" }}</dd>
+                        <dt>ჯგუფი:</dt>
+                        {% if user.is_superuser %}
+                            <dd>ადმინისტრატორი</dd>
+                        {% elif user.is_staff %}
+                            <dd>მოდერატორი</dd>
+                        {% else %}
+                            <dd>მაყურებელი</dd>
+                        {% endif %}
+                    </dl>
+                    <dl>
                         {% if user.settings.show_gender %}
                             <dt>სქესი:</dt>
                             {% if user.profile.gender == 0 %}
@@ -46,8 +46,8 @@
                                 <dd>მითითებული არ არის</dd>
                             {% endif %}
                         {% endif %}
-                        </dl>
-                    </div>
+                    </dl>
+                </div>
             </div>
         </div>
     </div>

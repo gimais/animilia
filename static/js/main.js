@@ -233,10 +233,12 @@ function getChildComments(that,parent_id,replying=false,more=0){
     }
 }
 
-
 function convertTimeGeo(date) {
     date = new Date(date*1000);
-    date = `${(date.getDate()<10?'0':'') + date.getDate()}/${((date.getMonth()+1)<10?'0':'') + (date.getMonth()+1)}/${date.getFullYear()} | ${(date.getHours()<10?'0':'') + date.getHours()}:${(date.getMinutes()<10?'0':'') + date.getMinutes()}`;
+    date = `${(date.getDate()<10?'0':'') + 
+    date.getDate()}/${((date.getMonth()+1)<10?'0':'') + 
+    (date.getMonth()+1)}/${date.getFullYear()} | ${(date.getHours()<10?'0':'') + 
+    date.getHours()}:${(date.getMinutes()<10?'0':'') + date.getMinutes()}`;
     return date;
 }
 
@@ -244,25 +246,30 @@ var $commentForm = $('.comment-form');
 $commentForm.submit(function(event){
     event.preventDefault();
     var $formDataSerialized = $(this).serialize();
-    var hasSpoiler = $(this).find('button[type="submit"]').hasClass('has-spoiler');
-    console.log(hasSpoiler);
-    $.ajax({
-        method: "POST",
-        url: window.location.origin+'/account/comment/',
-        data: $formDataSerialized+'&id='+$('.item-page').data('id')+'&spoiler='+hasSpoiler,
-        success: function (data) {
-            data.body = $(".comment-form textarea").val();
-            data.time = new Date().getTime()/1000;
-            data.parent_id = data.comment_id;
-            var html = makeCommentBoxHTML(data,true);
-            $(".comments-box").prepend(html);
-            $(".comments-box > .comment:first").hide(10).show(100);
-            $commentForm.trigger('reset');
-        },
-        error: function (data) {
-            console.log(data);
-        },
-    })
+    var textArea = $(this).find('textarea').val();
+
+    if(!checkCommentContainsMoreSpoilers(textArea)) {
+        $.ajax({
+            method: "POST",
+            url: window.location.origin + '/account/comment/',
+            data: $formDataSerialized + '&id=' + $('.item-page').data('id'),
+            success: function (data) {
+                data.body = $(".comment-form textarea").val();
+                data.time = new Date().getTime() / 1000;
+                data.parent_id = data.comment_id;
+                var html = makeCommentBoxHTML(data, true);
+
+                $(".comments-box").prepend(html);
+                $(".comments-box > .comment:first").hide(10).show(100);
+                $commentForm.trigger('reset')
+                $('.spoiler-button').attr('disabled',false);
+            },
+            error: function (data) {
+                console.log(data);
+            },
+        })
+    }else
+        alert('გთხოვთ, გამოიყენოთ მხოლოდ 1 სპოილერი!')
 });
 
 function ifCommentContainsSpoiler(text) {
@@ -270,6 +277,10 @@ function ifCommentContainsSpoiler(text) {
         text = spoilerAlertBBToHTML(text);
     }
     return text
+}
+
+function checkCommentContainsMoreSpoilers(text) {
+    return text.indexOf('[spoiler]') !== text.lastIndexOf('[spoiler]');
 }
 
 function spoilerAlertBBToHTML($str) {
@@ -316,7 +327,7 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
     $.ajax({
         method: "POST",
         url: window.location.origin+'/account/comment/',
-        data: $formDataSerialized + `&parent_id=${that.data('id')}` + '&spoiler='+$(this).hasClass('has-spoiler'),
+        data: $formDataSerialized + `&parent_id=${that.data('id')}`,
         success: function (data) {
             data.body = that.find('textarea').val();
             data.time = new Date().getTime()/1000;
@@ -507,12 +518,15 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
     tx.value = tx.value.substring(0, start) + '[spoiler]' + sel + '[/spoiler]' + tx.value.substring(end);
     tx.focus();
     tx.selectionEnd= end + 9;
-    $(this).parent().find('button[type="submit"]').addClass('has-spoiler');
+    $(this).attr('disabled',true);
 }).on('click','#reveal-spoiler',function (e) {
-    e.preventDefault();
-    $(this).prev('.spoiler').fadeIn(1000);
-    $(this).hide(200);
-    $(this).remove();
+    e.stopPropagation();
+    $(this).prev().fadeIn();
+    $(this).hide();
+}).on('click','.spoiler',function (e) {
+    e.stopPropagation();
+    $(this).next().fadeIn();
+    $(this).hide();
 });
 
 $('.showmore').on('click',function () {
