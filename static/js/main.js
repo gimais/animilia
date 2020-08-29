@@ -134,6 +134,7 @@ function makeCommentBoxHTML(data,reply=false) {
          html += `<div class="comment-right-buttons" id='remove-comment' style="color: #333333;"><i class="fas fa-trash"></i></div>`;
     }
     if(!data.deleted){
+        console.log(data);
         html += `<div class="comment-dl-buttons">
                     <div class="comment-right-buttons" id='dislike-comment' style="color: #ab3717;"><i class="fa${data.voted === 1 ? 's' : 'r'} fa-thumbs-down"></i>${data.dislikes ? data.dislikes : 0}</div>
                     <div class="comment-right-buttons" id='like-comment' style="color: #ff2e01;" ><i class="fa${data.voted === 0 ? 's' : 'r'} fa-thumbs-up"></i>${data.likes ? data.likes : 0}</div>
@@ -171,12 +172,12 @@ function makeCommentTextAreaHTML(parent_id){
     return html
 }
 
-function makeTextareaEdit(parent_id){
+function makeTextareaEdit(parent_id,spoiler){
     var html = '';
     html += `<form class=\'comment-edit-form\' style=\'padding: 15px 0\' method=\'POST\' data-id=\"${parent_id}\">
                 <input type="hidden" name="csrfmiddlewaretoken" value="${getCookie('csrftoken')}">
                 <p><textarea name="body" cols="40" rows="10" placeholder="კომენტარი" id="id_body"></textarea></p>
-                <button class="spoiler-button">სპოილერი</button>
+                <button class="spoiler-button" ${spoiler? 'disabled' : ''}>სპოილერი</button>
                 <button type="submit">შეცვლა</button>
                 <button type="reset">გაუქმება</button>
                 </form>`;
@@ -395,10 +396,11 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
 }).on('click','.comment #edit-comment',function () {
     var that = $(this);
     var id = that.parent().find('.reply-button').data('id');
-
     var commentBox = that.closest('.comment');
-    that.hide();
+    var hasSpoiler = that.parent().next().find('span').length > 0;
+    console.log(hasSpoiler);
 
+    that.hide();
     commentBox.find('.reply-button:first').hide();
     commentBox.find('#like-comment:first').hide();
     commentBox.find('#remove-comment:first').hide();
@@ -406,7 +408,7 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
     var textareaValue = spoilerALertHTMLToBB(commentBox.find('p:not([class])').html());
 
     commentBox.find('p:not([class])').hide();
-    commentBox.append(makeTextareaEdit(id));
+    commentBox.append(makeTextareaEdit(id,hasSpoiler));
     commentBox.find('.comment-edit-form textarea').focus().val(textareaValue);
 }).on('click','.comment .comment-edit-form button[type=reset]',function (e) {
     e.preventDefault();
@@ -527,6 +529,9 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
     e.stopPropagation();
     $(this).next().fadeIn();
     $(this).hide();
+}).on('keyup','textarea',function (e) {
+    if(!$(this).val().length)
+        $(this).parent().next().removeAttr('disabled');
 });
 
 $('.showmore').on('click',function () {

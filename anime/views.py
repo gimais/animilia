@@ -49,7 +49,7 @@ def more_comments(request):
         if paginator.num_pages >= page:
             result = list()
             for comment in paginator.get_page(page).object_list:
-                result.append(comment.get_more_comment_info())
+                result.append(comment.get_more_comment_info(request.user.pk))
             return JsonResponse(result, status=200, safe=False)
         else:
             return JsonResponse(ERROR, status=404)

@@ -47,7 +47,12 @@ class Comment(models.Model):
         verbose_name = 'კომენტარი'
         verbose_name_plural = 'კომენტარი'
 
-    def get_more_comment_info(self):
+    def get_more_comment_info(self,request_user):
+        vote = None
+        if self.like.filter(pk=request_user).exists():
+            vote = 0
+        elif self.dislike.filter(pk=request_user).exists():
+            vote = 1
 
         return {
             'comment_id': self.pk,
@@ -60,6 +65,7 @@ class Comment(models.Model):
             'likes': self.like.count(),
             'dislikes': self.dislike.count(),
             'childs_count':self.replies.count(),
+            'voted': vote,
         }
 
     def get_reply_comment_info(self,request_user):
