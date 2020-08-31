@@ -39,8 +39,12 @@ body {
     font-size: 14px;
     background: #d7ccc8;
     color: #333;
-    height: 100%;
-    position: relative
+    min-height: 100%;
+    position: relative;
+}
+
+html, body {
+    overflow: auto;
 }
 
 /*
@@ -423,11 +427,6 @@ nav{
     display: none;
 }
 
-/*#mob-home:hover {*/
-/*    background-color: #973116;*/
-/*}*/
-
-
 ul.top-nav li:last-child a:hover:not(.active) {background-color: #973116;}
 
 ul.top-nav li a.active {background-color: #973116;}
@@ -440,14 +439,7 @@ li{
 
 section{
     min-height: 100%;
-    margin-bottom: -121px;
 }
-
-section:after {
-    content: "";
-    display: block;
-}
-
 
 .signup-form{
     text-align: center;
@@ -811,15 +803,15 @@ section:after {
     background-color: #973116;
 }
 
-/*footer{*/
-/*    !*width: 100%;*!*/
-/*    !*padding: 10px 0;*!*/
-/*    !*position: absolute;*!*/
-/*    !*bottom: 0;*!*/
-/*    background: #973116;*/
-/*    text-align: center;*/
-/*    color:white;*/
-/*}*/
+body footer{
+    width: 100%;
+    padding: 10px 0;
+    position: absolute;
+    bottom: 0;
+    background: #973116;
+    text-align: center;
+    color:white;
+}
 
 /*section:after, footer {*/
 /*    height: 121px;*/
@@ -1584,14 +1576,6 @@ a.change-pass-button {
         clear: both;
     }
 
-    /*.container{*/
-    /*    max-width: 1024px;*/
-    /*}*/
-
-    /*.clearfix:after {*/
-    /*    content: "1260px";*/
-    /*}*/
-
     .top-nav{
         margin: 0 25px 0 0;
     }
@@ -1603,11 +1587,6 @@ a.change-pass-button {
 }
 
 @media (max-width: 1185px) {
-
-    /*.clearfix:after {*/
-    /*    content: "1185px";*/
-    /*}*/
-
 
     .item {
         margin-top: 5px;
@@ -1634,11 +1613,6 @@ a.change-pass-button {
 }
 
 @media (max-width: 900px) {
-
-    /*.clearfix:after {*/
-    /*    content: "900px";*/
-    /*}*/
-
 
     .top-nav li a {
         padding: 16px 21px;
@@ -1725,7 +1699,7 @@ a.change-pass-button {
     }
 
     .container{
-        margin: 20px auto;
+        margin: 20px auto 50px;
     }
     .item-page {
         width: 100%;
@@ -1737,18 +1711,7 @@ a.change-pass-button {
 
 }
 
-@media screen and (max-width: 620px) {
-    .profile-row dl {
-        width: 100%;
-        float: none;
-    }
-}
-
 @media screen and (max-width: 515px) {
-
-    /*.clearfix:after {*/
-    /*    content: "515px";*/
-    /*}*/
 
     .item-page-img {
         float: none;
@@ -1786,83 +1749,24 @@ a.change-pass-button {
 }
 
 @media screen and (max-width: 480px) {
-
-    /*.clearfix:after {*/
-    /*    content: "480px";*/
-    /*}*/
-
     .signup-content {
         padding: 50px 25px;
     }
 }
 
 @media screen and (max-width: 414px) {
-
-    /*.clearfix:after {*/
-    /*    content: "414px";*/
-    /*}*/
-    /*8888888888888888888888888888888888888888888*/
-    /*.profile-avatar-container,.profile-display,.profile-row dl,.profile-row{*/
-    /*    float: none;*/
-    /*    width:100%;*/
-    /*}*/
-
-    /*.profile-display,.item-page-img,.item-page-info,.item img,.profile-page {*/
-    /*    width: 100%;*/
-    /*    margin: 0;*/
-    /*    padding: 2px;*/
-    /*}*/
-
-    /*.profile-main.clearfix {*/
-    /*    padding: 0;*/
-    /*}*/
-
-    /*.tooltip{*/
-    /*    display: none;*/
-    /*}*/
-    /*ewrhetjhrwgtghren*/
-    /*.item-page-img {*/
-    /*    width: 100%;*/
-    /*}*/
-
-    /*.item-page-info {*/
-    /*    width: 100%;*/
-    /*}*/
-
     .signup-content {
         padding: 50px 25px;
     }
-
 
     .item img{
         width: 100%;
         height: auto;
     }
-
-    /*.item-name {*/
-    /*    color: white;*/
-    /*    margin: 7px 0;*/
-    /*}*/
-
-
-    /*.item-info {*/
-    /*    bottom: 0;*/
-    /*    position: absolute;*/
-    /*    font-size: 10px;*/
-    /*    padding: 0 20px;*/
-    /*    width: 100%;*/
-    /*    background: rgba(29,20,18,.8);*/
-    /*    color: white;*/
-    /*}*/
 }
 
 
 @media screen and (min-width: 4000px) {
-
-    /*.clearfix:after {*/
-    /*    content: "4000px max";*/
-    /*}*/
-
     .comment-body {
         margin: 0;
     }
@@ -1871,12 +1775,7 @@ a.change-pass-button {
         height: 280px;
     }
 
-    /*header{*/
-    /*    height: 280px;*/
-    /*}*/
-
     .logo {
         top: 265px;
     }
-
 }

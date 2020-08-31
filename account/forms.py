@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import MinimumLengthValidator
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordResetForm, \
     PasswordChangeForm, SetPasswordForm
@@ -7,7 +8,7 @@ from django.core.validators import MinLengthValidator
 from django.utils.translation import ngettext
 from django.utils import timezone
 from account.models import Comment, Profile, Settings
-from account.validators import SignUpMaxLengthValidator
+from account.validators import SignUpMaxLengthValidator, MyUnicodeUsernameValidator,blacklist
 from django.contrib.admin.forms import AdminAuthenticationForm
 
 AdminAuthenticationForm.error_messages = {
@@ -45,6 +46,7 @@ class SignUpForm(UserCreationForm):
 
     email = forms.EmailField(max_length=254, widget=forms.EmailInput(
         attrs={'class': 'form-input', 'placeholder': 'Email'}))
+
     password1 = forms.CharField(
         min_length=4,
         label="",
@@ -60,6 +62,12 @@ class SignUpForm(UserCreationForm):
         help_text="",
     )
 
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if username.lower() in blacklist:
+            raise forms.ValidationError('ასეთი Username მიუღებელია! სხვა სცადეთ!')
+        return username
+
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if email and User.objects.filter(email=email).exists():
@@ -69,7 +77,7 @@ class SignUpForm(UserCreationForm):
     class Meta:
         model = User
 
-        User.username_validator.message = "ნიკი შეიძლება შეიცავდეს მხოლოდ ასოებს,ციფრებსა და @/./+/-/_ სიმბოლოებს."
+        User._meta.get_field('username').validators[0] = MyUnicodeUsernameValidator()
         User._meta.get_field('username').validators[1] = SignUpMaxLengthValidator(16)
         User._meta.get_field('username').validators.append(MinLengthValidator(3))
         MinLengthValidator.message = "სიგრძე მინიმუმ %(limit_value)d სიმბოლოსგან უნდა შედგებოდეს. (შეყვანილია %(show_value)d სიმბოლო)"
@@ -93,6 +101,28 @@ class MyAuthenticationForm(AuthenticationForm):
         ),
         'inactive': "ეს ანგარიში არააქტიურია!",
     }
+
+    def clean(self):
+        username = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password')
+
+        if username is not None and password:
+            if '@' in username:
+                try:
+                    username = User.objects.get(email=username)
+                except User.DoesNotExist:
+                    raise self.get_invalid_login_error()
+
+                self.user_cache = authenticate(self.request, username=username, password=password)
+            else:
+                self.user_cache = authenticate(self.request, username=username, password=password)
+
+            if self.user_cache is None:
+                raise self.get_invalid_login_error()
+            else:
+                self.confirm_login_allowed(self.user_cache)
+
+        return self.cleaned_data
 
 
 class MyPasswordResetForm(PasswordResetForm):
