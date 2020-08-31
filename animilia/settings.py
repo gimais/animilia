@@ -37,6 +37,7 @@ if DEBUG:
 
 INSTALLED_APPS = [
     # 'debug_toolbar',
+    'feedback.apps.FeedbackConfig',
     'account.apps.AccountConfig',
     'anime.apps.AnimeConfig',
     'django.contrib.admin',

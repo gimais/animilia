@@ -98,9 +98,7 @@ class Comment(models.Model):
             }
 
     def __str__(self):
-        return '{}-ის კომენტარი'.format(self.body)
-
-
+        return str(self.pk)
 
 class Profile(models.Model):
     TYPES = (

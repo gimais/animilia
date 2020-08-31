@@ -23,13 +23,5 @@ class AnimeAdmin(admin.ModelAdmin):
     inlines = [ChoiceInline]
 
 
-# class AnimeSeriesAdmin(admin.ModelAdmin):
-#     list_display = ("anime", "url","row")
-#     list_filter = ("anime",)
-#
-# class CategoryAdmin(admin.ModelAdmin):
-#     list_display = ("name",)
-
-
 admin.site.register(Category)
 admin.site.register(Anime, AnimeAdmin)

@@ -439,6 +439,7 @@ li{
 
 section{
     min-height: 100%;
+    margin-bottom: 210px;
 }
 
 .signup-form{
@@ -1468,6 +1469,40 @@ a.change-pass-button {
 }
 
 
+/*FEEDBACK*/
+
+form.feedback{
+    width: 50%;
+    margin: auto;
+}
+
+.feedback > .form-title{
+    margin-bottom: 10px;
+    color: white;
+}
+
+.feedback input{
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.feedback input[type='submit']{
+    background-color: #333333;
+    color: white;
+    cursor: pointer;
+}
+
+.feedback textarea{
+    display: block;
+    height: 50px;
+    width: 360px;
+    margin: 10px auto;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+
+/*================*/
 .upload-demo .upload-demo-wrap,
 .upload-demo .upload-result,
 .upload-demo.ready .upload-msg {
