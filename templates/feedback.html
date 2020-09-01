@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}კონტაქტი - Animilia.ge{% endblock %}
+{% block logout_redirect %}/feedback{% endblock %}
+{% load static %}
+{% block content %}
+    <div class="container">
+        <form method="POST" class="form-container" action="{% url 'feedback' %}">
+            {% csrf_token %}
+            <div class="form-title">კონტაქტი</div>
+                {% for non_field_error in form.non_field_errors %}
+                    {{ non_field_error }}ra
+                {% endfor %}
+                {% for input in form %}
+                   <div class="form-group">
+                    {{ input }}
+                   </div>
+                    {% for error in input.errors %}
+                        <p class="reg-error">{{ error }}</p>
+                    {% endfor %}
+                {% endfor %}
+            <input type="submit" id="submit" class="form-submit" value="გაგზვნა">
+        </form>
+    </div>
+{% endblock %}

@@ -439,7 +439,6 @@ li{
 
 section{
     min-height: 100%;
-    margin-bottom: 210px;
 }
 
 .signup-form{
@@ -475,7 +474,7 @@ section{
     margin-bottom: 50px;
     margin-left: auto;
     margin-right: auto;
-    width: 60%;
+    width: 40%;
 }
 
 .container{
@@ -624,6 +623,7 @@ section{
     padding: 0 5px;
 	float:left;
     width:33.33%;
+    margin-top: 15px;
 }
 
 .item img{
@@ -804,15 +804,15 @@ section{
     background-color: #973116;
 }
 
-body footer{
-    width: 100%;
-    padding: 10px 0;
-    position: absolute;
-    bottom: 0;
-    background: #973116;
-    text-align: center;
-    color:white;
-}
+/*body footer{*/
+/*    width: 100%;*/
+/*    padding: 10px 0;*/
+/*    position: absolute;*/
+/*    bottom: 0;*/
+/*    background: #973116;*/
+/*    text-align: center;*/
+/*    color:white;*/
+/*}*/
 
 /*section:after, footer {*/
 /*    height: 121px;*/
@@ -1077,6 +1077,8 @@ button.spoiler-button:disabled {
 .spoiler{
     display: none;
     background: #f3f3f3;
+    border-radius: 5px;
+    padding: 2px;
 }
 
 #reveal-spoiler{
@@ -1084,7 +1086,6 @@ button.spoiler-button:disabled {
     font-size: 12px;
     background: #e2e2e2e2;
     border-radius: 5px;
-    margin: 0 4px;
 }
 
 #reveal-spoiler:hover, .spoiler:hover{
@@ -1319,7 +1320,7 @@ div.comment-right-buttons{
 #profile-username{
     padding: 2px 8px;
     display: inline-block;
-    font-size: 47px;
+    font-size: 1.3rem;
     text-transform: uppercase;
 }
 
@@ -1467,40 +1468,6 @@ a.change-pass-button {
     clear: both;
     margin-top: 25px;
 }
-
-
-/*FEEDBACK*/
-
-form.feedback{
-    width: 50%;
-    margin: auto;
-}
-
-.feedback > .form-title{
-    margin-bottom: 10px;
-    color: white;
-}
-
-.feedback input{
-    padding: 5px;
-    border-radius: 5px;
-}
-
-.feedback input[type='submit']{
-    background-color: #333333;
-    color: white;
-    cursor: pointer;
-}
-
-.feedback textarea{
-    display: block;
-    height: 50px;
-    width: 360px;
-    margin: 10px auto;
-    padding: 5px;
-    border-radius: 5px;
-}
-
 
 /*================*/
 .upload-demo .upload-demo-wrap,
@@ -1709,6 +1676,10 @@ form.feedback{
         margin: 0;
     }
 
+    .form-container{
+        width: 60%;
+    }
+
     .form-input {
         width: 80%;
     }
@@ -1717,12 +1688,14 @@ form.feedback{
         width: 50%;
     }
 
-    .top-nav li:first-child{
+    .form-input{
         width: 100%;
     }
 
     .top-nav li a{
         width: 100%;
+        font-size: 85%;
+        padding: 16px 0;
     }
 
     .item-page-info {
@@ -1734,8 +1707,9 @@ form.feedback{
     }
 
     .container{
-        margin: 20px auto 50px;
+        margin: 20px auto;
     }
+
     .item-page {
         width: 100%;
     }
@@ -1747,6 +1721,10 @@ form.feedback{
 }
 
 @media screen and (max-width: 515px) {
+
+   .form-container{
+        width: 80%;
+    }
 
     .item-page-img {
         float: none;

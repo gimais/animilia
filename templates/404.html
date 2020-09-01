@@ -3,35 +3,15 @@
 
 {% block content %}
   <style>
-    * {
-      line-height: 1.2;
-      margin: 0;
-    }
-
-    html {
-      color: #888;
-      display: table;
-      font-family: sans-serif;
-      height: 100%;
-      text-align: center;
-      width: 100%;
-    }
-
-    body {
-      display: table-cell;
-      vertical-align: middle;
-      margin: 2em auto;
-    }
-
     h1 {
       color: #555;
-      font-size: 2em;
+      font-size: 3.2em;
       font-weight: 400;
     }
 
     p {
-      margin: 0 auto;
-      width: 280px;
+        width: 280px;
+        margin: 5px auto;
     }
 
     @media only screen and (max-width: 280px) {
@@ -48,8 +28,11 @@
 
     }
   </style>
-  <h1>გვერდი ვერ მოიძებნა!</h1>
-  <p>ბოდიშით,მაგრამ ასეთი გვერდი არ არსებობს!</p>
+    <div class="container info-page">
+        <h1>404</h1>
+        <h2>გვერდი ვერ მოიძებნა</h2>
+        <p>ასეთი გვერდი არ არსებობს!</p>
+    </div>
 
 {% endblock %}
 <!-- IE needs 512+ bytes: https://blogs.msdn.microsoft.com/ieinternals/2010/08/18/friendly-http-error-pages/ -->

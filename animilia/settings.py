@@ -21,13 +21,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '-$^7afesh9l$p5xh)$oof1p_^g6+9f0g9w7%+#y7&d^@7a(i4d'
+# SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
-# INTERNAL_IPS = ['127.0.0.1']
 
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # During development only
@@ -36,7 +35,6 @@ if DEBUG:
 # Application definition
 
 INSTALLED_APPS = [
-    # 'debug_toolbar',
     'feedback.apps.FeedbackConfig',
     'account.apps.AccountConfig',
     'anime.apps.AnimeConfig',
@@ -50,7 +48,6 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -158,3 +155,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
 
 PASSWORD_RESET_TIMEOUT_DAYS = 1
+
+# SECURE_SSL_REDIRECT = True
+# SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+X_FRAME_OPTIONS = 'DENY'
+
+# # Email
+# DEFAULT_FROM_EMAIL = 'noreply@animilia.ge'
+# SERVER_EMAIL = ''
