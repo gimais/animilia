@@ -26,7 +26,7 @@ SECRET_KEY = '-$^7afesh9l$p5xh)$oof1p_^g6+9f0g9w7%+#y7&d^@7a(i4d'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['46.101.235.193']
 
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # During development only
@@ -88,10 +88,15 @@ WSGI_APPLICATION = 'animilia.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'django',
+        'USER': 'admin_apollon',
+        'PASSWORD': 'uFq7sX5RzWBMcCgQ',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 
