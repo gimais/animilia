@@ -15,7 +15,7 @@ class CommentAdmin(admin.ModelAdmin):
     def parent_link(self,obj=None):
         if obj.parent:
             return format_html("<a href='/admin/account/comment/{}/change/'>ლინკი</a>".format(obj.parent))
-        return 'არ არსებობს'
+        return 'არ არსებობს!'
 
     def has_add_permission(self, request, obj=None):
         return False
