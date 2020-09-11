@@ -143,10 +143,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static/"),
+    os.path.join(BASE_DIR, "static_dev/"),
 ]
 
-STATIC_ROOT = '/static/'
+STATIC_ROOT = '/static_dev/'
 
 # Media files (Posts,Avatars)
 
@@ -156,7 +156,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
 
 PASSWORD_RESET_TIMEOUT_DAYS = 1
-
 
 APPEND_SLASH = False
 # SECURE_SSL_REDIRECT = True
