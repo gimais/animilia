@@ -19,30 +19,6 @@ $('#login-focus').on('click',function () {
         $('.login-form').toggleClass('show');
 });
 
-
-HOVERED_ON_LOGO = 0;
-
-$('.logo').hover(function () {
-
-        HOVERED_ON_LOGO+=1;
-
-        switch(HOVERED_ON_LOGO){
-                case 10:
-                        alert('კაი ხოო გადაიწვა ნათურა!!!');
-                        break;
-                case 20:
-                        alert('გადაიწვა თქო ბლიად!!!');
-                        break;
-                case 30:
-                        alert('იცოდე ბოლო შანსია!!!');
-                        break;
-                case 40:
-                        window.location.assign('https://www.youtube.com/watch?v=G8iyI_-Amhw');
-                        break;
-        }
-});
-
-
 function activateClassButton(button){
        var activatedButton = $('.item-page-episodes').find('.episode-select-button.active');
        if(button!==activatedButton) {
@@ -96,12 +72,11 @@ $.ajaxSetup({
 
 const itemSlug = document.location.pathname;
 
-
 $('.episode-select-button').on('click',function () {
         var clickedButton = $(this);
         activateClassButton(clickedButton);
         var videoURL = clickedButton.data('url');
-        $('.item-player iframe').attr('src',videoURL);
+        $('.item-player video').attr('src',videoURL);
         if ($('.item-player').hasClass('hidden')) {
                 $('.item-player').removeClass('hidden');
         }
@@ -134,7 +109,6 @@ function makeCommentBoxHTML(data,reply=false) {
          html += `<div class="comment-right-buttons" id='remove-comment' style="color: #333333;"><i class="fas fa-trash"></i></div>`;
     }
     if(!data.deleted){
-        console.log(data);
         html += `<div class="comment-dl-buttons">
                     <div class="comment-right-buttons" id='dislike-comment' style="color: #ab3717;"><i class="fa${data.voted === 1 ? 's' : 'r'} fa-thumbs-down"></i>${data.dislikes ? data.dislikes : 0}</div>
                     <div class="comment-right-buttons" id='like-comment' style="color: #ff2e01;" ><i class="fa${data.voted === 0 ? 's' : 'r'} fa-thumbs-up"></i>${data.likes ? data.likes : 0}</div>
@@ -398,7 +372,6 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
     var id = that.parent().find('.reply-button').data('id');
     var commentBox = that.closest('.comment');
     var hasSpoiler = that.parent().next().find('span').length > 0;
-    console.log(hasSpoiler);
 
     that.hide();
     commentBox.find('.reply-button:first').hide();
@@ -453,7 +426,6 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
             url: window.location.origin + '/account/comment/like/',
             data: {id: id},
             success: function (data) {
-                console.log(data.type);
                 if (data.type===1) {
                     that.hide(100, function() {
                         $(this).html(`<i class="fas fa-thumbs-up" aria-hidden="true"></i>` + (parseInt(that.text()) + 1)).show(200);
@@ -539,7 +511,7 @@ $('.showmore').on('click',function () {
     var current_page = parseInt(that.attr('data-page'));
     $.ajax({
         method: "GET",
-        url: window.location.origin+'/anime/more_comments',
+        url: window.location.origin+'/anime/more_comments/',
         data: {
             'skip': current_page+1,
             'id':$('.item-page').data('id'),

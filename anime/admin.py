@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db import models
 from django.forms import CheckboxSelectMultiple
-from .models import Category, Anime, AnimeSeries
+from .models import Category, Anime, AnimeSeries,Dubber
 
 # Register your models here.
 
@@ -22,6 +22,10 @@ class AnimeAdmin(admin.ModelAdmin):
     list_display = ("name",'dubbed', "type", 'slug', 'updated')
     inlines = [ChoiceInline]
 
+    class Media:
+        js = ('admin/js/extrasett.js',)
+
 
 admin.site.register(Category)
+admin.site.register(Dubber)
 admin.site.register(Anime, AnimeAdmin)

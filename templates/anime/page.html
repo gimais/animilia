@@ -47,7 +47,11 @@
                         <dd>{{ anime.dubbed }}/{{anime.episodes}}</dd>
                         {% endif %}
                         <dt>გამხმოვანებელი:</dt>
-                        <dd>{{ anime.dubber }}</dd>
+                        <dd>
+                            {% for dubber in anime.dubbers.all %}
+                                <li>{{ dubber }}</li>
+                            {% endfor %}
+                        </dd>
                     </dl>
                 </div>
             </div>
@@ -62,13 +66,14 @@
                 {% endfor %}
             </div>
             <div class="item-player hidden">
-                <iframe  allowfullscreen></iframe>
+                <video controls></video>
             </div>
             {% else %}
             <div class="item-player">
-                {% for episode in episodes %}
-                <iframe src="{{episode.url}}" allowfullscreen></iframe>
-                {% endfor %}
+                {% with anime.series.all|first as episode %}
+                    <video src="{{ episode.url }}" controls>
+                </video>
+                {% endwith %}
             </div>
             {% endif %}
             <hr>
@@ -79,6 +84,8 @@
 
 {% block script %}
     <script>
+        {#var isMobile = (/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase()));#}
+
         Array.prototype.forEach.call(document.getElementsByClassName('comment'), child => {
             var com = $(child).find('.comment-body').find('p');
             if(com.length > 2){

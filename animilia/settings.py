@@ -26,7 +26,7 @@ SECRET_KEY = '-$^7afesh9l$p5xh)$oof1p_^g6+9f0g9w7%+#y7&d^@7a(i4d'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['46.101.235.193']
+ALLOWED_HOSTS = ['*']
 
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # During development only
@@ -91,12 +91,8 @@ WSGI_APPLICATION = 'animilia.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'django',
-        'USER': 'admin_apollon',
-        'PASSWORD': 'uFq7sX5RzWBMcCgQ',
-        'HOST': 'localhost',
-        'PORT': '',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'db.sqlite3',
     }
 }
 
@@ -161,10 +157,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
 PASSWORD_RESET_TIMEOUT_DAYS = 1
 
+
+APPEND_SLASH = False
 # SECURE_SSL_REDIRECT = True
 # SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-X_FRAME_OPTIONS = 'DENY'
+# CSRF_COOKIE_SECURE = True
 
 # # Email
 # DEFAULT_FROM_EMAIL = 'noreply@animilia.ge'

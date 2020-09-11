@@ -991,7 +991,7 @@ div#login-focus:hover {
     height: 0;
 }
 
-.item-player iframe {
+.item-player iframe, .item-player video {
     position: absolute;
     top: 0;
     left: 0;
@@ -1082,7 +1082,7 @@ button.spoiler-button:disabled {
 }
 
 #reveal-spoiler{
-    padding: 4px;
+    padding: 2px 4px;
     font-size: 12px;
     background: #e2e2e2e2;
     border-radius: 5px;

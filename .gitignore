@@ -216,3 +216,9 @@ fabric.properties
 !.elasticbeanstalk/*.global.yml
 
 animilia-env/
+animilia/settings.py
+animilia/urls.py
+**/migrations/
+
+db.sqlite3
+/media/

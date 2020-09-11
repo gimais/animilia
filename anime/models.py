@@ -3,21 +3,24 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import F
 
-# commaseparatedintegerfield
-# from django.urls import reverse
-
 class Category(models.Model):
     name = models.CharField(max_length=18,unique=True)
-    # posts = models.PositiveSmallIntegerField(default=0,editable=False)
 
     class Meta:
         db_table = 'categories'
         verbose_name = 'კატეგორია'
         verbose_name_plural = 'კატეგორიები'
 
-    def save(self, *args, **kwargs):
-        print(self.name)
-        super(Category, self).save(*args, **kwargs)
+    def __str__(self):
+        return self.name
+
+class Dubber(models.Model):
+    name = models.CharField(max_length=16,unique=True)
+
+    class Meta:
+        db_table = 'dubbers'
+        verbose_name = 'გამხმოვანებელი'
+        verbose_name_plural = 'გამხმოვანებლები'
 
     def __str__(self):
         return self.name
@@ -32,7 +35,7 @@ class Anime(models.Model):
     nameen = models.CharField(max_length=100,verbose_name='ინგლისურად',blank=True)
     namejp = models.CharField(max_length=100,verbose_name='იაპონურად',blank=True)
     nameru = models.CharField(max_length=100,verbose_name='რუსულად',blank=True)
-    dubber = models.CharField(max_length=16,verbose_name='გამხმოვანებელი',unique=False)
+    dubbers = models.ManyToManyField(Dubber,related_name='dubbers',verbose_name='გამხმოვანებელი')
     poster = models.ImageField(upload_to='posters/',max_length=50,blank=True,verbose_name='სურათი')
     year = models.PositiveSmallIntegerField(verbose_name='გამოშვების წელი')
     director = models.CharField(max_length=40,verbose_name='რეჟისორი')
@@ -78,6 +81,12 @@ class AnimeSeries(models.Model):
         db_table = 'animes_series'
         verbose_name = 'ანიმე სერია'
         verbose_name_plural = 'ანიმე სერიები'
+
+    def delete(self, using=None, keep_parents=False):
+        super(AnimeSeries, self).delete()
+
+        largest = AnimeSeries.objects.filter(anime=self.anime).aggregate(largest=models.Max('row'))['largest']
+        Anime.objects.filter(pk=self.anime.pk).update(dubbed=largest)
 
     def save(self, *args, **kwargs):
         if self._state.adding:

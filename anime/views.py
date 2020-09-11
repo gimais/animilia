@@ -15,7 +15,7 @@ def indexView(request):
 
 def page_view(request,slug):
     template_name = 'anime/page.html'
-    anime = get_object_or_404(Anime.objects.prefetch_related('series','categories','comments'),slug=slug)
+    anime = get_object_or_404(Anime.objects.prefetch_related('series','categories','comments','dubbers'),slug=slug)
     anime.increase_view_count(request.COOKIES)
 
     if request.user.is_authenticated:
