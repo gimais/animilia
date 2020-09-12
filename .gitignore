@@ -216,8 +216,7 @@ fabric.properties
 !.elasticbeanstalk/*.global.yml
 
 animilia-env/
-animilia/settings.py
-animilia/urls.py
+/animilia/
 **/migrations/
 
 db.sqlite3

@@ -66,12 +66,12 @@
                 {% endfor %}
             </div>
             <div class="item-player hidden">
-                <video controls></video>
+                <iframe frameborder="0" allowfullscreen="true"></iframe>
             </div>
             {% else %}
             <div class="item-player">
                 {% with anime.series.all|first as episode %}
-                    <video src="{{ episode.url }}" controls>
+                    <iframe src="{{ episode.url }}" frameborder="0" allowfullscreen="true"></iframe>
                 </video>
                 {% endwith %}
             </div>

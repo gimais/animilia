@@ -28,8 +28,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-if DEBUG:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # During development only
+# if DEBUG:
+#     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # During development only
+
 
 
 # Application definition
@@ -143,10 +144,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static_dev/"),
+    os.path.join(BASE_DIR, "static/"),
 ]
 
-STATIC_ROOT = '/static_dev/'
+STATIC_ROOT = '/static/'
 
 # Media files (Posts,Avatars)
 
@@ -157,11 +158,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
 PASSWORD_RESET_TIMEOUT_DAYS = 1
 
-APPEND_SLASH = False
+# APPEND_SLASH = False
 # SECURE_SSL_REDIRECT = True
 # SESSION_COOKIE_SECURE = True
 # CSRF_COOKIE_SECURE = True
 
-# # Email
-# DEFAULT_FROM_EMAIL = 'noreply@animilia.ge'
-# SERVER_EMAIL = ''
+# Email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.zoho.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'noreply@animilia.ge'
+EMAIL_HOST_USER = 'admin@animilia.ge'
+EMAIL_HOST_PASSWORD = '2MuJq%$GYmgf2F+'

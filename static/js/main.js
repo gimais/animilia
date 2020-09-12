@@ -76,7 +76,7 @@ $('.episode-select-button').on('click',function () {
         var clickedButton = $(this);
         activateClassButton(clickedButton);
         var videoURL = clickedButton.data('url');
-        $('.item-player video').attr('src',videoURL);
+        $('.item-player iframe').attr('src',videoURL);
         if ($('.item-player').hasClass('hidden')) {
                 $('.item-player').removeClass('hidden');
         }

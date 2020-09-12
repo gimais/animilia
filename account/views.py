@@ -143,7 +143,7 @@ def change_email_request_view(request):
     if request.user.is_authenticated and request.is_ajax():
         from django.template.loader import render_to_string
         current_site = get_current_site(request)
-        mail_subject = 'Email-is shecvla'
+        mail_subject = 'Email-ის შეცვლა'
         message = render_to_string('registration/account_email_change_email.html', {
             'user': request.user,
             'domain': current_site.domain,
