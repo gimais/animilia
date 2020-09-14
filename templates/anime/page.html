@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block title %}{{ anime.name }} - Animilia{% endblock %}
 {% block logout_redirect %}{{ request.path }}{% endblock %}
-{% block description %}{{ anime.name }} - ქართულად გახმოვანებული ანიმე{% endblock %}
+{% block description %}{{ anime.name }} - ქართულად გახმოვანებული{% endblock %}
+{% block ogmeta %}<meta property="og:description" content="უყურეთ {{ anime.name }} ქართულად Animilia.ge-ზე">{% endblock %}
 
 {% block content %}
     <div class="container">
