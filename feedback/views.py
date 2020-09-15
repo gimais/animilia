@@ -21,5 +21,8 @@ def feedback_form(request):
             messages.success(request, 'თქვენი წერილი წარმატებით გაიგზავნა.', extra_tags='welcome')
             return render(request,'feedback.html',{'form':FeedbackForm()})
     else:
-        form = FeedbackForm()
+        if request.user.is_authenticated:
+            form = FeedbackForm(user_username=request.user.get_username(),user_email=request.user.email)
+        else:
+            form = FeedbackForm()
     return render(request, 'feedback.html', {'form': form})

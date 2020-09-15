@@ -87,16 +87,16 @@ $('.episode-select-button').on('click',function () {
 function makeCommentBoxHTML(data,reply=false) {
     var html = '';
     html += `<div class="comment${reply?' clearfix':''}">
-                    <a class="comment-user-img" href="/profile/${data.user_id}">
+                    <a class="comment-user-img" href="/profile/${data.user_id}/">
                         <img src=${window.location.origin+'/media/'+data.avatar} alt>
                     </a>
                     <div class="comment-body">
                         <div class="comment-info">`;
 
     if(data.user_id === request_user_id){
-        html += `<a class='comment-user mine' href="/profile/${data.user_id}">${escapeHTML(data.username)}</a>`;
+        html += `<a class='comment-user mine' href="/profile/${data.user_id}/">${escapeHTML(data.username)}</a>`;
     }else{
-        html += `<a class='comment-user' href="/profile/${data.user_id}">${escapeHTML(data.username)}</a>`;
+        html += `<a class='comment-user' href="/profile/${data.user_id}/">${escapeHTML(data.username)}</a>`;
     }
 
     if(typeof request_user_id !== "undefined" && !data.deleted){
@@ -236,11 +236,11 @@ $commentForm.submit(function(event){
 
                 $(".comments-box").prepend(html);
                 $(".comments-box > .comment:first").hide(10).show(100);
-                $commentForm.trigger('reset')
+                $commentForm.trigger('reset');
                 $('.spoiler-button').attr('disabled',false);
             },
             error: function (data) {
-                console.log(data);
+                alert("მოხდა შეცდომა, თავიდან სცადეთ");
             },
         })
     }else
@@ -363,7 +363,7 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
                 }
             },
             error: function (data) {
-                console.log(data);
+                alert("მოხდა შეცდომა, თავიდან სცადეთ!");
             },
         })
     }
@@ -445,7 +445,7 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
                 }
             },
             error: function (data) {
-                console.log(data);
+                alert("ლაიქისთვის საჭიროა ავტორიზაცია!");
             },
         })
     }else
@@ -478,7 +478,7 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
                 }
             },
             error: function (data) {
-                console.log(data);
+                alert("დისლაიქისთვის საჭიროა ავტორიზაცია!");
             },
         })
     }else

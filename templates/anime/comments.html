@@ -27,7 +27,7 @@
         {% with requester=user %}
         <div class="comment clearfix">
 {#            <div class="admin"></div>#}
-            <a class="comment-user-img" href="/profile/{{ comment.user_id }}">
+            <a class="comment-user-img" href="/profile/{{ comment.user_id }}/">
                 <img src="/media/{{ comment.avatar }}" alt>
             </a>
             <div class="comment-body">
@@ -55,7 +55,6 @@
             </div>
             {% if comment.replies_count %}
             <div class="comment-replies-check closed" data-id="{{comment.id}}">
-{#                <i class="fas fa-caret-down"></i>#}
                 პასუხების ჩვენება ({{comment.replies_count}})
             </div>
                 <div class="comment-replies-box" style="display: none"></div>

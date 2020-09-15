@@ -3,11 +3,29 @@ from .models import Feedback
 
 
 class FeedbackForm(forms.ModelForm):
-    customer_name = forms.CharField(max_length=50, widget=forms.TextInput(
-        attrs={'class': 'form-input', 'placeholder': 'სახელი'}))
+    def __init__(self,*args,**kwargs):
+        if 'user_username' in kwargs:
+            self.user_username = kwargs.pop('user_username')
+            self.user_email = kwargs.pop('user_email')
+        else:
+            self.user_username = ''
+            self.user_email = ''
+        super(FeedbackForm,self).__init__(*args,**kwargs)
+        self.fields['customer_name'].widget = forms.TextInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'სახელი',
+            'value': self.user_username,
+        })
+        self.fields['email'].widget = forms.TextInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'Email (გთხოვთ, მიუთითეთ ის ემაილი რომელზე გინდათ პასუხი მიიღოთ)',
+            'value': self.user_email,
+        })
 
-    email = forms.EmailField(max_length=254, widget=forms.EmailInput(
-        attrs={'class': 'form-input', 'placeholder': 'Email'}))
+
+    customer_name = forms.CharField(max_length=50)
+
+    email = forms.EmailField(max_length=254)
 
     details = forms.CharField(
         label="",

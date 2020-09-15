@@ -8,7 +8,7 @@
             {% csrf_token %}
             <div class="form-title">კონტაქტი</div>
                 {% for non_field_error in form.non_field_errors %}
-                    {{ non_field_error }}ra
+                    {{ non_field_error }}
                 {% endfor %}
                 {% for input in form %}
                    <div class="form-group">
