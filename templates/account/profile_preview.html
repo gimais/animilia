@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ user }}-ის პროფილი{% endblock %}
+{% block title %}{{ profileuser }} -  პროფილი{% endblock %}
 {% block logout_redirect %}/{% endblock %}
 
 {% block content %}
@@ -8,40 +8,40 @@
         <div class="clearfix">
             <div class="profile-avatar-container" style="margin: 0">
                 <div class="profile-img">
-                    <img id="active-avatar" src="/media/{{ user.profile.avatar }}" alt>
+                    <img id="active-avatar" src="/media/{{ profileuser.profile.avatar }}" alt>
                 </div>
             </div>
             <div class="profile-display">
-                <p id="profile-username">{{ user.username }}</p>
-                <p id="profile-group">{{ user.groups.all.0 }}</p>
+                <p id="profile-username">{{ profileuser.username }}</p>
+                <p id="profile-group">{{ profileuser.groups.all.0 }}</p>
                 <div class="profile-row">
                     <dl>
                         <dt>რეგისტრაციის თარიღი:</dt>
-                            <dd>{{ user.date_joined|date:"d.m.Y" }}</dd>
+                            <dd>{{ profileuser.date_joined|date:"d.m.Y" }}</dd>
                         <dt>ჯგუფი:</dt>
-                        {% if user.is_superuser %}
+                        {% if profileuser.is_superuser %}
                             <dd>ადმინისტრატორი</dd>
-                        {% elif user.is_staff %}
+                        {% elif profileuser.is_staff %}
                             <dd>მოდერატორი</dd>
                         {% else %}
                             <dd>მაყურებელი</dd>
                         {% endif %}
                     </dl>
                     <dl>
-                        {% if user.settings.show_gender %}
+                        {% if profileuser.settings.show_gender %}
                             <dt>სქესი:</dt>
-                            {% if user.profile.gender == 0 %}
+                            {% if profileuser.profile.gender == 0 %}
                                 <dd>მამრობოთი</dd>
-                            {% elif user.profile.gender == 1 %}
+                            {% elif profileuser.profile.gender == 1 %}
                                 <dd>მდედრობითი</dd>
                             {% else %}
                                 <dd>მითითებული არ არის</dd>
                             {% endif %}
                         {% endif %}
-                        {% if user.settings.show_birth %}
+                        {% if profileuser.settings.show_birth %}
                             <dt>დაბადების თარიღი:</dt>
-                            {% if user.profile.birth %}
-                                <dd>{{ user.profile.birth }}</dd>
+                            {% if profileuser.profile.birth %}
+                                <dd>{{ profileuser.profile.birth }}</dd>
                             {% else %}
                                 <dd>მითითებული არ არის</dd>
                             {% endif %}

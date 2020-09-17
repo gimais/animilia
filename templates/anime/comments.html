@@ -32,7 +32,7 @@
             </a>
             <div class="comment-body">
                 <div class="comment-info">
-                    <a class='comment-user {% if comment.user_id == requester.pk %}mine{% endif %}' href="/profile/{{ comment.user_id }}">{{ comment.username }}</a>
+                    <a class='comment-user {% if comment.user_id == requester.pk %}mine{% endif %}' href="/profile/{{ comment.user_id }}/">{{ comment.username }}</a>
                 {% if user.is_authenticated %}
                     {% if comment.user_id == requester.pk %}
                         {% if comment.like_count == 0 and comment.dislike_count == 0 and comment.replies_count == 0 %}

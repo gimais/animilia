@@ -80,7 +80,7 @@ def profile_preview(request,id):
         user = get_object_or_404(User.objects.select_related('profile','settings'),pk=id)
     else:
         return Http404
-    return render(request,'account/profile_preview.html',{'user':user})
+    return render(request,'account/profile_preview.html',{'profileuser':user})
 
 
 def username_update(request):

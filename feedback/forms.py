@@ -18,7 +18,7 @@ class FeedbackForm(forms.ModelForm):
         })
         self.fields['email'].widget = forms.TextInput(attrs={
             'class': 'form-input',
-            'placeholder': 'Email (გთხოვთ, მიუთითეთ ის ემაილი რომელზე გინდათ პასუხი მიიღოთ)',
+            'placeholder': 'Email (გთხოვთ მიუთითეთ ის Email, რომელზეც გინდათ მიიღოთ პასუხი)',
             'value': self.user_email,
         })
 
