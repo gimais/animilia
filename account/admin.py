@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Comment,Profile
+from .models import Comment,Profile, Settings
 
 # Register your models here.
 
@@ -35,5 +35,13 @@ class ProfileAdmin(admin.ModelAdmin):
     def has_add_permission(self, request, obj=None):
         return False
 
+class SettingsAdmin(admin.ModelAdmin):
+    list_display = ('user','ip')
+    readonly_fields = ('id','user','ip','show_birth','show_gender','avatar_updated','username_updated')
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
 admin.site.register(Comment,CommentAdmin)
 admin.site.register(Profile,ProfileAdmin)
+admin.site.register(Settings,SettingsAdmin)

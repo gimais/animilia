@@ -1,4 +1,5 @@
 // jQuery 3.4.1
+"use strict";
 
 function escapeHTML(txt) {
     return txt
@@ -10,13 +11,13 @@ function escapeHTML(txt) {
 }
 
 $('#mob-menu').click(function () {
-        $('nav').toggleClass('open');
-        $('.top-nav').toggleClass('open')
+    $('nav').toggleClass('open');
+    $('.top-nav').toggleClass('open')
 });
 
 
 $('#login-focus').on('click',function () {
-        $('.login-form').toggleClass('show');
+    $('.login-form').toggleClass('show');
 });
 
 function activateClassButton(button){
@@ -84,9 +85,9 @@ $('.episode-select-button').on('click',function () {
 });
 
 
-function makeCommentBoxHTML(data,reply=false) {
+function makeCommentBoxHTML(data) {
     var html = '';
-    html += `<div class="comment${reply?' clearfix':''}">
+    html += `<div class="comment${data.parent_id?'':' clearfix'}">
                     <a class="comment-user-img" href="/profile/${data.user_id}/">
                         <img src=${window.location.origin+'/media/'+data.avatar} alt>
                     </a>
@@ -100,7 +101,10 @@ function makeCommentBoxHTML(data,reply=false) {
     }
 
     if(typeof request_user_id !== "undefined" && !data.deleted){
-        html += `<p class="reply-button" data-it="${data.parent_id?data.parent_id:data.comment_id}" data-id="${data.comment_id}" data-username="${escapeHTML(data.username)}"><i class="fas fa-reply"></i>  პასუხი</p>`;
+        if(data.parent_id)
+            html += `<p class="reply-button" data-it="${data.parent_id}" data-id="${data.comment_id}" data-username="${escapeHTML(data.username)}"><i class="fas fa-reply"></i>  პასუხი</p>`;
+        else
+            html += `<p class="reply-button" data-id="${data.comment_id}" data-username="${escapeHTML(data.username)}"><i class="fas fa-reply"></i>  პასუხი</p>`;
     }
     if (typeof request_user_id !== "undefined" && data.user_id===request_user_id && !data.deleted){
         if(typeof data.dislikes === "undefined" && typeof data.likes === "undefined" || data.dislikes ===0 && data.likes === 0) {
@@ -134,10 +138,14 @@ function makeCommentBoxHTML(data,reply=false) {
     return html
 }
 
-function makeCommentTextAreaHTML(parent_id){
+function makeCommentTextAreaHTML(parent_id,replying_to_id=NaN){
     var html = '';
-    html += `<form class=\'comment-form\' style=\'padding: 15px 0\' method=\'POST\' data-id=\"${parent_id}\">
-            <input type="hidden" name="csrfmiddlewaretoken" value="${getCookie('csrftoken')}">
+    if(isNaN(replying_to_id)){
+        html += `<form class=\'comment-form\' style=\'padding: 15px 0\' method=\'POST\' data-id=\"${parent_id}\">`;
+    }else{
+        html += `<form class=\'comment-form\' style=\'padding: 15px 0\' method=\'POST\' data-id=\'${parent_id}\' data-it=\"${replying_to_id}\">`;
+    }
+    html += `<input type="hidden" name="csrfmiddlewaretoken" value="${getCookie('csrftoken')}">
             <p> <textarea name="body" cols="40" rows="10" placeholder="კომენტარი" id="id_body"></textarea></p>
             <button class="spoiler-button">სპოილერი</button>
             <button type="submit">გაგზავნა</button>
@@ -166,7 +174,7 @@ function getChildComments(that,parent_id,replying=false,more=0){
         that.toggleClass('closed opened done');
         $.ajax({
         method: "GET",
-        url: window.location.origin+'/account/check_replies/'+parent_id,
+        url: '/account/check_replies/'+parent_id,
         data: {
             'skip': 1,
         },
@@ -220,9 +228,11 @@ function convertTimeGeo(date) {
 var $commentForm = $('.comment-form');
 $commentForm.submit(function(event){
     event.preventDefault();
+    var submitButton = $(this).find('button[type="submit"]');
     var $formDataSerialized = $(this).serialize();
     var textArea = $(this).find('textarea').val();
 
+    submitButton.attr('disabled', true);
     if(!checkCommentContainsMoreSpoilers(textArea)) {
         $.ajax({
             method: "POST",
@@ -232,7 +242,7 @@ $commentForm.submit(function(event){
                 data.body = $(".comment-form textarea").val();
                 data.time = new Date().getTime() / 1000;
                 data.parent_id = data.comment_id;
-                var html = makeCommentBoxHTML(data, true);
+                var html = makeCommentBoxHTML(data);
 
                 $(".comments-box").prepend(html);
                 $(".comments-box > .comment:first").hide(10).show(100);
@@ -242,6 +252,9 @@ $commentForm.submit(function(event){
             error: function (data) {
                 alert("მოხდა შეცდომა, თავიდან სცადეთ");
             },
+            complete : function () {
+                submitButton.attr('disabled', false);
+            }
         })
     }else
         alert('გთხოვთ, გამოიყენოთ მხოლოდ 1 სპოილერი!')
@@ -259,6 +272,9 @@ function checkCommentContainsMoreSpoilers(text) {
 }
 
 function spoilerAlertBBToHTML($str) {
+    let $format_search;
+    let $format_replace;
+
     $format_search = /\[spoiler\](.*?)\[\/spoiler\]/ig;
     $format_replace = '<span class="spoiler">$1</span><button id="reveal-spoiler">სპოილერი</button>';
 
@@ -275,13 +291,31 @@ function spoilerALertHTMLToBB(text) {
 
 $('.comments-box, .comment-form').on('click','.reply-button',function () {
     var button = $(this);
-    var parent_id = button.data('it') || button.data('id');
+    var is_replying_parent = true;
+    var parent_id = button.data('id');
+    var replying_to_id;
+    var formHTML;
     var username = button.data('username');
-    var formHTML = makeCommentTextAreaHTML(parent_id);
     var lastComment = button.parents('.comment:last');
-    if(lastComment.find('.comment-form').length===0){
-        lastComment.append(formHTML)
+
+    if (typeof button.data('it') !== 'undefined') {
+        is_replying_parent = false;
     }
+
+    if(is_replying_parent){
+        formHTML = makeCommentTextAreaHTML(parent_id);
+    }else{
+        parent_id = button.data('it');
+        replying_to_id = button.data('id');
+        formHTML = makeCommentTextAreaHTML(replying_to_id,parent_id);
+    }
+
+    if(lastComment.find('.comment-form').length===0) {
+        lastComment.append(formHTML);
+    }else{
+        lastComment.find('.comment-form').replaceWith(formHTML);
+    }
+
     var commentForm = lastComment.find('.comment-form');
     commentForm.find('textarea').val(username+', ').focus();
     var checkRepliesButton = lastComment.find('.comment-replies-check');
@@ -299,10 +333,17 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
     event.preventDefault();
     var that = $(this).parent();
     var $formDataSerialized = that.serialize();
+
+    if (typeof that.data('it') !== 'undefined') {
+        $formDataSerialized += `&parent_id=${that.data('it')}` + `&replying_to_id=${that.data('id')}`;
+    }else{
+        $formDataSerialized += `&parent_id=${that.data('id')}`;
+    }
+
     $.ajax({
         method: "POST",
-        url: window.location.origin+'/account/comment/',
-        data: $formDataSerialized + `&parent_id=${that.data('id')}`,
+        url: '/account/comment/',
+        data: $formDataSerialized,
         success: function (data) {
             data.body = that.find('textarea').val();
             data.time = new Date().getTime()/1000;
@@ -318,7 +359,6 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
                             პასუხების ჩვენება (0)
                             </div>
                             <div class="comment-replies-box">`;
-               // html += makeCommentBoxHTML(data);
                html += '</div>';
                that.parent().append(html);
             }
@@ -341,7 +381,7 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
         var id = that.parent().find('.reply-button').data('id');
         $.ajax({
             method: "POST",
-            url: window.location.origin + '/account/comment/delete/',
+            url: '/account/comment/delete/',
             data: {id: id},
             success: function (data) {
                 if (that.parents('.comment').attr('class') === 'comment clearfix') {
@@ -399,7 +439,7 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
 
         $.ajax({
             method: "POST",
-            url: window.location.origin + '/account/comment/edit/',
+            url: '/account/comment/edit/',
             data: $formSerialized + '&id=' + parent.data('id'),
             success: function (data) {
                 parent.parent().find('p:not([class])').text(finText);
@@ -423,7 +463,7 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
         var id = parent.find('.reply-button').data('id');
         $.ajax({
             method: "POST",
-            url: window.location.origin + '/account/comment/like/',
+            url: '/account/comment/like/',
             data: {id: id},
             success: function (data) {
                 if (data.type===1) {
@@ -457,7 +497,7 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
         var id = parent.find('.reply-button').data('id');
         $.ajax({
             method: "POST",
-            url: window.location.origin + '/account/comment/dislike/',
+            url: '/account/comment/dislike/',
             data: {id: id},
             success: function (data) {
                 if (data.type===1)
@@ -511,7 +551,7 @@ $('.showmore').on('click',function () {
     var current_page = parseInt(that.attr('data-page'));
     $.ajax({
         method: "GET",
-        url: window.location.origin+'/anime/more_comments/',
+        url: '/anime/more_comments/',
         data: {
             'skip': current_page+1,
             'id':$('.item-page').data('id'),
@@ -519,7 +559,7 @@ $('.showmore').on('click',function () {
         success: function (data) {
             var html = '';
             for(let i=0;i<data.length;i++)
-              html += makeCommentBoxHTML(data[i],true);
+              html += makeCommentBoxHTML(data[i]);
             that.attr('data-page',current_page+1);
             $('.comments-box').append(html);
             if(that.attr('data-max') == current_page+1){
@@ -602,7 +642,7 @@ $('.profile-details-input').on('click','#change-username-button',function (e) {
     e.preventDefault();
     $.ajax({
         method: "GET",
-        url: window.location.origin + '/account/email_change/',
+        url: '/account/email_change/',
         success: function () {
             alert('მოთხოვნა გაიგზავნა თქვენს Email-ზე,გთხოვთ გადაამოწმოთ! შეამოწმეთ Spam ფაილიც!')
         },

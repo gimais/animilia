@@ -43,15 +43,15 @@
                     <p class="reply-button" data-id="{{comment.id}}" data-username="{{comment.username}}"><i class="fas fa-reply"></i>  პასუხი</p>
                 {% endif %}
                 {% endwith %}
-                <div class="comment-dl-buttons">
-                    <div class="comment-right-buttons" id='dislike-comment' style="color: #ab3717;"><i class="{% if comment.has_dislike  %}fas{% else %} far{% endif %} fa-thumbs-down"></i>{{ comment.dislike_count }}</div>
-                    <div class="comment-right-buttons" id='like-comment' style="color: #ff2e01;" ><i class="{% if comment.has_like  %}fas{% else %} far{% endif %} fa-thumbs-up"></i>{{ comment.like_count }}</div>
-                </div>
+                    <div class="comment-dl-buttons">
+                        <div class="comment-right-buttons" id='dislike-comment' style="color: #ab3717;"><i class="{% if comment.has_dislike  %}fas{% else %} far{% endif %} fa-thumbs-down"></i>{{ comment.dislike_count }}</div>
+                        <div class="comment-right-buttons" id='like-comment' style="color: #ff2e01;" ><i class="{% if comment.has_like  %}fas{% else %} far{% endif %} fa-thumbs-up"></i>{{ comment.like_count }}</div>
+                    </div>
                     <p class='comment-time'>{{ comment.created|date:"d/m/Y | H:i" }}</p>
                 </div>
-                    <p style="word-break: break-word;">
-                            {{ comment.body}}
-                    </p>
+                <p style="word-break: break-word;">
+                        {{ comment.body}}
+                </p>
             </div>
             {% if comment.replies_count %}
             <div class="comment-replies-check closed" data-id="{{comment.id}}">

@@ -209,7 +209,8 @@ class CommentForm(forms.ModelForm):
 class UpdateUsernameForm(forms.ModelForm):
     error_messages = {
         'not_changed': "თქვენ ეს ნიკი ისედაც გაქვთ!",
-        'deadline': 'ნიკის შეცვლა შეგიძლიათ ყოველ 7 დღეში ერთხელ!'
+        'deadline': 'ნიკის შეცვლა შეგიძლიათ ყოველ 7 დღეში ერთხელ!',
+        'blacklist': 'ასეთი Username მიუღებელია! სხვა სცადეთ!'
     }
 
     class Meta:
@@ -228,6 +229,12 @@ class UpdateUsernameForm(forms.ModelForm):
             raise forms.ValidationError(
                 self.error_messages['not_changed'],
                 code='not_changed',
+            )
+
+        if username.lower() in blacklist:
+            raise forms.ValidationError(
+                self.error_messages['blacklist'],
+                code='blacklist',
             )
 
         updated_time_difference = (timezone.now() - self.user.settings.username_updated).total_seconds()

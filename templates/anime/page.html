@@ -30,6 +30,12 @@
                         {% elif anime.type == 1 %}
                             <dd>ფილმი</dd>
                         {% endif %}
+                        <dt>სტატუსი:</dt>
+                        {% if anime.finished %}
+                            <dd class="anime-status finished">გახმოვანებული</dd>
+                        {% else%}
+                            <dd class="anime-status not-finished">გახმოვანების პროცესში</dd>
+                        {% endif %}
                         <dt>სტუდია:</dt>
                         <dd>{{ anime.studio }}</dd>
                         <dt>გამოშვების წელი:</dt>
@@ -87,6 +93,16 @@
 {% block script %}
     <script>
         {#var isMobile = (/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase()));#}
+
+        var url = new URL(window.location.href);
+        var commentBox = $('.reply-button[data-id=' + url.searchParams.get("parent") +']').parents('.comment');
+
+        $([document.documentElement, document.body]).animate({
+            scrollTop: commentBox.offset().top-50
+        }, 500,function () {
+                var commentRepliesCheck = commentBox.find('.comment-replies-check');
+                getChildComments(commentRepliesCheck,commentRepliesCheck.data('id'));
+        });
 
         Array.prototype.forEach.call(document.getElementsByClassName('comment'), child => {
             var com = $(child).find('.comment-body').find('p');

@@ -55,10 +55,14 @@
                         {% if user.is_staff %}
                             <li><a href="/admin/" target="_blank">Admin</a></li>
                         {% endif %}
+                        <li>
+                            <a class="menu-icon fas fa-bell" href="{% url 'notification' %}">
+                                <span class="notif-count">{{ user.notification_set.count }}</span>
+                            </a>
+                        </li>
                         <li><a class='active' href="{% url 'profile' %}" data-id="{{ user.id }}">{{user.username}}</a></li>
-                        <li><a href="{% url 'logout' %}?next={% block logout_redirect %}{% endblock %}" style="padding: 35px 40px;position: relative;">
-                            <span>გასვლა </span>
-                            <i class="fas fa-sign-out-alt"></i>
+                        <li><a class="menu-icon fas fa-sign-out-alt" href="{% url 'logout' %}?next={% block logout_redirect %}{% endblock %}">
+                            <span>გასვლა</span>
                         </a></li>
                     {% endif %}
                 </ul>
@@ -92,6 +96,16 @@
         {% block content %}
         {% endblock %}
     </section>
+    <footer>
+        <div class="footer-logo"></div>
+        <div class="social-icons">
+            <ul>
+                <li><a href="https://www.facebook.com/animilia1000" target="_blank" title="Facebook-ის გვერდი"><i class="fab fa-facebook" aria-hidden="true"></i></a></li>
+                <li><a href="https://www.myvideo.ge/?user_id=1821361" target="_blank" title="Myvideo"><img src="/static/img/myvideo-icon.svg" alt="Myvideo"></a></li>
+              <li><a href="/feedback" title="კონტაქტი"><img src="/static/img/feedback_icon.svg" alt="კონტაქტი"></a></li>
+            </ul>
+        </div>
+    </footer>
     <script src="{% static "js/vendor/modernizr-3.8.0.min.js" %}"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <script>window.jQuery || document.write('<script src="/static/js/vendor/jquery-3.4.1.min.js"><\/script>')</script>

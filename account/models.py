@@ -7,27 +7,23 @@ from anime.models import Anime
 
 
 class CommentManager(models.Manager):
-    def with_annotates_auth(self,user_pk):
+    def with_annotates(self,user_obj):
         profiles = Profile.objects.filter(user_id=OuterRef('user_id'))
         user = User.objects.filter(pk=OuterRef('user_id'))
-        has_like = User.objects.get(pk=user_pk).likes.filter(id=OuterRef('id'))
-        has_dislike = User.objects.get(pk=user_pk).dislikes.filter(id=OuterRef('id'))
-        return self.get_queryset().annotate(avatar=Subquery(profiles.values('avatar')[:1]),
-                                            username=Subquery(user.values('username')[:1]),
-                                            has_like=Exists(has_like),
-                                            has_dislike=Exists(has_dislike),
-                                            like_count=Count('like',distinct=True),
-                                            dislike_count=Count('dislike', distinct=True),
-                                            replies_count=Count('replies',distinct=True))
+        params = {'avatar' : Subquery(profiles.values('avatar')[:1]),
+                  'username' : Subquery(user.values('username')[:1]),
+                  'like_count' : Count('like',distinct=True),
+                  'dislike_count' : Count('dislike', distinct=True),
+                  'replies_count' : Count('replies',distinct=True)}
 
-    def with_annotates_anony(self):
-        profiles = Profile.objects.filter(user_id=OuterRef('user_id'))
-        user = User.objects.filter(pk=OuterRef('user_id'))
-        return self.get_queryset().annotate(avatar=Subquery(profiles.values('avatar')[:1]),
-                                            username=Subquery(user.values('username')[:1]),
-                                            like_count=Count('like', distinct=True),
-                                            dislike_count=Count('dislike', distinct=True),
-                                            replies_count=Count('replies',distinct=True))
+        if user_obj.is_authenticated:
+            has_like = user_obj.likes.filter(id=OuterRef('id'))
+            has_dislike = user_obj.dislikes.filter(id=OuterRef('id'))
+
+            params['has_like'] = Exists(has_like)
+            params['has_dislike'] = Exists(has_dislike)
+
+        return self.get_queryset().annotate(**params)
 
 class Comment(models.Model):
     anime = models.ForeignKey(Anime,on_delete=models.CASCADE,related_name='comments')
@@ -95,6 +91,7 @@ class Comment(models.Model):
                 'username':self.user.username,
                 'avatar':self.user.profile.avatar.name,
                 'time':datetime.timestamp(self.created),
+                'user_id':self.user.pk
             }
 
     def __str__(self):
@@ -129,6 +126,7 @@ def sub_three_days():
 
 class Settings(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
+    ip = models.GenericIPAddressField(verbose_name='IP',null=True)
     username_updated = models.DateTimeField(auto_now_add=True)
     avatar_updated = models.DateTimeField(default=sub_three_days)
     show_birth = models.BooleanField(default=False)
@@ -138,5 +136,14 @@ class Settings(models.Model):
         verbose_name = 'პარამეტრები'
         verbose_name_plural = "პარამეტრები"
 
+
     def __str__(self):
         return "{}-ის პარამეტრები".format(self.user.username)
+
+class Notification(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    comment = models.ForeignKey(Comment,on_delete=models.CASCADE,related_name='notifications')
+    reply_comment = models.ForeignKey(Comment,blank=True,on_delete=models.CASCADE)
+
+    def __str__(self):
+        return "comment_id: {}, reply_id: {}, user_id : {}".format(self.comment.id,self.reply_comment.id,self.user.username)

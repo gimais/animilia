@@ -21,6 +21,8 @@ from account.views import profile_preview
 from templates.sitemaps import AnimeSitemap
 from django.contrib.sitemaps.views import sitemap
 from feedback.views import feedback_form
+import debug_toolbar
+
 
 sitemaps = {
     'animes':AnimeSitemap,
@@ -33,4 +35,5 @@ urlpatterns = [
     path('profile/<int:id>/',profile_preview,name='profile_preview'),
     path('sitemap.xml', sitemap, {'sitemaps':sitemaps},name='sitemap'),
     path('',include('anime.urls')),
+    path('__debug__/', include(debug_toolbar.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

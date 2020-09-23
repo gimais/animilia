@@ -18,7 +18,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from account.forms import SignUpForm, MyAuthenticationForm, CommentForm,\
     UpdateProfileForm, UpdateUsernameForm, EmailChangeForm,ShowProfileForm
 from anime.models import Anime
-from .models import Comment, Profile
+from .models import Comment, Profile, Notification, Settings
 
 ERROR = {'error':'moxda shecdoma!'}
 
@@ -46,6 +46,18 @@ def signup_view(request):
                 raw_password = form.cleaned_data.get('password1')
                 user = authenticate(username=username, password=raw_password)
                 login(request, user)
+
+                # add ip field to settings
+                x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+
+                if x_forwarded_for:
+                    ipaddress = x_forwarded_for.split(',')[-1].strip()
+                else:
+                    ipaddress = request.META.get('REMOTE_ADDR')
+
+                save_ip = Settings.objects.get(user_id=user.pk)
+                save_ip.ip = ipaddress
+                save_ip.save()
                 return redirect('profile')
         else:
             form = SignUpForm()
@@ -68,7 +80,6 @@ def profile_view(request):
         context = {
             'p_form':profile_form,
             's_form':settings_form,
-            'user':User.objects.prefetch_related('profile','settings').get(id=request.user.pk),
         }
         return render(request, 'account/profile.html', context)
     else:
@@ -190,29 +201,45 @@ def add_comment(request):
         form = CommentForm(request.POST)
         if form.is_valid():
             try:
-                parent_id = int(request.POST.get('parent_id',False))
-                parent_comment = Comment.objects.prefetch_related('replies').get(id=parent_id)
+                parent_id = int(request.POST.get('parent_id', False))
+                parent_comment = Comment.objects.get(id=parent_id)
             except (TypeError, ValueError, OverflowError,Comment.DoesNotExist):
                 parent_comment = None
 
             if parent_comment:
 
+                #send notification to replying_comment_author
+                try:
+                    replying_to_id = int(request.POST.get('replying_to_id', False))
+                    replying_to_comment_obj = Comment.objects.get(id=replying_to_id)
+                except (TypeError, ValueError, OverflowError,Comment.DoesNotExist):
+                    replying_to_comment_obj = None
+
+                request_user = request.user
+
+                if replying_to_comment_obj:
+                    replying_comment_author = replying_to_comment_obj.user_id
+                else:
+                    replying_to_comment_obj = parent_comment
+                    replying_comment_author = parent_comment.user_id
+
                 reply_comment = form.save(commit=False)
                 reply_comment.anime = parent_comment.anime
                 reply_comment.parent = parent_comment
-                reply_comment.user = request.user
-                # if request.POST.get('spoiler', False) == 'true':
-                #     reply_comment.spoiler = True
-                # else:
-                #     reply_comment.spoiler = False
+                reply_comment.user = request_user
+
                 reply_comment.save()
+
+                if not replying_comment_author == request_user.id:
+                    Notification.objects.create(reply_comment_id=replying_to_comment_obj.id,
+                                            user_id=replying_comment_author,
+                                            comment_id=reply_comment.id)
 
                 response_data = {
                     'username':request.user.username,
                     'avatar':request.user.profile.avatar.name,
                     'user_id':request.user.id, # ar washalooo ? edit da remove functiebistvis rom daadasturos js-shi
                     'comment_id':reply_comment.id,
-                    # 'has_spoiler': reply_comment.spoiler,
                 }
                 status = 200
             else:
@@ -262,7 +289,8 @@ def check_replies(request,int):
 
         if replies:
             result = list()
-            for reply in replies:
+            replies_iterator = replies.iterator()
+            for reply in replies_iterator:
                 result.append(reply.get_reply_comment_info(request.user.pk))
             return JsonResponse(result, status=200,safe=False)
         else:
@@ -389,3 +417,15 @@ def dislike_comment(request):
             return JsonResponse({'error':'dafiqsirda shecdoma!'}, status=400)
     else:
         return JsonResponse({'error': "araavtorizebuli motxovna!"}, status=401)
+
+
+def check_notification(request):
+    if request.user.is_authenticated:
+        notifications = Notification.objects.select_related('user','reply_comment','comment').\
+            filter(user_id=request.user).values_list(
+            'reply_comment_id','reply_comment__body','comment__created',
+            'comment__anime__slug','reply_comment__parent','id'
+        )
+        return render(request, 'account/notifications.html',{'notifications':notifications})
+    else:
+        return redirect('home')

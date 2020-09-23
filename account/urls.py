@@ -16,6 +16,8 @@ urlpatterns = [
     path('login/', local_view.login_view, name='login'),
     path('logout/', views.LogoutView.as_view(), name='logout'),
 
+    path('notifications/',local_view.check_notification,name='notification'),
+
     path('profile/',local_view.profile_view,name='profile'),
     path('avatar_update/',local_view.avatar_update,name='avatar_update'),
     path('username_update/',local_view.username_update,name='username_update'),

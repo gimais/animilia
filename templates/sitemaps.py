@@ -3,7 +3,7 @@ from anime.models import Anime
 
 class AnimeSitemap(Sitemap):
     priority = 1
-    changefreq = "yearly"
+    changefreq = "monthly"
 
     def items(self):
         return Anime.objects.all()

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}შეყობინებები{% endblock %}
+{% block logout_redirect %}/{% endblock %}
+{% load static %}
+
+{% block content %}
+    <div class="container">
+        <ul class="notifications">
+        {% for notification in notifications %}
+{#            0 - reply_comment_id, 1 - body, 2 - created, 3 - slug, 4 - parent, 5 - id #}
+            <li>
+                <span class="notif-info">
+                    თქვენს კომენტარზე ("{{ notification.1 }}")
+                {% if notification.4 != None %}
+                    <a href="/anime/{{ notification.3 }}?parent={{ notification.4 }}&notif={{ notification.5 }}">პასუხია</a>
+                {% else %}
+                    <a href="/anime/{{ notification.3 }}?parent={{ notification.0 }}&notif={{ notification.5 }}">პასუხია</a>
+                {% endif %}
+                </span>
+                <span class="notif-time">{{ notification.2|date:"d/m/Y | H:i" }}</span>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

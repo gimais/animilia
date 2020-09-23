@@ -19,7 +19,7 @@ class AnimeAdmin(admin.ModelAdmin):
         models.ManyToManyField: {'widget': CheckboxSelectMultiple},
     }
 
-    list_display = ("name",'dubbed', "type", 'slug', 'updated')
+    list_display = ("name",'dubbed', "type", 'slug', 'updated','finished')
     inlines = [ChoiceInline]
 
     class Media:

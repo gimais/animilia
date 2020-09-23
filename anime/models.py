@@ -50,6 +50,7 @@ class Anime(models.Model):
     views = models.IntegerField(default=0,editable=False)
     dubbed = models.PositiveSmallIntegerField(default=0,verbose_name='გახმოვანებული',editable=False)
     slug = models.SlugField(unique=True,verbose_name='ლინკი')
+    finished = models.BooleanField(default=False,verbose_name="დამთავრებულია")
 
     class Meta:
         db_table = 'animes_list'
