@@ -426,6 +426,13 @@ def check_notification(request):
             'reply_comment_id','reply_comment__body','comment__created',
             'comment__anime__slug','reply_comment__parent','id'
         )
-        return render(request, 'account/notifications.html',{'notifications':notifications})
+        notif_exists = notifications.exists()
+        context = {
+            'exists':notif_exists
+        }
+
+        if notif_exists:
+            context['notifications'] = notifications
+        return render(request, 'account/notifications.html',context)
     else:
         return redirect('home')

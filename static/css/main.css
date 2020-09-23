@@ -422,7 +422,7 @@ nav{
 }
 
 .top-nav li > a.menu-icon{
-    padding: 20px 28px 18px;
+    padding: 22px 28px 18px;
     position: relative;
 }
 
@@ -1735,6 +1735,9 @@ a.change-pass-button {
         margin: 0 auto;
     }
 
+    /*.top-nav li a span.notif-count {*/
+    /*    left: 93px;*/
+    /*}*/
 }
 
 @media screen and (max-width: 515px) {
