@@ -31,7 +31,7 @@ ALLOWED_HOSTS = ['*']
 # if DEBUG:
 #     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # During development only
 
-INTERNAL_IPS = ['127.0.0.1']
+INTERNAL_IPS = ['127.0.0.1','188.169.75.221']
 
 # Application definition
 
