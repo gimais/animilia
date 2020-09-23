@@ -9,7 +9,6 @@ idna==2.7
 jmespath==0.10.0
 pathspec==0.5.9
 Pillow==7.0.0
-post==2019.4.13
 psycopg2-binary==2.8.5
 public==2019.4.13
 pypiwin32==223
