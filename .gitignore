@@ -215,9 +215,9 @@ fabric.properties
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 
-animilia-env/
-/animilia/
-**/migrations/
-
-db.sqlite3
-/media/
+#animilia-env/
+#/animilia/
+#**/migrations/
+#
+#db.sqlite3
+#/media/
