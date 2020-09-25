@@ -217,8 +217,10 @@ fabric.properties
 .ebextensions/
 
 animilia-env/
-animilia/
+animilia/settings.py
+animilia/urls.py
 **/migrations/
 
 db.sqlite3
-/media/
+media/posters/
+media/avatars/
