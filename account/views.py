@@ -282,19 +282,14 @@ def add_comment(request):
 
 def check_replies(request,int):
     if request.is_ajax():
-        try:
-            replies = Comment.objects.filter(parent=int)
-        except (Comment.DoesNotExist,Comment.MultipleObjectsReturned):
-            replies = None
+        replies = Comment.objects.filter(parent=int).iterator()
+        result = list()
 
-        if replies:
-            result = list()
-            replies_iterator = replies.iterator()
-            for reply in replies_iterator:
-                result.append(reply.get_reply_comment_info(request.user.pk))
-            return JsonResponse(result, status=200,safe=False)
-        else:
-            return JsonResponse({'error':'repliebi ar arsebobs!'},status=400)
+        for reply in replies:
+            result.append(reply.get_reply_comment_info(request.user.pk))
+
+        return JsonResponse(result, status=200,safe=False)
+
     return JsonResponse(ERROR, status=400)
 
 

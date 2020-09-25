@@ -121,7 +121,7 @@ function makeCommentBoxHTML(data) {
         html+= `<p class='comment-time'>${convertTimeGeo(data.time)}</p>
             </div>`;
     if(data.deleted){
-        html+= `<p class="deleted-comment">ეს კომენტარი წაშლილია!</p>`
+        html+= `<p class="deleted-comment">ეს კომენტარი წაშლილია</p>`
     }else{
         html += `<p style="word-wrap: break-word;"">${ifCommentContainsSpoiler(escapeHTML(data.body))}</p>`
     }
@@ -166,7 +166,7 @@ function makeTextareaEdit(parent_id,spoiler){
     return html
 }
 
-function getChildComments(that,parent_id,replying=false,more=0){
+function getChildComments(that,parent_id, replying = false, more = 0){
     var commentClosed = that.text().replace('დამალვა','ჩვენება');
     var commentsOpened = that.text().replace('ჩვენება','დამალვა');
     if(!that.hasClass('done') || more){
@@ -549,13 +549,20 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
 $('.showmore').on('click',function () {
     var that = $(this);
     var current_page = parseInt(that.attr('data-page'));
+    var hasParentQueryString = urlForQueryParams.searchParams.has("parent");
+    var dataJson = {
+        'skip': current_page+1,
+        'id':$('.item-page').data('id'),
+    };
+
+    if(hasParentQueryString){
+        dataJson.parent = urlForQueryParams.searchParams.get("parent");
+    }
+
     $.ajax({
         method: "GET",
         url: '/anime/more_comments/',
-        data: {
-            'skip': current_page+1,
-            'id':$('.item-page').data('id'),
-        },
+        data: dataJson,
         success: function (data) {
             var html = '';
             for(let i=0;i<data.length;i++)
@@ -567,7 +574,9 @@ $('.showmore').on('click',function () {
             }
         },
         error: function () {
-            console.log('meti comment ar aris');
+            that.html('მეტი აღარ არის!');
+            that.attr('class','nomore');
+            that.unbind('click');
         },
     })
 });

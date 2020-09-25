@@ -411,7 +411,6 @@ nav{
 }
 
 .top-nav li a span.notif-count {
-    position: absolute;
     border-radius: 50%;
     background: #ff2b01;
     padding: 6px 0 0;
@@ -750,24 +749,7 @@ section{
   clear: both;
 }
 
-/*.item-name{*/
-/*    margin: 15px 0;*/
-/*    font-weight: bold;*/
-/*    font-size: large;*/
-/*    display: inline-block;*/
-/*    color:black;*/
-/*    text-decoration: none;*/
-/*}*/
-
-/*.item-name:hover{*/
-/*    color: #973116;*/
-/*}*/
-
-/*.genres-list span{*/
-/*    font-weight: 600;*/
-/*}*/
-
-.showmore{
+.showmore, .nomore{
     margin: auto;
     width: 150px;
     background-color: #555555;
@@ -781,6 +763,15 @@ section{
 
 .showmore:hover{
     background-color: #973116;
+}
+
+.nomore{
+    background-color: #cac3c3;
+    cursor: not-allowed;
+}
+
+.nomore:hover{
+    background-color: #cac3c3;
 }
 
 body footer{
@@ -1050,6 +1041,7 @@ dd.not-finished{
     text-align: center;
     color: #ff2e01;
     height: 29px;
+    margin-top: 16px;
     line-height: 25px;
 }
 
@@ -1555,7 +1547,7 @@ a.change-pass-button {
     padding: 9px 0;
     background-color: #322219;
     color: #ffffff;
-    margin: 3px auto;
+    margin: 6px auto;
 }
 
 .notif-info {
@@ -1735,9 +1727,19 @@ a.change-pass-button {
         margin: 0 auto;
     }
 
-    /*.top-nav li a span.notif-count {*/
-    /*    left: 93px;*/
-    /*}*/
+    .top-nav li a span.notif-count {
+        left: 51%;
+    }
+
+    .notif-time {
+        margin-left: 15px;
+        float: none;
+        display: block;
+    }
+
+    .notifications {
+        padding: 10px 20px;
+    }
 }
 
 @media screen and (max-width: 515px) {
@@ -1796,6 +1798,10 @@ a.change-pass-button {
     .item img{
         width: 100%;
         height: auto;
+    }
+
+    .top-nav li a span.notif-count {
+        left: 51.6%;
     }
 }
 

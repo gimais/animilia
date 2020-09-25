@@ -64,6 +64,16 @@ class Comment(models.Model):
             'voted': vote,
         }
 
+    def get_deleted_comment_for_notification_redirect(self):
+        return {
+            'comment_id': self.pk,
+            'user_id': self.user.pk,
+            'username': self.user.username,
+            'avatar': self.user.profile.avatar.name,
+            'time': datetime.timestamp(self.created),
+            'childs_count':self.replies.count(),
+        }
+
     def get_reply_comment_info(self,request_user):
         vote = None
         if self.like.filter(pk=request_user).exists():
