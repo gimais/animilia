@@ -12,7 +12,7 @@
                             <a href = "/anime/{{ anime.slug }}">
                                 <div style="position: relative">
                                     <div class="home-item-image">
-                                        <img src={% if anime.poster %}"/media/{{ anime.poster }}" {% else %} {% static 'img/no-poster-available.jpg' %} {% endif %} alt="პოსტერი">
+                                        <img src={% if anime.poster %}"/media/{{ anime.poster }}?r=1" {% else %} {% static 'img/no-poster-available.jpg' %} {% endif %} alt="პოსტერი">
                                     </div>
                                     <div class='age' style="padding: {% if anime.age >= 10 %}10px {% endif %} 5px">{{ anime.age }}+</div>
                                     <div class="info">
