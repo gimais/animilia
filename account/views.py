@@ -419,8 +419,8 @@ def check_notification(request):
         notifications = Notification.objects.select_related('user','reply_comment','comment').\
             filter(user_id=request.user).values_list(
             'reply_comment_id','reply_comment__body','comment__created',
-            'comment__anime__slug','reply_comment__parent','id'
-        )
+            'comment__anime__slug','reply_comment__parent','id')
+
         notif_exists = notifications.exists()
         context = {
             'exists':notif_exists

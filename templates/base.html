@@ -55,11 +55,15 @@
                         {% if user.is_staff %}
                             <li><a href="/admin/" target="_blank">Admin</a></li>
                         {% endif %}
+                        {% with notification_count=user.notification_set.count %}
                         <li>
                             <a class="menu-icon fas fa-bell" href="{% url 'notification' %}">
-                                <span class="notif-count">{{ user.notification_set.count }}</span>
+                            {% if notification_count %}
+                                <span class="notif-count">{{ notification_count }}</span>
+                            {% endif %}
                             </a>
                         </li>
+                       {% endwith %}
                         <li><a class='active' href="{% url 'profile' %}" data-id="{{ user.id }}">{{user.username}}</a></li>
                         <li><a class="menu-icon fas fa-sign-out-alt" href="{% url 'logout' %}?next={% block logout_redirect %}{% endblock %}">
                             <span>გასვლა</span>

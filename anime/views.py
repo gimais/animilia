@@ -17,7 +17,7 @@ def indexView(request):
 
 def page_view(request,slug):
     template_name = 'anime/page.html'
-    anime = get_object_or_404(Anime.objects.prefetch_related('series','categories','comments','dubbers'),slug=slug)
+    anime = get_object_or_404(Anime.objects,slug=slug)
     anime.increase_view_count(request.COOKIES)
     context = {
         'anime':anime,
@@ -99,7 +99,7 @@ def show_parent_comment_and_delete_notification(request,anime,context):
             if notif_obj is not None and notif_obj.user_id == request.user.id:
                 notif_obj.delete()
 
-                if comments.first().id != parent_comment:  # if comment is deleted
+                if str(comments.first()) != str(parent_comment):  # if comment is deleted
                     try:
                         deleted_parent_comment = Comment.objects.get(id=parent_comment).\
                             get_deleted_comment_for_notification_redirect()
