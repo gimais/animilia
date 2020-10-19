@@ -69,7 +69,7 @@
             <hr>
             {% if anime.type == 0 %}
             <div class="item-page-episodes">
-                {% for episode in anime.series.all %}
+                {% for episode in anime.series.all|dictsort:"row" %}
                 <div class="episode-select-button" data-id="{{episode.row}}" data-url="{{episode.url}}">{{ episode.row }}</div>
                 {% endfor %}
             </div>

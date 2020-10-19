@@ -418,7 +418,7 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
     commentBox.find('#like-comment:first').hide();
     commentBox.find('#remove-comment:first').hide();
     commentBox.find('#dislike-comment:first').hide();
-    var textareaValue = spoilerALertHTMLToBB(commentBox.find('p:not([class])').html());
+    var textareaValue = spoilerALertHTMLToBB(commentBox.find('p:not([class])').text());
 
     commentBox.find('p:not([class])').hide();
     commentBox.append(makeTextareaEdit(id,hasSpoiler));
