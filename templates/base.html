@@ -44,8 +44,8 @@
                             <div id="login-focus">შესვლა</div>
                                 <form class="login-form" method="post" action="{% url 'login' %}?next={{ request.path }}">
                                     {% csrf_token %}
-                                    <input type="text" name="username" class="form-input pad" autofocus placeholder="ნიკი" autocapitalize="none" autocomplete="off" required>
-                                    <input type="password" name="password" autocomplete="current-password" class="form-input pad" placeholder="პაროლი" required id="id_password">
+                                    <input type="text" name="username" class="form-input pad" autofocus placeholder="ნიკი" autocapitalize="none" autocomplete="off">
+                                    <input type="password" name="password" autocomplete="current-password" class="form-input pad" placeholder="პაროლი" id="id_password">
                                     <input type="submit" value="შესვლა">
                                     <a  href="{% url 'password_reset' %}">არ მახსოვს პაროლი...</a>
                                 </form>

@@ -31,7 +31,11 @@ def login_view(request):
             messages.success(request,'გამარჯობა, {}'.format(form.get_user()),extra_tags='welcome')
             return redirect(next_page)
         else:
-            messages.error(request, 'ნიკი ან პაროლი არასწორია. თავიდან სცადეთ!',extra_tags='failedAuth')
+            try:
+                error = form.errors.as_data()['__all__'][0].message
+            except IndexError:
+                error = "მოხდა კრიტიკული შეცდომა, გთხოვთ მიწეროთ ადმინისტრაციას დეტალებისთვის."
+            messages.error(request, error,extra_tags='failedAuth')
             return redirect(next_page)
     else:
         return redirect(next_page)

@@ -35,6 +35,7 @@ MinimumLengthValidator.validate = lambda self, password, user: validate(self, pa
 
 
 class SignUpForm(UserCreationForm):
+    use_required_attribute = False
 
     def __init__(self, *args, **kwargs):
         super(SignUpForm, self).__init__(*args, **kwargs)
@@ -48,14 +49,12 @@ class SignUpForm(UserCreationForm):
         attrs={'class': 'form-input', 'placeholder': 'Email'}))
 
     password1 = forms.CharField(
-        min_length=4,
         label="",
         strip=False,
         widget=forms.PasswordInput(attrs={'class': 'form-input', 'placeholder': 'პაროლი (მინ 4 სიმბოლო)'}),
         help_text='',
     )
     password2 = forms.CharField(
-        min_length=4,
         label='',
         widget=forms.PasswordInput(attrs={'class': 'form-input', 'placeholder': 'გაიმეორეთ პაროლი'}),
         strip=False,
@@ -64,8 +63,13 @@ class SignUpForm(UserCreationForm):
 
     def clean_username(self):
         username = self.cleaned_data.get('username')
+
         if username.lower() in blacklist:
             raise forms.ValidationError('ასეთი Username მიუღებელია! სხვა სცადეთ!')
+
+        if User.objects.filter(username__iexact=username).exists():
+            raise forms.ValidationError('ეს ნიკი დაკავებულია!')
+
         return username
 
     def clean_email(self):
@@ -95,32 +99,41 @@ class SignUpForm(UserCreationForm):
 
 
 class MyAuthenticationForm(AuthenticationForm):
+
     error_messages = {
         'invalid_login': (
-            "გთხოვთ შეიყვანოთ სწორი ნიკი და პაროლი"
+            "ნიკი ან პაროლი არასწორია. თავიდან სცადეთ!"
         ),
-        'inactive': "ეს ანგარიში არააქტიურია!",
+        'inactive': ("ეს ექაუნთი დაბლოკილია!"),
+        'empty_field': ("ცარიელი ველები უნდა შეავსოთ!"),
     }
 
     def clean(self):
         username = self.cleaned_data.get('username')
         password = self.cleaned_data.get('password')
 
-        if username is not None and password:
+        if username and password:
             if '@' in username:
                 try:
                     username = User.objects.get(email=username)
                 except User.DoesNotExist:
                     raise self.get_invalid_login_error()
-
-                self.user_cache = authenticate(self.request, username=username, password=password)
             else:
-                self.user_cache = authenticate(self.request, username=username, password=password)
+                try:
+                    username = User.objects.get(username__iexact=username)
+                except User.DoesNotExist:
+                    raise self.get_invalid_login_error()
+
+            self.user_cache = authenticate(self.request, username=username, password=password)
 
             if self.user_cache is None:
                 raise self.get_invalid_login_error()
             else:
                 self.confirm_login_allowed(self.user_cache)
+        else:
+            raise forms.ValidationError(self.error_messages['empty_field'],
+                                        code='empty_field'
+                                        )
 
         return self.cleaned_data
 
@@ -179,21 +192,6 @@ class MyPasswordChangeForm(PasswordChangeForm):
     )
 
     field_order = ['old_password', 'new_password1', 'new_password2']
-
-class MySetPasswordForm(SetPasswordForm):
-    new_password1 = forms.CharField(
-        label='',
-        widget=forms.PasswordInput(
-            attrs={'autocomplete': 'new-password', 'class': 'form-input', 'placeholder': 'ახალი პაროლი'}),
-        strip=False,
-    )
-    new_password2 = forms.CharField(
-        label="",
-        strip=False,
-        widget=forms.PasswordInput(
-            attrs={'autocomplete': 'new-password', 'class': 'form-input', 'placeholder': 'გაიმეორეთ ახალი პაროლი'}),
-    )
-
 
 class CommentForm(forms.ModelForm):
     body = forms.CharField(
