@@ -13,9 +13,18 @@
                 <div class="item-page-head clearfix">
                     <div class="item-page-left">
                         <h1>{{ anime.name }}</h1>
-                        <h4> {{ anime.nameen }}</h4>
-                        <h4> {{ anime.namejp }}</h4>
-                        <h4> {{ anime.nameru }}</h4>
+                        {% if anime.namege %}
+                            <h4 class="geo-header"> {{ anime.namege }}</h4>
+                        {% endif %}
+                        {% if anime.nameen %}
+                            <h4> {{ anime.nameen }}</h4>
+                        {% endif %}
+                        {% if anime.namejp %}
+                            <h4> {{ anime.namejp }}</h4>
+                        {% endif %}
+                        {% if anime.nameru %}
+                            <h4> {{ anime.nameru }}</h4>
+                        {% endif %}
                     </div>
                     <div class="item-page-right">
                         <span><i class="fas fa-star"></i> {{ anime.rating }}</span>

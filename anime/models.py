@@ -32,6 +32,7 @@ class Anime(models.Model):
     )
 
     name = models.CharField(max_length=100,unique=True,verbose_name='სახელი')
+    namege = models.CharField(max_length=100,verbose_name='ქართულად',blank=True)
     nameen = models.CharField(max_length=100,verbose_name='ინგლისურად',blank=True)
     namejp = models.CharField(max_length=100,verbose_name='იაპონურად',blank=True)
     nameru = models.CharField(max_length=100,verbose_name='რუსულად',blank=True)

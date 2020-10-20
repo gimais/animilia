@@ -903,6 +903,12 @@ div#login-focus:hover {
     font-family: "comfortaa",sans-serif;
 }
 
+.item-page-head .geo-header{
+    line-height: 150%;
+    font-size: 16px;
+    font-family: "DejaVu Sans Condensed", sans-serif;
+}
+
 .item-page-head h1{
     margin: auto;
     margin-bottom: 7px;
