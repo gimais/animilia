@@ -65,7 +65,7 @@ class SignUpForm(UserCreationForm):
         username = self.cleaned_data.get('username')
 
         if username.lower() in blacklist:
-            raise forms.ValidationError('ასეთი Username მიუღებელია! სხვა სცადეთ!')
+            raise forms.ValidationError('ასეთი ნიკი მიუღებელია! სხვა სცადეთ!')
 
         if User.objects.filter(username__iexact=username).exists():
             raise forms.ValidationError('ეს ნიკი დაკავებულია!')
@@ -208,7 +208,8 @@ class UpdateUsernameForm(forms.ModelForm):
     error_messages = {
         'not_changed': "თქვენ ეს ნიკი ისედაც გაქვთ!",
         'deadline': 'ნიკის შეცვლა შეგიძლიათ ყოველ 7 დღეში ერთხელ!',
-        'blacklist': 'ასეთი Username მიუღებელია! სხვა სცადეთ!'
+        'blacklist': 'ასეთი ნიკი მიუღებელია! სხვა სცადეთ!',
+        'exists': 'ეს ნიკი დაკავებულია.'
     }
 
     class Meta:
@@ -233,6 +234,12 @@ class UpdateUsernameForm(forms.ModelForm):
             raise forms.ValidationError(
                 self.error_messages['blacklist'],
                 code='blacklist',
+            )
+
+        if User.objects.filter(username__iexact=username).exists():
+            raise forms.ValidationError(
+                self.error_messages['exists'],
+                code='exists',
             )
 
         updated_time_difference = (timezone.now() - self.user.settings.username_updated).total_seconds()

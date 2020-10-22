@@ -17,7 +17,7 @@ def indexView(request):
 
 def page_view(request,slug):
     template_name = 'anime/page.html'
-    anime = get_object_or_404(Anime.objects,slug=slug)
+    anime = get_object_or_404(Anime.objects,slug__iexact=slug)
     anime.increase_view_count(request.COOKIES)
     context = {
         'anime':anime,

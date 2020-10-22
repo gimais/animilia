@@ -901,10 +901,11 @@ div#login-focus:hover {
 .item-page-head h4{
     font-size: 14px;
     font-family: "comfortaa",sans-serif;
+    line-height: 125%;
 }
 
 .item-page-head .geo-header{
-    line-height: 150%;
+    line-height: 145%;
     font-size: 16px;
     font-family: "DejaVu Sans Condensed", sans-serif;
 }

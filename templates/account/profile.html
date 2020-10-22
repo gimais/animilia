@@ -179,7 +179,7 @@ $(window).on('click',function (e) {
                 <div class="profile-avatar-container ">
                         <div class="profile-img">
                             <i class="fas fa-times-circle" {% if user.profile.avatar == 'no-avatar.jpg' %}style="display: none"{% endif %} id="clear-image"></i>
-                            <img id="active-avatar" src="/media/{{ user.profile.avatar }}" alt>
+                            <img id="active-avatar" src="/media/{{ user.profile.avatar }}?r=1" alt="avatar">
 
                             <div id="avatarCroppieModal">
                               <!-- Modal content -->
