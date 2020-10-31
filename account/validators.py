@@ -13,7 +13,7 @@ blacklist = ['.htaccess', '.htpasswd', '.well-known','ad', 'add','admin', 'admin
              'administrator','ads', 'ads.txt', 'advertise', 'advertising', 'analytics',
              'apps','assets','authentication', 'authorize', 'backup',
              'blog', 'blogs', 'board','business', 'buy', 'calendar', 'categories',
-             'category', 'change', 'channel', 'channels', 'chart', 'chat', 'checkout',
+             'category', 'change', 'chart', 'chat', 'checkout',
              'clear', 'client', 'close', 'cloud','comment', 'comments', 'community',
              'compare', 'compose', 'config', 'connect', 'contact', 'contest', 'cookies', 'copy', 'copyright',
              'count','cpanel', 'create', 'css','customers', 'customize', 'dashboard',
@@ -21,7 +21,7 @@ blacklist = ['.htaccess', '.htpasswd', '.well-known','ad', 'add','admin', 'admin
              'discuss', 'documentation','domain', 'download','downloads', 'edit', 'editor',
              'email', 'favicon.ico', 'features', 'feed', 'feedback',
              'feeds', 'file','files', 'filter', 'follow', 'follower', 'followers', 'following', 'fonts', 'forgot',
-             'forgot-password','forgotpassword', 'form', 'forms', 'forum', 'forums', 'ftp', 'get','group', 'groups',
+             'forgot-password','forgotpassword', 'form', 'forms', 'forum', 'forums', 'get','group', 'groups',
              'guest',  'head', 'header', 'help', 'hide', 'home', 'host', 'hosting', 'hostmaster',
              'htpasswd', 'http', 'httpd', 'https','humans.txt', 'icons', 'images', 'img', 'import',
              'info','js','json', 'like','limit', 'live', 'load','local','localdomain', 'localhost',
@@ -39,7 +39,7 @@ blacklist = ['.htaccess', '.htpasswd', '.well-known','ad', 'add','admin', 'admin
              'stylesheet', 'stylesheets', 'sudo', 'super', 'superuser', 'support',
              'sysadmin', 'system', 'tablet', 'team','terms', 'terms-of-use','true', 'undefined',
              'update', 'upgrade', 'user', 'webmaster', 'website','www','yourname', 'yourusername','god','zlib','anal', 'anus',
-             'balls', 'bastard', 'bitch','biatch', 'blowjob', 'blow job', 'clitoris', 'cock', 'dick', 'dildo', 'fuck',
+             'bastard', 'bitch','biatch', 'blowjob', 'blow job', 'clitoris', 'cock', 'dick', 'dildo', 'fuck',
              'f u c k', 'Goddamn','God damn','nigger', 'nigga', 'omg', 'penis','pussy', 'sex','shit', 's hit', 'sh1t',
              'spunk', 'tit', 'vagina', 'wtf','yleo','ylexar','muteli','dedamovtyan','shenidedasheveci',
-             'shenidedamovtyan','yle','sheveci']
+             'shenidedamovtyan','yle','sheveci','ანიმილია']

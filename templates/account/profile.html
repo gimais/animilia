@@ -14,7 +14,8 @@
 <script type="text/javascript">
 
 $(document).ready(function () {
-    $('.cr-slider-wrap').prependTo($('.cr-slider-wrap').parent());
+    const croppieSlider = $('.cr-slider-wrap');
+    croppieSlider.prependTo(croppieSlider.parent());
 
     $("select[name='birth-day']").append(getDaysSelectOptionsHTML(31,22));
     $("select[name='birth-month']").append(getMonthsSelectOptionsHTML());
@@ -122,7 +123,6 @@ $uploadCrop = $('#upload-demo').croppie({
         height: 200,
         type: 'square'
     },
-    {#enableExif: true#}
 });
 
 $('input[name=avatar]').on('change', function () {
@@ -255,9 +255,6 @@ $(window).on('click',function (e) {
                 </div>
             </div>
             <div class="profile-edit">
-                 <div class="tooltip">&lowast;
-                  <span class="tooltiptext">გთხოვთ, მონაცემები შეავსოთ და არ მოიტყუოთ.<br> სტატისტიკისთვის გვჭირდება ^_^</span>
-                </div>
                <div class="profile-header">პროფილის დეტალები</div>
                 <form method="POST" class="profile-details">
                     {% csrf_token %}

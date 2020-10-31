@@ -74,14 +74,16 @@ $.ajaxSetup({
 const itemSlug = document.location.pathname;
 
 $('.episode-select-button').on('click',function () {
-        var clickedButton = $(this);
-        activateClassButton(clickedButton);
-        var videoURL = clickedButton.data('url');
-        $('.item-player iframe').attr('src',videoURL);
-        if ($('.item-player').hasClass('hidden')) {
-                $('.item-player').removeClass('hidden');
+    let clickedButton = $(this);
+    let videoURL = clickedButton.data('url');
+    let itemPlayer = $('.item-player');
+
+    activateClassButton(clickedButton);
+    $('.item-player iframe').attr('src',videoURL);
+    if (itemPlayer.hasClass('hidden')) {
+                itemPlayer.removeClass('hidden');
         }
-        setCookie(itemSlug.substring(7,itemSlug.length-1),clickedButton.data('id'),20);
+    setCookie(itemSlug.substring(7,itemSlug.length-1),clickedButton.data('id'),20);
 });
 
 

@@ -6,7 +6,8 @@ from .models import Feedback
 # Register your models here.
 
 class FeedbackAdmin(admin.ModelAdmin):
-    list_display = ('id','ip','customer_name', 'date','closed')
+    list_per_page = 10
+    list_display = ('id','ip','customer_name', 'date','closed','registered_user_link')
     list_filter = ('date','closed')
     search_fields = ('ip', 'details',)
     readonly_fields = ('id','date','ip', 'customer_name','email','details')
@@ -14,7 +15,13 @@ class FeedbackAdmin(admin.ModelAdmin):
     def has_add_permission(self, request, obj=None):
         return False
 
-    class Meta:
-        model = Feedback
+    def registered_user_link(self,obj):
+        if obj.registered_user:
+            return format_html('<a href="/admin/account/profile/{}/change/">{}</a>',obj.registered_user.pk,obj.registered_user)
+        return 'ანონიმურია'
+
+    def get_queryset(self, request):
+        queryset = super(FeedbackAdmin, self).get_queryset(request)
+        return queryset.select_related('registered_user')
 
 admin.site.register(Feedback, FeedbackAdmin)

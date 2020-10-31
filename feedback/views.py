@@ -17,6 +17,10 @@ def feedback_form(request):
                 ipaddress = request.META.get('REMOTE_ADDR')
 
             form.ip = ipaddress
+
+            if request.user.is_authenticated:
+                form.registered_user = request.user
+
             form.save()
             messages.success(request, 'თქვენი წერილი წარმატებით გაიგზავნა.', extra_tags='welcome')
             return render(request,'feedback.html',{'form':FeedbackForm()})

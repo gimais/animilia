@@ -45,7 +45,7 @@ class SignUpForm(UserCreationForm):
         'password_mismatch': 'შეყვანილი პაროლები არ დაემთხვა!',
     }
 
-    email = forms.EmailField(max_length=254, widget=forms.EmailInput(
+    email = forms.EmailField(max_length=254, widget=forms.TextInput(
         attrs={'class': 'form-input', 'placeholder': 'Email'}))
 
     password1 = forms.CharField(
@@ -84,8 +84,8 @@ class SignUpForm(UserCreationForm):
         User._meta.get_field('username').validators[0] = MyUnicodeUsernameValidator()
         User._meta.get_field('username').validators[1] = SignUpMaxLengthValidator(16)
         User._meta.get_field('username').validators.append(MinLengthValidator(3))
-        MinLengthValidator.message = "სიგრძე მინიმუმ %(limit_value)d სიმბოლოსგან უნდა შედგებოდეს. (შეყვანილია %(show_value)d სიმბოლო)"
-        User._meta.get_field('username').error_messages['unique'] = 'ეს ნიკი დაკავებულია!'
+        # MinLengthValidator.message = "სიგრძე მინიმუმ %(limit_value)d სიმბოლოსგან უნდა შედგებოდეს. (შეყვანილია %(show_value)d სიმბოლო)"
+        # User._meta.get_field('username').error_messages['unique'] = 'ეს ნიკი დაკავებულია!'
 
         help_texts = {
             'username': '',
@@ -236,7 +236,7 @@ class UpdateUsernameForm(forms.ModelForm):
                 code='blacklist',
             )
 
-        if User.objects.filter(username__iexact=username).exists():
+        if User.objects.filter(username__iexact=username).exclude(username=old_username).exists():
             raise forms.ValidationError(
                 self.error_messages['exists'],
                 code='exists',

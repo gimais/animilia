@@ -1,18 +1,18 @@
 (function($) {
     $(document).ready(function() {
-        var module = $(".js-inline-admin-formset .module");
-        var type = $(".field-type select#id_type");
+        const module = $(".js-inline-admin-formset .module");
+        const type = $(".field-type select#id_type");
 
-        function toogleRowAddButton(type) {
-            var addButton = module.find('.add-row');
-            var emptyInput = module.find('#series-empty');
+        function toggleRowAddButton(type) {
+            let addButton = module.find('.add-row');
+            let emptyInput = module.find('#series-empty');
 
             if(type){
                 addButton.show();
             }else{
                 addButton.hide();
                 emptyInput.show();
-                var rows = $('tbody').find('tr');
+                let rows = $('tbody').find('tr');
                 for(let i = 0; i < rows.length - 2; i++){
                     $(rows[i]).remove()
                 }
@@ -26,10 +26,10 @@
         type.change(function(){
             if($(this).children("option:selected").val()==='1'){
                 $(".field-episodes").hide();
-                toogleRowAddButton(false)
+                toggleRowAddButton(false)
             }else{
                 $(".field-episodes").show();
-                toogleRowAddButton(true)
+                toggleRowAddButton(true)
             }
         });
 

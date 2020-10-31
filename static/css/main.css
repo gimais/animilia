@@ -11,22 +11,6 @@
    Base styles: opinionated defaults
    ========================================================================== */
 
-@font-face {
-    font-family: 'DejaVu Sans Condensed';
-    src: url('/static/fonts/dejavu-sans-condensed-webfont.eot'); /* IE9 Compat Modes */
-    src: url('/static/fonts/dejavu-sans-condensed-webfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-         url('/static/fonts/dejavu-sans-condensed-webfont.woff2') format('woff2'), /* Super Modern Browsers */
-         url('/static/fonts/dejavu-sans-condensed-webfont.woff') format('woff'), /* Pretty Modern Browsers */
-         url('/static/fonts/dejavu-sans-condensed-webfont.ttf') format('truetype'), /* Safari, Android, iOS */
-         url('/static/fonts/dejavu-sans-condensed-webfont.svg#dejavu_sans_condensedregular') format('svg'); /* Legacy iOS */
-}
-
-@font-face {
-    font-family: 'comfortaa';
-    src: url('/static/fonts/comfortaa-Regular.woff') format('woff'), /* Pretty Modern Browsers */
-         url('/static/fonts/comfortaa-Regular.ttf') format('truetype') /* Safari, Android, iOS */
-}
-
 * {
     margin: 0;
     padding: 0;
@@ -218,88 +202,6 @@ textarea {
   clear: both;
 }
 
-/* ==========================================================================
-   EXAMPLE Media Queries for Responsive Design.
-   These examples override the primary ('mobile first') styles.
-   Modify as content requires.
-   ========================================================================== */
-
-@media only screen and (min-width: 35em) {
-  /* Style adjustments for viewports that meet the condition */
-}
-
-@media print,
-  (-webkit-min-device-pixel-ratio: 1.25),
-  (min-resolution: 1.25dppx),
-  (min-resolution: 120dpi) {
-  /* Style adjustments for high resolution devices */
-}
-
-/* ==========================================================================
-   Print styles.
-   Inlined to avoid the additional HTTP request:
-   https://www.phpied.com/delay-loading-your-print-css/
-   ========================================================================== */
-
-@media print {
-  *,
-  *:before,
-  *:after {
-    background: transparent !important;
-    color: #000 !important;
-    /* Black prints faster */
-    box-shadow: none !important;
-    text-shadow: none !important;
-  }
-  a,
-  a:visited {
-    text-decoration: underline;
-  }
-  a[href]:after {
-    content: " (" attr(href) ")";
-  }
-  abbr[title]:after {
-    content: " (" attr(title) ")";
-  }
-  /*
-     * Don't show links that are fragment identifiers,
-     * or use the `javascript:` pseudo protocol
-     */
-  a[href^="#"]:after,
-  a[href^="javascript:"]:after {
-    content: "";
-  }
-  pre {
-    white-space: pre-wrap !important;
-  }
-  pre,
-  blockquote {
-    border: 1px solid #999;
-    page-break-inside: avoid;
-  }
-  /*
-     * Printing Tables:
-     * https://web.archive.org/web/20180815150934/http://css-discuss.incutio.com/wiki/Printing_Tables
-     */
-  thead {
-    display: table-header-group;
-  }
-  tr,
-  img {
-    page-break-inside: avoid;
-  }
-  p,
-  h2,
-  h3 {
-    orphans: 3;
-    widows: 3;
-  }
-  h2,
-  h3 {
-    page-break-after: avoid;
-  }
-}
-
 /*FROM HERE*/
 nav{
     border-bottom: 2px solid #973116;
@@ -389,9 +291,6 @@ nav{
     user-select: none;
 }
 
-.top-nav li:hover{
-    background-color: #973116;
-}
 
 .top-nav li a {
     cursor: pointer;
@@ -439,11 +338,14 @@ a.menu-icon.fas.fa-sign-out-alt {
     display: none;
 }
 
-ul.top-nav li:last-child a:hover:not(.active) {background-color: #973116;}
+ul.top-nav li > a:hover:not(.active),ul.top-nav li a.active,.showmore:hover,
+.comment-edit-form button[type=reset],.comment-form button[type=reset],div#login-focus:hover{
+    background-color: #973116;
+}
 
-ul.top-nav li a.active {background-color: #973116;}
-
-ul.top-nav li.right {float: right;}
+ul.top-nav li.right {
+    float: right;
+}
 
 li{
     list-style-type: none;
@@ -471,10 +373,6 @@ section{
   text-transform: uppercase;
   text-align: center;
   margin-bottom: 40px;
-}
-
-.clear {
-  clear: both;
 }
 
 #sidebar{
@@ -555,10 +453,6 @@ section{
     .form-input:focus:-moz-placeholder {
       color: #222; }
 
-.pad{
-    padding: 7px;
-}
-
 .form-submit {
     cursor: pointer;
       border-radius: 5px;
@@ -587,7 +481,6 @@ section{
     text-align: center;
     color:white;
 }
-
 
 /*profile tabs*/
 
@@ -705,7 +598,10 @@ section{
 }
 
 .item a {
-    user-select: none;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
 }
 
 .item .details{
@@ -755,7 +651,7 @@ section{
   clear: both;
 }
 
-.showmore, .nomore{
+.showmore{
     margin: auto;
     width: 150px;
     background-color: #555555;
@@ -765,19 +661,6 @@ section{
     text-align: center;
     cursor: pointer;
     margin-top: 15px;
-}
-
-.showmore:hover{
-    background-color: #973116;
-}
-
-.nomore{
-    background-color: #cac3c3;
-    cursor: not-allowed;
-}
-
-.nomore:hover{
-    background-color: #cac3c3;
 }
 
 body footer{
@@ -838,18 +721,12 @@ div#login-focus {
     text-decoration: none;
 }
 
-div#login-focus:hover {
-    background-color: #973116;
-}
-
 .login-form{
     text-align: center;
-    font-size: 25px;
-    width: 264px;
-    color: white;
+    width: 258px;
     background-color: rgba(41, 32, 24, 0.8);
     padding: 15px;
-    border-radius: 0 0 15px 15px;
+    border-radius: 0 0 9px 9px;
     border: 2px solid #953116;
     display: none;
     position: absolute;
@@ -860,23 +737,22 @@ div#login-focus:hover {
     width: 180px;
     border-radius: 5px;
     border: none;
+    padding: 7px;
 }
 
 .login-form input[type=submit]{
-    font-size: 15px;
-    padding: 5px;
-    width: 40%;
+    width: 50%;
     background-color: #953116;
     color: white;
-    margin: 8px 0;
-    border: none;
-    border-radius: 4px;
+    margin-top: 8px;
     cursor: pointer;
 }
 
-.login-form a{
+form.login-form a{
     font-size: 15px;
-    color: white;
+    padding: 0;
+    margin: auto;
+    width: fit-content !important;
 }
 
 .item-page{
@@ -900,7 +776,7 @@ div#login-focus:hover {
 
 .item-page-head h4{
     font-size: 14px;
-    font-family: "comfortaa",sans-serif;
+    font-family: "Comfortaa",cursive;
     line-height: 125%;
 }
 
@@ -1103,10 +979,6 @@ button.spoiler-button {
 
 button.spoiler-button:disabled {
     opacity: 0.5;
-}
-
-.comment-edit-form button[type=reset],.comment-form button[type=reset]{
-    background-color: #973116;
 }
 
 .comment {
@@ -1615,13 +1487,6 @@ a.change-pass-button {
     }
 }
 
-@media (max-width: 1185px) {
-
-    .item {
-        margin-top: 5px;
-    }
-}
-
 @media (max-width: 1024px) {
     #sidebar {
         display: none;
@@ -1666,7 +1531,7 @@ a.change-pass-button {
         height: 0;
     }
 
-    .logo,.web-name,.tooltip, .footer-logo {
+    .logo,.web-name,.tooltip {
         display: none;
     }
 
@@ -1708,25 +1573,32 @@ a.change-pass-button {
     }
 
     .form-container{
-        width: 60%;
-    }
-
-    .form-input {
         width: 80%;
     }
 
-    .top-nav li{
+    .top-nav li,.login-form{
         width: 50%;
     }
 
-    .form-input{
+    .form-input, .item-page{
         width: 100%;
+    }
+
+    .login-form input{
+        width: 70%;
+        height: 20%;
+        margin: 5px auto;
+        padding: 10px;
     }
 
     .top-nav li a{
         width: 100%;
         font-size: 85%;
         padding: 16px 0;
+    }
+
+    form.login-form a {
+        font-size: 16px;
     }
 
     .item-page-info {
@@ -1741,10 +1613,6 @@ a.change-pass-button {
         margin: 20px auto;
     }
 
-    .item-page {
-        width: 100%;
-    }
-
     .item{
         width: 50%;
     }
@@ -1752,12 +1620,6 @@ a.change-pass-button {
     body footer{
         height: auto;
         min-height: 76px;
-    }
-
-    .social-icons{
-        text-align: center;
-        float: none;
-        margin: 0 auto;
     }
 
     .top-nav li a span.notif-count {
@@ -1775,16 +1637,15 @@ a.change-pass-button {
     }
 }
 
-@media screen and (max-width: 515px) {
+@media screen and (max-width: 560px) {
+
+    .footer-logo{
+        display: none;
+    }
 
    .form-container{
         width: 100%;
-       padding: 20px 30px;
-    }
-
-    .item-page-img {
-        float: none;
-        width: 100%;
+        padding: 20px 30px;
     }
 
     .item-page{
@@ -1795,11 +1656,13 @@ a.change-pass-button {
         width: 100%;
         margin-top: 8px;
     }
+
     .item-page-desc {
         padding: 8px 0;
     }
 
-    .profile-avatar-container,.profile-display,.profile-row dl,.profile-row,.item,.profile-details-input{
+    .profile-avatar-container, .profile-display, .profile-row dl,
+    .profile-row,.item, .profile-details-input, .item-page-img, .login-form{
         float: none;
         width:100%;
     }
@@ -1815,13 +1678,17 @@ a.change-pass-button {
         margin-top: 8px;
     }
 
-}
+    .social-icons{
+        text-align: center;
+        float: none;
+        margin: 0 auto;
+    }
 
-@media screen and (max-width: 480px) {
-    .signup-content {
-        padding: 50px 25px;
+    .profile-main.clearfix{
+        padding: 10px 20px;
     }
 }
+
 
 @media screen and (max-width: 414px) {
     .signup-content {
