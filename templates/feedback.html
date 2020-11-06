@@ -4,7 +4,7 @@
 {% load static %}
 {% block content %}
     <div class="container">
-        <form method="POST" class="form-container" action="{% url 'feedback' %}">
+        <form method="POST" id="feedback-form" class="form-container" action="{% url 'feedback' %}">
             {% csrf_token %}
             <div class="form-title">კონტაქტი</div>
                 {% for non_field_error in form.non_field_errors %}

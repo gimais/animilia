@@ -107,10 +107,8 @@
 
 {% block script %}
     <script>
-        {#var isMobile = (/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase()));#}
-
         var urlForQueryParams = new URL(window.location.href);
-
+        {# urlForQueryParams - checking if parent param exists in url to sroll (used for notification redirect)#}
         if(urlForQueryParams.searchParams.has("parent")) {
             var parentId = urlForQueryParams.searchParams.get("parent");
             var commentBox = $('.reply-button[data-id=' + parentId + ']').parents('.comment');
@@ -140,7 +138,7 @@
                 var html = makeCommentBoxHTML(deletedObj);
                 $(".comments-box").prepend(makeCommentBoxHTML(deletedObj));
 
-                var commentBox = $('.comment-replies-check[data-id=' + parentId + ']');
+                commentBox = $('.comment-replies-check[data-id=' + parentId + ']');
                 $([document.documentElement, document.body]).animate({
                     scrollTop: commentBox.parents('.comment').offset().top - 50
                 }, 500, function () {

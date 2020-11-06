@@ -1,37 +1,14 @@
 from django import forms
 from django.contrib.auth import authenticate
-from django.contrib.auth.password_validation import MinimumLengthValidator
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordResetForm, \
     PasswordChangeForm, SetPasswordForm
 from django.contrib.auth.models import User
-from django.core.validators import MinLengthValidator
-from django.utils.translation import ngettext
+from django.core.validators import MinLengthValidator, MaxLengthValidator
 from django.utils import timezone
+from django.utils.safestring import mark_safe
+
 from account.models import Comment, Profile, Settings
-from account.validators import SignUpMaxLengthValidator, MyUnicodeUsernameValidator,blacklist
-from django.contrib.admin.forms import AdminAuthenticationForm
-
-AdminAuthenticationForm.error_messages = {
-    'invalid_login':
-        "გთხოვთ, შეიყვანოთ სწორი მომხმარებლის სახელი და პაროლი. "
-        "იქონიეთ მხედველობაში, რომ ორივე ველი ითვალისწინებს პატარა და დიდ ასოებს."
-}
-
-
-def validate(self, password, user=None):
-    if len(password) < self.min_length:
-        raise forms.ValidationError(
-            ngettext(
-                "ეს პაროლი მოკლეა. ის უნდა შეიცავდეს მინიმუმ %(min_length)d სიმბოლოს.",
-                "ეს პაროლი მოკლეა. ის უნდა შეიცავდეს მინიმუმ %(min_length)d სიმბოლოს.",
-                self.min_length
-            ),
-            code='password_too_short',
-            params={'min_length': self.min_length},
-        )
-
-
-MinimumLengthValidator.validate = lambda self, password, user: validate(self, password, user)
+from account.validators import MyUnicodeUsernameValidator,blacklist,ERRORS
 
 
 class SignUpForm(UserCreationForm):
@@ -40,10 +17,6 @@ class SignUpForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super(SignUpForm, self).__init__(*args, **kwargs)
         self.fields['username'].widget.attrs.pop("autofocus", None)
-
-    error_messages = {
-        'password_mismatch': 'შეყვანილი პაროლები არ დაემთხვა!',
-    }
 
     email = forms.EmailField(max_length=254, widget=forms.TextInput(
         attrs={'class': 'form-input', 'placeholder': 'Email'}))
@@ -65,34 +38,37 @@ class SignUpForm(UserCreationForm):
         username = self.cleaned_data.get('username')
 
         if username.lower() in blacklist:
-            raise forms.ValidationError('ასეთი ნიკი მიუღებელია! სხვა სცადეთ!')
+            raise forms.ValidationError(
+                ERRORS['blacklist'],
+                code='blacklist'
+            )
 
         if User.objects.filter(username__iexact=username).exists():
-            raise forms.ValidationError('ეს ნიკი დაკავებულია!')
+            raise forms.ValidationError(
+                ERRORS['unique'],
+                code='unique'
+            )
 
         return username
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        if email and User.objects.filter(email=email).exists():
-            raise forms.ValidationError('ეს Email უკვე დარეგისტრირებულია.')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError(
+                mark_safe(ERRORS['unique_email']),
+                code='unique_email'
+            )
         return email
 
     class Meta:
         model = User
 
         User._meta.get_field('username').validators[0] = MyUnicodeUsernameValidator()
-        User._meta.get_field('username').validators[1] = SignUpMaxLengthValidator(16)
+        User._meta.get_field('username').validators[1] = MaxLengthValidator(16)
         User._meta.get_field('username').validators.append(MinLengthValidator(3))
-        # MinLengthValidator.message = "სიგრძე მინიმუმ %(limit_value)d სიმბოლოსგან უნდა შედგებოდეს. (შეყვანილია %(show_value)d სიმბოლო)"
-        # User._meta.get_field('username').error_messages['unique'] = 'ეს ნიკი დაკავებულია!'
 
-        help_texts = {
-            'username': '',
-        }
         widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'ნიკი (მინ: 3 - მაქს: 16)'}),
-            'autofocus': None,
+            'username': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'ნიკი (მინ: 3 - მაქს: 16)'})
         }
 
         fields = ('username', 'email', 'password1', 'password2',)
@@ -100,56 +76,51 @@ class SignUpForm(UserCreationForm):
 
 class MyAuthenticationForm(AuthenticationForm):
 
-    error_messages = {
-        'invalid_login': (
-            "ნიკი ან პაროლი არასწორია. თავიდან სცადეთ!"
-        ),
-        'inactive': ("ეს ექაუნთი დაბლოკილია!"),
-        'empty_field': ("ცარიელი ველები უნდა შეავსოთ!"),
-    }
-
     def clean(self):
         username = self.cleaned_data.get('username')
         password = self.cleaned_data.get('password')
 
-        if username and password:
+        if username is not None and password:
             if '@' in username:
                 try:
-                    username = User.objects.get(email=username)
+                    user = User.objects.get(email=username)
                 except User.DoesNotExist:
                     raise self.get_invalid_login_error()
             else:
                 try:
-                    username = User.objects.get(username__iexact=username)
+                    user = User.objects.get(username__iexact=username)
                 except User.DoesNotExist:
                     raise self.get_invalid_login_error()
 
-            self.user_cache = authenticate(self.request, username=username, password=password)
+            if user.check_password(password):
+                self.confirm_login_allowed(user)
+
+            self.user_cache = authenticate(self.request, username=user, password=password)
 
             if self.user_cache is None:
                 raise self.get_invalid_login_error()
-            else:
-                self.confirm_login_allowed(self.user_cache)
         else:
-            raise forms.ValidationError(self.error_messages['empty_field'],
-                                        code='empty_field'
-                                        )
+            raise forms.ValidationError(
+                ERRORS['empty_fields'],
+                code='empty_fields'
+            )
 
         return self.cleaned_data
 
 
 class MyPasswordResetForm(PasswordResetForm):
+    use_required_attribute = False
+
     email = forms.EmailField(
         label='',
         max_length=254,
-        widget=forms.EmailInput(attrs={'autocomplete': 'email', 'class': 'form-input', 'placeholder': 'Email'})
+        widget=forms.TextInput(attrs={'autocomplete': 'email', 'class': 'form-input', 'placeholder': 'Email'})
     )
 
-
+#check
 class MySetPasswordForm(SetPasswordForm):
-    error_messages = {
-        'password_mismatch': ('მოცემული პაროლები არ ემთხვევა.'),
-    }
+    use_required_attribute = False
+
     new_password1 = forms.CharField(
         label='',
         widget=forms.PasswordInput(
@@ -165,10 +136,7 @@ class MySetPasswordForm(SetPasswordForm):
 
 
 class MyPasswordChangeForm(PasswordChangeForm):
-    error_messages = {
-        'password_mismatch': ('მოცემული პაროლები არ ემთხვევა.'),
-        'password_incorrect': ("ძველი პაროლი არასწორია. გთხოვთ,თავიდან სცადოთ."),
-    }
+    use_required_attribute = False
 
     old_password = forms.CharField(
         label='',
@@ -182,7 +150,6 @@ class MyPasswordChangeForm(PasswordChangeForm):
         widget=forms.PasswordInput(
             attrs={'autocomplete': 'new-password', 'class': 'form-input', 'placeholder': 'ახალი პაროლი'}),
         strip=False,
-        # help_text=password_validation.password_validators_help_text_html(),
     )
     new_password2 = forms.CharField(
         label="",
@@ -196,20 +163,17 @@ class MyPasswordChangeForm(PasswordChangeForm):
 class CommentForm(forms.ModelForm):
     body = forms.CharField(
         label="",
-        widget=forms.Textarea(attrs={'placeholder': 'კომენტარი'})
+        widget=forms.Textarea(attrs={'placeholder': 'კომენტარი'}),
     )
 
     class Meta:
         model = Comment
         fields = ('body',)
 
-
 class UpdateUsernameForm(forms.ModelForm):
     error_messages = {
-        'not_changed': "თქვენ ეს ნიკი ისედაც გაქვთ!",
+        'not_changed': "ეს ნიკი ისედაც გაქვთ!",
         'deadline': 'ნიკის შეცვლა შეგიძლიათ ყოველ 7 დღეში ერთხელ!',
-        'blacklist': 'ასეთი ნიკი მიუღებელია! სხვა სცადეთ!',
-        'exists': 'ეს ნიკი დაკავებულია.'
     }
 
     class Meta:
@@ -232,14 +196,14 @@ class UpdateUsernameForm(forms.ModelForm):
 
         if username.lower() in blacklist:
             raise forms.ValidationError(
-                self.error_messages['blacklist'],
+                ERRORS['blacklist'],
                 code='blacklist',
             )
 
         if User.objects.filter(username__iexact=username).exclude(username=old_username).exists():
             raise forms.ValidationError(
-                self.error_messages['exists'],
-                code='exists',
+                ERRORS['unique'],
+                code='unique',
             )
 
         updated_time_difference = (timezone.now() - self.user.settings.username_updated).total_seconds()
@@ -281,21 +245,18 @@ class ShowProfileForm(forms.ModelForm):
         model = Settings
         fields = ('show_gender', 'show_birth',)
 
-
 class EmailChangeForm(forms.Form):
-    """
-    A form that lets a user change set their email while checking for a change in the
-    e-mail.
-    """
+    use_required_attribute = False
+
     error_messages = {
         'email_mismatch': "მოცემული Email-ები არ ემთხვევა ერთმანეთს!",
         'not_changed': "ეს Email ისედაც გაქვთ!",
     }
 
-    new_email1 = forms.EmailField(max_length=254, widget=forms.EmailInput(
+    new_email1 = forms.EmailField(max_length=254, widget=forms.TextInput(
         attrs={'class': 'form-input', 'placeholder': 'ახალი Email'}))
 
-    new_email2 = forms.EmailField(max_length=254, widget=forms.EmailInput(
+    new_email2 = forms.EmailField(max_length=254, widget=forms.TextInput(
         attrs={'class': 'form-input', 'placeholder': 'გაიმეორეთ ახალი Email'}))
 
     def __init__(self, user, *args, **kwargs):

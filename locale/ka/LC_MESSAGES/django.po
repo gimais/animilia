@@ -1,0 +1,74 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# André Bouatchidzé <a@anbz.net>, 2013-2015
+# avsd05 <avsd05@gmail.com>, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 16:41+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Georgian (http://www.transifex.com/django/django/language/"
+"ka/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ka\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#, python-format
+msgid "username"
+msgstr "ნიკი"
+
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+"ნიკი ან პაროლი არასწორია. "
+"თავიდან სცადეთ."
+
+#, python-format სტაფი
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+"გთხოვთ, შეიყვანოთ სწორი %(username)s და პაროლი. "
+"იქონიეთ მხედველობაში, რომ ორივე ველი ითვალისწინებს პატარა და დიდ ასოებს."
+
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+"სიგრძე მაქსიმუმ %(limit_value)d სიმბოლოსგან უნდა შედგებოდეს."
+" (შეყვანილია %(show_value)d სიმბოლო)."
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d characters."
+msgstr[0] ""
+"ეს პაროლი მოკლეა. ის უნდა შეიცავდეს მინიმუმ %(min_length)d სიმბოლოს."
+
+msgid "A user with that username already exists."
+msgstr "ეს ნიკი დაკავებულია."
+
+msgid "The two password fields didn't match."
+msgstr "შეყვანილი პაროლები ერთმანეთს არ ემთხვევა."
+
+msgid "This account is inactive."
+msgstr "თქვენი ექაუნთი დაბლოკილია."
+
+msgid "Recent actions"
+msgstr "ბოლო ქმედებები"
+
+msgid "My actions"
+msgstr "ჩემი ქმედებები"

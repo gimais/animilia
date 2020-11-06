@@ -9,7 +9,7 @@ class Category(models.Model):
     class Meta:
         db_table = 'categories'
         verbose_name = 'კატეგორია'
-        verbose_name_plural = 'კატეგორიები'
+        verbose_name_plural = 'კატეგორია'
 
     def __str__(self):
         return self.name
@@ -20,7 +20,7 @@ class Dubber(models.Model):
     class Meta:
         db_table = 'dubbers'
         verbose_name = 'გამხმოვანებელი'
-        verbose_name_plural = 'გამხმოვანებლები'
+        verbose_name_plural = 'გამხმოვანებელი'
 
     def __str__(self):
         return self.name
@@ -56,7 +56,7 @@ class Anime(models.Model):
     class Meta:
         db_table = 'animes_list'
         verbose_name = 'ანიმე'
-        verbose_name_plural = 'ანიმეები'
+        verbose_name_plural = 'ანიმე'
 
     def increase_view_count(self,cookies):
         if cookies.get('_vEpAd',False) == False:

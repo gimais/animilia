@@ -11,6 +11,7 @@ class FeedbackAdmin(admin.ModelAdmin):
     list_filter = ('date','closed')
     search_fields = ('ip', 'details',)
     readonly_fields = ('id','date','ip', 'customer_name','email','details')
+    exclude = ['registered_user']
 
     def has_add_permission(self, request, obj=None):
         return False

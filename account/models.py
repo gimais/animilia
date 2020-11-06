@@ -1,10 +1,9 @@
 from datetime import datetime,timedelta
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import Count,Exists,OuterRef,Subquery
+from django.db.models import Count, Exists, OuterRef, Subquery
 from django.utils import timezone
 from anime.models import Anime
-
 
 class CommentManager(models.Manager):
     def with_annotates(self,user_obj):
@@ -31,7 +30,6 @@ class Comment(models.Model):
     body = models.TextField()
     like = models.ManyToManyField(User,blank=True,editable=False,related_name='likes')
     dislike = models.ManyToManyField(User,blank=True,editable=False,related_name='dislikes')
-    # spoiler = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     active = models.BooleanField(default=True)
     parent = models.ForeignKey('self',on_delete=models.CASCADE,null=True,blank=True,related_name='replies')
@@ -57,7 +55,6 @@ class Comment(models.Model):
             'avatar': self.user.profile.avatar.name,
             'time': datetime.timestamp(self.created),
             'body': self.body,
-            # 'has_spoiler': self.spoiler,
             'likes': self.like.count(),
             'dislikes': self.dislike.count(),
             'childs_count':self.replies.count(),
@@ -90,7 +87,6 @@ class Comment(models.Model):
                 'time':datetime.timestamp(self.created),
                 'parent_id':self.parent.pk,
                 'body':self.body,
-                # 'has_spoiler':self.spoiler,
                 'likes':self.like.count(),
                 'dislikes':self.dislike.count(),
                 'voted': vote,
@@ -123,10 +119,6 @@ class Profile(models.Model):
         verbose_name = 'პროფილი'
         verbose_name_plural = "პროფილი"
 
-
-    def get_comments_count(self):
-        return Comment.objects.filter(user=self.user).count()
-
     def __str__(self):
         return '{}-ის პროფილი'.format(self.user.username)
 
@@ -134,18 +126,20 @@ class Profile(models.Model):
 def sub_three_days():
     return timezone.now() - timedelta(days=3)
 
+def sub_seven_days():
+    return timezone.now() - timedelta(days=7)
+
 class Settings(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     ip = models.GenericIPAddressField(verbose_name='IP',null=True)
-    username_updated = models.DateTimeField(auto_now_add=True)
+    username_updated = models.DateTimeField(default=sub_seven_days)
     avatar_updated = models.DateTimeField(default=sub_three_days)
     show_birth = models.BooleanField(default=False)
     show_gender = models.BooleanField(default=False)
 
     class Meta:
-        verbose_name = 'პარამეტრები'
+        verbose_name = 'პარამეტრი'
         verbose_name_plural = "პარამეტრები"
-
 
     def __str__(self):
         return "{}-ის პარამეტრები".format(self.user.username)

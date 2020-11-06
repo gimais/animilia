@@ -6,10 +6,14 @@ from .forms import MyAuthenticationForm,MyPasswordResetForm,MyPasswordChangeForm
 
 # Forms
 views.LoginView.authentication_form = MyAuthenticationForm
+
 views.PasswordResetView.form_class = MyPasswordResetForm
+
 views.PasswordChangeView.form_class = MyPasswordChangeForm
-views.PasswordResetConfirmView.form_class = MySetPasswordForm
 views.PasswordChangeView.success_url = '/account/profile'
+
+views.PasswordResetConfirmView.form_class = MySetPasswordForm
+
 
 urlpatterns = [
     path('register/',local_view.signup_view,name='signup'),

@@ -55,9 +55,10 @@ $('.profile-details-input').on('click','#submit-username-button',function (e) {
                 accepts: "application/json; charset=utf-8",
                 success: function (data) {
                     $('.username-info').html(`<span style='color:#5ced5c;'>ნიკი შეიცვლა!</span>`);
-                    $('#profile-username').html(new_username);
-                    username.html(new_username);
+                    $('#profile-username').text(new_username);
+                    username.text(new_username);
                     $username_updated = data.time;
+                    $('.profile-details-input > .cancel').trigger('click');
                 },
                 error: function (response) {
                     var html = '';
@@ -72,14 +73,14 @@ $('.profile-details-input').on('click','#submit-username-button',function (e) {
 });
 
 $('#clear-image').on('click',function () {
-    if(confirm('ნამდვილად გსურთ ავატარის წაშლა?\nთუ თქვენ ბოლო 3 დღეში ავატარი ატვირთული გქონდათ,' +
+    if(confirm('ნამდვილად გსურთ ავატარის წაშლა?\nთუ თქვენ ბოლო 3 დღეში ავატარი ატვირთული გქონდათ, ' +
         'ვერ ატვირთავთ ახალ ავატარს!')) {
         $.ajax({
             url: "/account/avatar_update/",
             type: "POST",
             data: {'type':0},
             success: function (data) {
-                $('#active-avatar').attr('src','/static/img/no-avatar.jpg');
+                $('#active-avatar').attr('src','/media/no-avatar.jpg');
                 $(this).hide();
             },
             error: function () {
@@ -136,7 +137,10 @@ $('.close').on('click',function () {
 
 $('.upload-result').on('click', function (e) {
     e.preventDefault();
-    $(this).text('მოიცადეთ...');
+    let that = $(this);
+
+    that.attr('disabled',true);
+    that.text('მოიცადეთ...');
     $uploadCrop.croppie('result', {
         type: 'blob',
         size: 'viewport',
@@ -152,12 +156,16 @@ $('.upload-result').on('click', function (e) {
             processData: false,
             contentType: false,
             success: function (data) {
+                console.log(data);
                 $('#avatarCroppieModal').css('display','none');
                 $('#active-avatar').attr('src', "/media/"+data.new_avatar);
                 $avatar_updated = data.time;
             },
             error:function () {
                 alert('მოხდა შეცდომა,გთხოვთ მოგვიანებით სცადეთ!')
+            },
+            complete:function () {
+                that.attr('disabled',false);
             }
         });
     });

@@ -663,6 +663,13 @@ section{
     margin-top: 15px;
 }
 
+.nomore{
+    background-color: #cac3c3;
+    width: fit-content;
+    margin: 0 auto;
+    padding: 5px 15px;
+}
+
 body footer{
     width: 100%;
     height: 96px;
@@ -1088,6 +1095,11 @@ button.spoiler-button:disabled {
     border: none;
 }
 
+.comment-text{
+    word-break: break-word;
+    white-space: pre;
+}
+
 .comment-replies-check,.password-change-container{
     border: 1px solid #e2e2e2;
     padding: 5px;
@@ -1222,7 +1234,7 @@ div.comment-right-buttons{
 .profile-avatar-container {
     float: left;
     width: 200px;
-    margin-bottom: 15px
+    margin: 0;
 }
 
 #profile-username{
@@ -1337,8 +1349,7 @@ a.change-pass-button {
     margin-bottom: 9px;
 }
 
-
-.profile-page button{
+.profile-page button[type='submit']{
     clear: both;
     margin-top: 25px;
 }
@@ -1356,21 +1367,27 @@ a.change-pass-button {
     display: inline-block;
 }
 .upload-demo-wrap {
-    width: 240px;
-    height: 240px;
+    width: auto;
+    height: auto;
     margin: 0 auto;
 }
 
 .modal-content .upload-result {
-    margin: 4% 42% 0;
+    margin: 10px auto 0;
     padding: 15px;
     background-color: #571d0d;
     color: white;
     cursor: pointer;
+    display: block;
 }
 
 .upload-demo-wrap .cr-slider-wrap {
-    margin: 0 auto;
+    margin: 6px auto;
+}
+
+.croppie-container .cr-boundary {
+    width: 240px;
+    height: 240px;
 }
 
 /* The Modal (background) */
@@ -1686,6 +1703,10 @@ a.change-pass-button {
 
     .profile-main.clearfix{
         padding: 10px 20px;
+    }
+
+    .modal-content{
+        width: 90%;
     }
 }
 

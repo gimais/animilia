@@ -89,12 +89,8 @@ def profile_view(request):
     else:
         return redirect('home')
 
-
 def profile_preview(request,id):
-    if isinstance(id,int):
-        user = get_object_or_404(User.objects.select_related('profile','settings'),pk=id)
-    else:
-        return Http404
+    user = get_object_or_404(User.objects.select_related('profile','settings'),pk=id)
     return render(request,'account/profile_preview.html',{'profileuser':user})
 
 
@@ -118,7 +114,7 @@ def avatar_update(request):
         if request.method == 'POST':
             is_type = request.POST.get('type',None)
             if is_type is not None:
-                profile = Profile.objects.get(pk=request.pk)
+                profile = Profile.objects.get(pk=request.user.pk)
                 profile.avatar = 'no-avatar.jpg'
                 profile.save()
                 return JsonResponse({'success': True,'info':'ავატარი წაიშალა!'}, status=200)
@@ -127,7 +123,7 @@ def avatar_update(request):
                 from PIL import Image
                 check_avatar = Image.open(avatar)
                 if check_avatar.format!="JPEG" or check_avatar.size[0] > 200 or check_avatar.size[1] > 200:
-                    return JsonResponse({'success':'false','info':'არ აკმაყოფილებს პირობებს!'})
+                    return JsonResponse({'success':'false','info':'არ აკმაყოფილებს პირობებს!'},status=406)
 
                 profile = request.user.profile
                 settings = request.user.settings
@@ -138,7 +134,7 @@ def avatar_update(request):
 
                 # uploading and saving
                 avatar.name = str(request.user.pk) + '_{}'.format(settings.avatar_updated.date()) + '.jpg'
-                profile.avatar = request.FILES.get('data')
+                profile.avatar = avatar
                 profile.save()
 
                 return JsonResponse({'success':True,
@@ -152,8 +148,6 @@ def avatar_update(request):
     else:
         return redirect('home')
 
-
-
 def change_email_request_view(request):
     if request.user.is_authenticated and request.is_ajax():
         from django.template.loader import render_to_string
@@ -165,12 +159,12 @@ def change_email_request_view(request):
             'uid': urlsafe_base64_encode(force_bytes(request.user.pk)).decode(),
             'token': email_change_token.make_token(request.user),
         })
+
         request.user.email_user(mail_subject,message)
+
         return JsonResponse({'success':'true'},status=200)
     else:
         return redirect('home')
-
-
 
 @never_cache
 def change_email_view(request,uidb64,token):
@@ -211,7 +205,6 @@ def add_comment(request):
                 parent_comment = None
 
             if parent_comment:
-
                 #send notification to replying_comment_author
                 try:
                     replying_to_id = int(request.POST.get('replying_to_id', False))
@@ -235,9 +228,11 @@ def add_comment(request):
                 reply_comment.save()
 
                 if not replying_comment_author == request_user.id:
-                    Notification.objects.create(reply_comment_id=replying_to_comment_obj.id,
-                                            user_id=replying_comment_author,
-                                            comment_id=reply_comment.id)
+                    Notification.objects.create(
+                        reply_comment_id=replying_to_comment_obj.id,
+                        user_id=replying_comment_author,
+                        comment_id=reply_comment.id
+                    )
 
                 response_data = {
                     'username':request.user.username,
@@ -256,10 +251,7 @@ def add_comment(request):
                     comment = form.save(commit=False)
                     comment.anime = anime
                     comment.user = request.user
-                    # if request.POST.get('spoiler', False) == 'true':
-                    #     comment.spoiler = True
-                    # else:
-                    #     comment.spoiler = False
+
                     comment.save()
 
                     response_data = {
@@ -267,19 +259,18 @@ def add_comment(request):
                         'avatar':request.user.profile.avatar.name,
                         'user_id':request.user.id,
                         'comment_id':comment.id,
-                        # 'has_spoiler': comment.spoiler,
                     }
 
                     status = 200
                 else:
                     response_data = {
-                        'error':'aseti anime ID bazashi ar aris!',
+                        'error':'aseti anime bazashi ar aris!',
                     }
                     status = 400
             return JsonResponse(response_data,status=status)
 
         else:
-            return JsonResponse(ERROR, status=400)
+            return JsonResponse(form.errors.get_json_data(), status=400)
     else:
         return JsonResponse({'error':"araavtorizebuli motxovna!"},status=401)
 

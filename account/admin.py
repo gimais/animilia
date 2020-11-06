@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Comment,Profile, Settings
+from .models import Comment, Profile, Settings
+
 
 # Register your models here.
 
@@ -10,7 +11,7 @@ class CommentAdmin(admin.ModelAdmin):
     list_filter = ('active', 'created')
     search_fields = ['user__username','body']
     actions = ('active_comments','inactive_comments')
-    readonly_fields = ('id','created','user','anime','parent_link')
+    readonly_fields = ('id','created','user','anime','parent_link','body')
     exclude = ['parent']
 
     def parent_link(self,obj=None):

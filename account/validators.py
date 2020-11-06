@@ -1,13 +1,16 @@
-from django.core.validators import MaxLengthValidator
 from django.contrib.auth.validators import UnicodeUsernameValidator
-
-class SignUpMaxLengthValidator(MaxLengthValidator):
-    message = "სიგრძე მაქსიმუმ %(limit_value)d სიმბოლოსგან უნდა შედგებოდეს." \
-              " (შეყვანილია %(show_value)d სიმბოლო)"
+from django.utils.translation import gettext_lazy as _
 
 class MyUnicodeUsernameValidator(UnicodeUsernameValidator):
     regex = r'^[\w-]+$'
     message = 'ნიკი შეიძლება შეიცავდეს მხოლოდ ასოებს,ციფრებსა და /-/_ სიმბოლოებს.'
+
+ERRORS = {
+    'unique': _("A user with that username already exists."),
+    'unique_email' : "ეს Email უკვე დარეგისტრირებულია. ( <a href='/account/password_reset/'>პაროლის გახსენება</a> )",
+    'empty_fields': "ცარიელი ველები უნდა შეავსოთ.",
+    'blacklist': "ასეთი ნიკი მიუღებელია. სხვა სცადეთ.",
+}
 
 blacklist = ['.htaccess', '.htpasswd', '.well-known','ad', 'add','admin', 'administration',
              'administrator','ads', 'ads.txt', 'advertise', 'advertising', 'analytics',
