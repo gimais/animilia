@@ -10,6 +10,9 @@ from django.utils.safestring import mark_safe
 from account.models import Comment, Profile, Settings
 from account.validators import MyUnicodeUsernameValidator,blacklist,ERRORS
 
+User._meta.get_field('username').validators[0] = MyUnicodeUsernameValidator()
+User._meta.get_field('username').validators[1] = MaxLengthValidator(16)
+User._meta.get_field('username').validators.append(MinLengthValidator(3))
 
 class SignUpForm(UserCreationForm):
     use_required_attribute = False
@@ -62,10 +65,6 @@ class SignUpForm(UserCreationForm):
 
     class Meta:
         model = User
-
-        User._meta.get_field('username').validators[0] = MyUnicodeUsernameValidator()
-        User._meta.get_field('username').validators[1] = MaxLengthValidator(16)
-        User._meta.get_field('username').validators.append(MinLengthValidator(3))
 
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'ნიკი (მინ: 3 - მაქს: 16)'})
@@ -271,6 +270,11 @@ class EmailChangeForm(forms.Form):
                 raise forms.ValidationError(
                     self.error_messages['not_changed'],
                     code='not_changed',
+                )
+            if User.objects.filter(email=new_email1).exists():
+                raise forms.ValidationError(
+                    mark_safe(ERRORS['unique_email']),
+                    code='unique_email'
                 )
         return new_email1
 

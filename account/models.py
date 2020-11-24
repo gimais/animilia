@@ -1,19 +1,24 @@
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta
+
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import Count, Exists, OuterRef, Subquery
+from django.db.models import Count, Exists, OuterRef, Subquery, Q
 from django.utils import timezone
+
 from anime.models import Anime
 
+
 class CommentManager(models.Manager):
-    def with_annotates(self,user_obj):
+    def related_objects_annotates(self, user_obj):
         profiles = Profile.objects.filter(user_id=OuterRef('user_id'))
         user = User.objects.filter(pk=OuterRef('user_id'))
-        params = {'avatar' : Subquery(profiles.values('avatar')[:1]),
-                  'username' : Subquery(user.values('username')[:1]),
-                  'like_count' : Count('like',distinct=True),
-                  'dislike_count' : Count('dislike', distinct=True),
-                  'replies_count' : Count('replies',distinct=True)}
+        params = {'avatar': Subquery(profiles.values('avatar')[:1]),
+                  'username': Subquery(user.values('username')[:1]),
+                  'like_count': Count('like', distinct=True),
+                  'dislike_count': Count('dislike', distinct=True),
+                  'replies_count': Count('replies', distinct=True),
+                  'active_replies_count': Count('replies', filter=Q(replies__active=True), distinct=True),
+                  }
 
         if user_obj.is_authenticated:
             has_like = user_obj.likes.filter(id=OuterRef('id'))
@@ -57,38 +62,41 @@ class Comment(models.Model):
             'body': self.body,
             'likes': self.like.count(),
             'dislikes': self.dislike.count(),
-            'childs_count':self.replies.count(),
+            'childs_count' : self.replies.count(),
+            'active_childs_count':self.replies.filter(active=True).count(),
             'voted': vote,
         }
 
-    def get_deleted_comment_for_notification_redirect(self):
+    def get_deleted_comment_info(self):
         return {
-            'comment_id': self.pk,
-            'user_id': self.user.pk,
+            'deleted': True,
+            'comment_id': self.id,
+            'user_id': self.user.id,
             'username': self.user.username,
             'avatar': self.user.profile.avatar.name,
             'time': datetime.timestamp(self.created),
-            'childs_count':self.replies.count(),
+            'childs_count': self.replies.count(),
+            'active_childs_count': self.replies.filter(active=True).count(),
         }
 
-    def get_reply_comment_info(self,request_user):
-        vote = None
-        if self.like.filter(pk=request_user).exists():
-            vote = 0
-        elif self.dislike.filter(pk=request_user).exists():
-            vote = 1
-
+    def get_reply_comment_info(self,request_user=None):
         if self.active:
+            vote = None
+            if self.like.filter(pk=request_user).exists():
+                vote = 0
+            elif self.dislike.filter(pk=request_user).exists():
+                vote = 1
+
             return {
-                'comment_id':self.pk,
-                'user_id':self.user.pk,
-                'username':self.user.username,
-                'avatar':self.user.profile.avatar.name,
-                'time':datetime.timestamp(self.created),
-                'parent_id':self.parent.pk,
-                'body':self.body,
-                'likes':self.like.count(),
-                'dislikes':self.dislike.count(),
+                'comment_id': self.pk,
+                'parent_id': self.parent.pk,
+                'user_id': self.user.pk,
+                'username': self.user.username,
+                'avatar': self.user.profile.avatar.name,
+                'time': datetime.timestamp(self.created),
+                'body': self.body,
+                'likes': self.like.count(),
+                'dislikes': self.dislike.count(),
                 'voted': vote,
             }
         else:
@@ -148,6 +156,7 @@ class Notification(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     comment = models.ForeignKey(Comment,on_delete=models.CASCADE,related_name='notifications')
     reply_comment = models.ForeignKey(Comment,blank=True,on_delete=models.CASCADE)
+    visited = models.BooleanField(default=False)
 
     def __str__(self):
         return "comment_id: {}, reply_id: {}, user_id : {}".format(self.comment.id,self.reply_comment.id,self.user.username)

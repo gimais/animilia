@@ -1,7 +1,6 @@
 {% if user.is_authenticated %}
     <form class='comment-form' method='POST'>
-        {% csrf_token %}
-        {{comment_form.as_p|safe}}
+        {{ comment_form.as_p|safe }}
         <button class="spoiler-button">სპოილერი</button>
         <button type='submit'>გაგზავნა</button>
     </form>
@@ -24,44 +23,67 @@
 
 <div class="comments-box clearfix">
     {% for comment in comments %}
-        {% with requester=user %}
         <div class="comment clearfix">
-{#            <div class="admin"></div>#}
+            {#            <div class="admin"></div>#}
             <a class="comment-user-img" href="/profile/{{ comment.user_id }}">
-                <img src="/media/{{ comment.avatar }}?r=1" alt>
+                <img src="/media/{{ comment.avatar }}?r=1" alt="{{ comment.username }}" loading="lazy">
             </a>
             <div class="comment-body">
                 <div class="comment-info">
-                    <a class='comment-user {% if comment.user_id == requester.pk %}mine{% endif %}' href="/profile/{{ comment.user_id }}">{{ comment.username }}</a>
-                {% if user.is_authenticated %}
-                    {% if comment.user_id == requester.pk %}
-                        {% if comment.like_count == 0 and comment.dislike_count == 0 and comment.replies_count == 0 %}
-                        <div class="comment-right-buttons" id='edit-comment' style="color: #333333;"><i class="fas fa-edit"></i></div>
+                    <a class='comment-user {% if comment.user_id == user.pk %}mine{% endif %}'
+                       href="/profile/{{ comment.user_id }}">{{ comment.username }}</a>
+                    {% if comment.active %}
+                        {% if user.is_authenticated %}
+                            <p class="reply-button" data-id="{{ comment.id }}" data-username="{{ comment.username }}">
+                                <i class="fas fa-reply"></i> პასუხი
+                            </p>
                         {% endif %}
-                        <div class="comment-right-buttons" id='remove-comment' style="color: #333333;"><i class="fas fa-trash"></i></div>
+                        <p class='comment-time'>{{ comment.created|date:"d/m/Y | H:i" }}</p>
+                        </div>
+                        <p class="comment-text">
+                            {{ comment.body|linebreaksbr }}
+                        </p>
+                        <div class="comment-actions">
+                            <div class="comment-dl-buttons">
+                                <div class="comment-right-buttons" id='like-comment' style="color: #ff2e01;"><i
+                                        class="{% if comment.has_like %}fas{% else %} far{% endif %} fa-thumbs-up"></i>{{ comment.like_count }}
+                                </div>
+                                <div class="comment-right-buttons" id='dislike-comment' style="color: #ab3717;"><i
+                                        class="{% if comment.has_dislike %}fas{% else %} far{% endif %} fa-thumbs-down"></i>{{ comment.dislike_count }}
+                                </div>
+                            </div>
+                            {% if user.is_authenticated %}
+                                <div class="user-actions">
+                                    {% if comment.user_id == user.pk %}
+                                        {% if comment.like_count == 0 and comment.dislike_count == 0 and comment.active_replies_count == 0 %}
+                                            <div class="comment-right-buttons" id='edit-comment'><i
+                                                    class="fas fa-edit"></i></div>
+                                        {% endif %}
+                                        <div class="comment-right-buttons" id='remove-comment'><i
+                                                class="fas fa-trash"></i></div>
+                                    {% endif %}
+                                    <p class="reply-button touch" data-id="{{ comment.id }}"
+                                       data-username="{{ comment.username }}">
+                                        <i class="fas fa-reply"></i> პასუხი
+                                    </p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <p class='comment-time'>{{ comment.created|date:"d/m/Y | H:i" }}</p>
+                        </div>
+                        <p class="deleted-comment">ეს კომენტარი წაშლილია</p>
                     {% endif %}
-                    <p class="reply-button" data-id="{{comment.id}}" data-username="{{comment.username}}"><i class="fas fa-reply"></i>  პასუხი</p>
-                {% endif %}
-                {% endwith %}
-                    <div class="comment-dl-buttons">
-                        <div class="comment-right-buttons" id='dislike-comment' style="color: #ab3717;"><i class="{% if comment.has_dislike  %}fas{% else %} far{% endif %} fa-thumbs-down"></i>{{ comment.dislike_count }}</div>
-                        <div class="comment-right-buttons" id='like-comment' style="color: #ff2e01;" ><i class="{% if comment.has_like  %}fas{% else %} far{% endif %} fa-thumbs-up"></i>{{ comment.like_count }}</div>
-                    </div>
-                    <p class='comment-time'>{{ comment.created|date:"d/m/Y | H:i" }}</p>
-                </div>
-                <p class="comment-text">
-                        {{ comment.body}}
-                </p>
+        </div>
+        {% if comment.active_replies_count %}
+            <div class="comment-replies-check closed" data-id="{{ comment.id }}">
+                პასუხების ჩვენება ({{ comment.replies_count }})
             </div>
-            {% if comment.replies_count %}
-            <div class="comment-replies-check closed" data-id="{{comment.id}}">
-                პასუხების ჩვენება ({{comment.replies_count}})
-            </div>
-                <div class="comment-replies-box" style="display: none"></div>
-            {% endif %}
+            <div class="comment-replies-box"></div>
+        {% endif %}
         </div>
     {% endfor %}
 </div>
 {% if comments.has_next %}
-<div class="showmore" data-page="1" data-max="{{ max_page }}">მეტი</div>
+    <div class="showmore" data-page="1" data-max="{{ max_page }}">მეტი</div>
 {% endif %}

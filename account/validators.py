@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 class MyUnicodeUsernameValidator(UnicodeUsernameValidator):
     regex = r'^[\w-]+$'
-    message = 'ნიკი შეიძლება შეიცავდეს მხოლოდ ასოებს,ციფრებსა და /-/_ სიმბოლოებს.'
+    message = 'ნიკი შეიძლება შეიცავდეს მხოლოდ ასოებს, ციფრებსა და /-/_ სიმბოლოებს.'
 
 ERRORS = {
     'unique': _("A user with that username already exists."),

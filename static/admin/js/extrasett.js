@@ -1,5 +1,5 @@
-(function($) {
-    $(document).ready(function() {
+(function ($) {
+    $(document).ready(function () {
         const module = $(".js-inline-admin-formset .module");
         const type = $(".field-type select#id_type");
 
@@ -7,33 +7,35 @@
             let addButton = module.find('.add-row');
             let emptyInput = module.find('#series-empty');
 
-            if(type){
+            if (type) {
                 addButton.show();
-            }else{
+            } else {
                 addButton.hide();
                 emptyInput.show();
                 let rows = $('tbody').find('tr');
-                for(let i = 0; i < rows.length - 2; i++){
+                for (let i = 0; i < rows.length - 2; i++) {
                     $(rows[i]).remove()
                 }
             }
         }
 
         module.hide();
-        if($(".field-type select#id_type option:selected").val()==='1')
-            $(".field-episodes").hide();
 
-        type.change(function(){
-            if($(this).children("option:selected").val()==='1'){
+        if ($(this).children("option:selected").val() === '1') {
+            $(".field-episodes").hide();
+        }
+
+        type.change(function () {
+            if ($(this).children("option:selected").val() === '1') {
                 $(".field-episodes").hide();
                 toggleRowAddButton(false)
-            }else{
+            } else {
                 $(".field-episodes").show();
                 toggleRowAddButton(true)
             }
         });
 
-        $(".js-inline-admin-show-or-hide-button").on('click',function () {
+        $(".js-inline-admin-show-or-hide-button").on('click', function () {
             module.toggle();
         });
     });

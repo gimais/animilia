@@ -29,14 +29,14 @@ $(document).ready(function () {
 
 });
 
-var $avatar_updated = {{ user.settings.avatar_updated|date_to_timestamp:3 }};
-var $username_updated = {{ user.settings.username_updated|date_to_timestamp:7 }};
+let $avatar_updated = {{ user.settings.avatar_updated|date_to_timestamp:3 }};
+let $username_updated = {{ user.settings.username_updated|date_to_timestamp:7 }};
 
 $('.profile-details-input').on('click','#submit-username-button',function (e) {
     e.preventDefault();
-    var that = $(this);
-    var username = $('a[href="/account/profile/"]');
-    var new_username = that.parent().find('input[name=username]').val();
+    let that = $(this);
+    let username = $('#profile-username');
+    let new_username = that.parent().find('input[name=username]').val();
     if(username.text() === new_username)
         $('.username-info').html('თქვენ ეს ნიკი ისედაც გაქვთ!');
     else if(new_username.length<3)
@@ -44,14 +44,16 @@ $('.profile-details-input').on('click','#submit-username-button',function (e) {
     else if(new_username.length>16)
         $('.username-info').html('ნიკი მაქსიმუმ 16 სიმბოლოსგან უნდა შედგებოდეს!');
     else{
-        var now = new Date();
+        let now = new Date();
         if(!(now.getTime()/1000 >= $username_updated))
             alert(`ნიკის შეცვლა შეგიძლიათ ყოველ 7 დღეში ერთხელ.\nშეცვლას შეძლებთ ${convertTimeGeo($username_updated)}-ზე`);
         else if (confirm('ნამდვილად გსურთ ნიკის შეცვლა?!\nნიკის კვლავ შეცვლას შეძლებთ 7 დღის შემდეგ!')) {
             $.ajax({
                 method: "POST",
-                url: window.location.origin + '/account/username_update/',
-                data: {username: new_username},
+                url: '/account/username_update/',
+                data: {
+                    username: new_username
+                },
                 accepts: "application/json; charset=utf-8",
                 success: function (data) {
                     $('.username-info').html(`<span style='color:#5ced5c;'>ნიკი შეიცვლა!</span>`);
@@ -61,7 +63,7 @@ $('.profile-details-input').on('click','#submit-username-button',function (e) {
                     $('.profile-details-input > .cancel').trigger('click');
                 },
                 error: function (response) {
-                    var html = '';
+                    let html = '';
                     response.responseJSON.errors.forEach(function (error) {
                         html += (`<span>${error}</span><br>`);
                     });
@@ -78,8 +80,10 @@ $('#clear-image').on('click',function () {
         $.ajax({
             url: "/account/avatar_update/",
             type: "POST",
-            data: {'type':0},
-            success: function (data) {
+            data: {
+                'type':0
+            },
+            success: function () {
                 $('#active-avatar').attr('src','/media/no-avatar.jpg');
                 $(this).hide();
             },
@@ -99,11 +103,11 @@ $('.change-profile-img').on('click',function () {
     $('input[name=avatar]').click();
 });
 
-var $uploadCrop;
+let $uploadCrop;
 
 function readFile(input) {
     if (input.files && input.files[0]) {
-        var reader = new FileReader();
+        const reader = new FileReader();
 
         reader.onload = function (e) {
             $('.upload-demo').addClass('ready');
@@ -147,7 +151,7 @@ $('.upload-result').on('click', function (e) {
         format: 'jpeg',
         quality: 0.95,
     }).then(function (img) {
-        var formData = new FormData();
+        let formData = new FormData();
         formData.append('data', img);
         $.ajax({
             url: "/account/avatar_update/",
@@ -158,7 +162,7 @@ $('.upload-result').on('click', function (e) {
             success: function (data) {
                 console.log(data);
                 $('#avatarCroppieModal').css('display','none');
-                $('#active-avatar').attr('src', "/media/"+data.new_avatar);
+                $('#active-avatar').attr('src', "/media/"+data['new_avatar']);
                 $avatar_updated = data.time;
             },
             error:function () {
@@ -186,11 +190,12 @@ $(window).on('click',function (e) {
             <div class="profile-main clearfix">
                 <div class="profile-avatar-container ">
                         <div class="profile-img">
-                            <i class="fas fa-times-circle" {% if user.profile.avatar == 'no-avatar.jpg' %}style="display: none"{% endif %} id="clear-image"></i>
+                            {% if user.profile.avatar != 'no-avatar.jpg' %}
+                                <i class="fas fa-times-circle" id="clear-image"></i>
+                            {% endif %}
                             <img id="active-avatar" src="/media/{{ user.profile.avatar }}?r=1" alt="avatar">
 
                             <div id="avatarCroppieModal">
-                              <!-- Modal content -->
                               <div class="modal-content">
                                 <span class="close">&times;</span>
 
@@ -212,7 +217,7 @@ $(window).on('click',function (e) {
                     </div>
                 <div class="profile-display">
                     <p id="profile-username">{{ user.username }}</p>
-                    <p id="profile-group">{{ user.groups.all.0 }}</p>
+{#                    <p id="profile-group">{{ user.groups.all.0 }}</p>#}
                     <div class="profile-row">
                         <dl>
                             <dt>რეგისტრაციის თარიღი:</dt>
@@ -245,7 +250,7 @@ $(window).on('click',function (e) {
                     </div>
                 </div>
             </div>
-            <div class="profile-edit">
+            <div class="profile-edit clearfix">
                 <div class="profile-header">პარამეტრები</div>
                 <div class="profile-details-input" style="position:relative">
                     <label for="id_email">Email</label>
@@ -258,7 +263,7 @@ $(window).on('click',function (e) {
                     <button class="change-button" id="change-username-button">შეცვლა</button>
                     <p class="username-info"></p>
                 </div>
-                <div class="profile-details-input" style="position:relative">
+                <div class="profile-details-input">
                     <a class="change-pass-button" href="{% url 'password_change' %}">პაროლის შეცვლა</a>
                 </div>
             </div>

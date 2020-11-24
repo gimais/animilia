@@ -21,6 +21,7 @@ urlpatterns = [
     path('logout/', views.LogoutView.as_view(), name='logout'),
 
     path('notifications/',local_view.check_notification,name='notification'),
+    path('notifications/delete/<int:id>',local_view.delete_notification,name='notification'),
 
     path('profile/',local_view.profile_view,name='profile'),
     path('avatar_update/',local_view.avatar_update,name='avatar_update'),
@@ -37,10 +38,11 @@ urlpatterns = [
     path('reset/done/', views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 
     path('comment/', local_view.add_comment, name='comment'),
-    path('check_replies/<int:int>', local_view.check_replies, name='replies_check'),
-    path('comment/delete/', local_view.delete_comment, name='comment_delete'),
-    path('comment/edit/', local_view.edit_comment, name='comment_edit'),
+    path('reply_comment/', local_view.reply_comment, name='reply_comment'),
+    path('check_replies/<int:id>', local_view.check_replies, name='replies_check'),
 
+    path('comment/delete/<int:id>', local_view.delete_comment, name='comment_delete'),
+    path('comment/edit/', local_view.edit_comment, name='comment_edit'),
     path('comment/like/', local_view.like_comment, name='comment_like'),
     path('comment/dislike/', local_view.dislike_comment, name='comment_dislike'),
 ]

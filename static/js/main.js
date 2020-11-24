@@ -1,154 +1,290 @@
 // jQuery 3.4.1
 "use strict";
 
+const itemSlug = document.location.pathname;
+const request_user_id = $('.top-nav li a[href="/account/profile/"]').data('id');
+
 function escapeHTML(txt) {
     return txt
-         .replace(/&/g, "&amp;")
-         .replace(/</g, "&lt;")
-         .replace(/'/g, "&#039;")
-         .replace(/"/g, "&quot;")
-         .replace(/>/g, "&gt;");
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/'/g, "&#039;")
+        .replace(/"/g, "&quot;")
+        .replace(/>/g, "&gt;");
 }
 
-$('#mob-menu').click(function () {
-    $('nav').toggleClass('open');
-    $('.top-nav').toggleClass('open')
-});
-
-
-$('#login-focus').on('click',function () {
-    $('.login-form').toggleClass('show');
-});
-
-function activateClassButton(button){
-       var activatedButton = $('.item-page-episodes').find('.episode-select-button.active');
-       if(button!==activatedButton) {
-               activatedButton.removeClass('active');
-               button.addClass('active');
-       }
+function newLineToBr(txt) {
+    return txt.replace(/(?:\r\n|\r|\n)/g, '<br/>');
 }
 
-const cT = function () {
-    var date = new Date();
-    return date.getTime()
-};
+function activateClassButton(button) {
+    let activatedButton = $('.item-page-episodes').find('.episode-select-button.active');
+    if (button !== activatedButton) {
+        activatedButton.removeClass('active');
+        button.addClass('active');
+    }
+}
+
+function cT() {
+    return new Date().getTime()
+}
+
+function getYearsSelectOptionsHTML(startYear, EndYear) {
+    let html = '';
+    for (let i = EndYear; i >= startYear; i--) {
+        html += '<option value="' + i + '">' + i + '</option>';
+    }
+    return html
+}
+
+function getMonthsSelectOptionsHTML() {
+    const monthNames = ["იანვარი", "თებერვალი", "მარტი", "აპრილი", "მაისი", "ივნისი",
+        "ივლისი", "აგვისტო", "სექტემბერი", "ოქტომბერი", "ნოემბერი", "დეკემბერი"];
+    let html = "";
+
+    for (let i = 1; i <= monthNames.length; i++) {
+        html += '<option value="' + i + '">' + monthNames[i - 1] + '</option>';
+    }
+    return html
+}
+
+function getDaysSelectOptionsHTML(days) {
+    let html = '';
+    for (let i = 1; i <= days; i++) {
+        html += '<option value="' + i + '">' + i + '</option>';
+    }
+    return html
+}
 
 function setCookie(name, value, expire) {
-        var date = new Date();
-        date.setTime(date.getTime() + (expire*24*60*60*1000));
-        var expires = "expires="+ date.toUTCString();
-        document.cookie = name + "=" + value + ";" + expires ;
+    let date = new Date();
+    date.setTime(date.getTime() + (expire * 24 * 60 * 60 * 1000));
+    let expires = "expires=" + date.toUTCString();
+    document.cookie = name + "=" + value + ";" + expires;
 }
 
 function getCookie(cname) {
-  let name = cname + "=";
-  let decodedCookie = decodeURIComponent(document.cookie);
-  let ca = decodedCookie.split(';');
-  for(let i = 0; i <ca.length; i++) {
-    let c = ca[i];
-    while (c.charAt(0) == ' ') {
-      c = c.substring(1);
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) === 0) {
+            return c.substring(name.length, c.length);
+        }
     }
-    if (c.indexOf(name) == 0) {
-      return c.substring(name.length, c.length);
-    }
-  }
-  return "";
+    return "";
 }
 
-var request_user_id = $('.top-nav li a[href="/account/profile/"]').data('id');
-
 function csrfSafeMethod(method) {
-    // these HTTP methods do not require CSRF protection
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 }
 
 $.ajaxSetup({
-    beforeSend: function(xhr, settings) {
+    beforeSend: function (xhr, settings) {
         if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
             xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
         }
     }
 });
 
-const itemSlug = document.location.pathname;
+function makeSpoilerComment(text) {
+    while (text.includes('[spoiler]'))
+        text = spoilerAlertBBToHTML(text);
+    return text
+}
 
-$('.episode-select-button').on('click',function () {
-    let clickedButton = $(this);
-    let videoURL = clickedButton.data('url');
-    let itemPlayer = $('.item-player');
 
-    activateClassButton(clickedButton);
-    $('.item-player iframe').attr('src',videoURL);
-    if (itemPlayer.hasClass('hidden')) {
-                itemPlayer.removeClass('hidden');
-        }
-    setCookie(itemSlug.substring(7,itemSlug.length-1),clickedButton.data('id'),20);
-});
+function checkCommentContainsMoreSpoilers(text) {
+    return text.indexOf('[spoiler]') !== text.lastIndexOf('[spoiler]')
+}
 
+function spoilerAlertBBToHTML($str) {
+    let $format_search;
+    let $format_replace;
+
+    $format_search = /\[spoiler](.*?)\[\/spoiler]/ig;
+    $format_replace = '<span class="spoiler">$1</span><button id="reveal-spoiler">სპოილერი</button>';
+
+    return $str.replace($format_search, $format_replace);
+}
+
+function spoilerALertHTMLToBB(text) {
+    while (text.includes('<span')) {
+        text = text.replace(/<span (.*?)>(.*?)<\/span>/gi, "[spoiler]$2[/spoiler]");
+        text = text.replace(/<button (.*?)>(.*?)<\/button>/gi, '');
+    }
+    return text
+}
+
+// function stripHTML(html){
+//     return html.replace(/<\/?[^>]+(>|$)/g, "");
+// }
+
+function hideBigComment(comment) {
+    let text = comment.find('.comment-text');
+
+    if (text.length && (text.height() * 4) + (text.width() / 3) > 400) {
+        text.addClass('hide-this');
+        text.after('<button class="read-more">სრულად</button>')
+    }
+}
+
+function convertTimeGeo(date) {
+    date = new Date(date * 1000);
+    date = `${(date.getDate() < 10 ? '0' : '') +
+    date.getDate()}/${((date.getMonth() + 1) < 10 ? '0' : '') +
+    (date.getMonth() + 1)}/${date.getFullYear()} | ${(date.getHours() < 10 ? '0' : '') +
+    date.getHours()}:${(date.getMinutes() < 10 ? '0' : '') + date.getMinutes()}`;
+    return date;
+}
+
+function makeCommentTextHTML(body) {
+    return makeSpoilerComment(newLineToBr(escapeHTML(body)));
+}
 
 function makeCommentBoxHTML(data) {
     let html = '';
-    html += `<div class="comment${data.parent_id?'':' clearfix'}">
-                    <a class="comment-user-img" href="/profile/${data.user_id}/">
-                        <img src=${window.location.origin+'/media/'+data.avatar} alt>
+    html += `<div class="comment clearfix">
+                    <a class="comment-user-img" href="/profile/${data['user_id']}/">
+                        <img src=${'/media/' + data.avatar} alt="avatar">
                     </a>
                     <div class="comment-body">
-                        <div class="comment-info">`;
+                        <div class="comment-info">
+                            <a class='comment-user${data['user_id'] === request_user_id ? " mine" : ""}' href="/profile/${data['user_id']}/">${data.username}</a>`;
 
-    if(data.user_id === request_user_id){
-        html += `<a class='comment-user mine' href="/profile/${data.user_id}/">${escapeHTML(data.username)}</a>`;
-    }else{
-        html += `<a class='comment-user' href="/profile/${data.user_id}/">${escapeHTML(data.username)}</a>`;
-    }
+    if (typeof request_user_id !== "undefined")
+        html += `<p class="reply-button" data-id="${data['comment_id']}" data-username="${data.username}">
+                            <i class="fas fa-reply"></i> პასუხი
+                        </p>`;
 
-    if(typeof request_user_id !== "undefined" && !data.deleted){
-        if(data.parent_id)
-            html += `<p class="reply-button" data-it="${data.parent_id}" data-id="${data.comment_id}" data-username="${escapeHTML(data.username)}"><i class="fas fa-reply"></i>  პასუხი</p>`;
-        else
-            html += `<p class="reply-button" data-id="${data.comment_id}" data-username="${escapeHTML(data.username)}"><i class="fas fa-reply"></i>  პასუხი</p>`;
-    }
-    if (typeof request_user_id !== "undefined" && data.user_id===request_user_id && !data.deleted){
-        if(typeof data.dislikes === "undefined" && typeof data.likes === "undefined" || data.dislikes ===0 && data.likes === 0) {
-            html += `<div class="comment-right-buttons" id='edit-comment' style="color: #333333;"><i class="fas fa-edit"></i></div>`;
+    html += `<p class='comment-time'>${convertTimeGeo(data.time)}</p>
+                        </div>
+                        <p class="comment-text">${makeCommentTextHTML(data.body)}</p>
+                        <div class="comment-actions">
+                            <div class="comment-dl-buttons">
+                                <div class="comment-right-buttons" id='like-comment' style="color: #ff2e01;" >
+                                    <i class="fa${data['voted'] === 0 ? 's' : 'r'} fa-thumbs-up"></i>${data['likes']}
+                                </div>
+                                <div class="comment-right-buttons" id='dislike-comment' style="color: #ab3717;margin-right: 3px;">
+                                    <i class="fa${data['voted'] === 1 ? 's' : 'r'} fa-thumbs-down"></i>${data['dislikes']}
+                                </div>
+                            </div>`;
+
+    if (typeof request_user_id !== "undefined") {
+        html += `<div class="user-actions">`;
+
+        if (data['user_id'] === request_user_id) {
+            if (data['dislikes'] === 0 && data['likes'] === 0) {
+                html += `<div class="comment-right-buttons" id='edit-comment' style="margin-right: 3px;"><i class="fas fa-edit"></i></div>`;
+            }
+            html += `<div class="comment-right-buttons" id='remove-comment'><i class="fas fa-trash"></i></div>`;
         }
-         html += `<div class="comment-right-buttons" id='remove-comment' style="color: #333333;"><i class="fas fa-trash"></i></div>`;
-    }
-    if(!data.deleted){
-        html += `<div class="comment-dl-buttons">
-                    <div class="comment-right-buttons" id='dislike-comment' style="color: #ab3717;"><i class="fa${data.voted === 1 ? 's' : 'r'} fa-thumbs-down"></i>${data.dislikes ? data.dislikes : 0}</div>
-                    <div class="comment-right-buttons" id='like-comment' style="color: #ff2e01;" ><i class="fa${data.voted === 0 ? 's' : 'r'} fa-thumbs-up"></i>${data.likes ? data.likes : 0}</div>
+
+        html += `<p class="reply-button touch" data-id="${data['comment_id']}" data-username="${data.username}">
+                        <i class="fas fa-reply"></i>  პასუხი
+                </p>
                 </div>`;
     }
-        html+= `<p class='comment-time'>${convertTimeGeo(data.time)}</p>
-            </div>`;
-    if(data.deleted){
-        html+= `<p class="deleted-comment">ეს კომენტარი წაშლილია</p>`
-    }else{
-        html += `<p class="comment-text">${ifCommentContainsSpoiler(escapeHTML(data.body))}</p>`
-    }
-    html+= '</div>';
 
-    if(typeof data.childs_count !== "undefined" && data.childs_count > 0) {
-        html += `<div class="comment-replies-check closed" data-id="${data.comment_id}">
-                პასუხების ჩვენება (${data.childs_count})
-            </div>
-                <div class="comment-replies-box" style="display: none"></div>`;
+    html += `</div></div>`;
+
+    if (data['active_childs_count'] > 0) {
+        html += `<div class="comment-replies-check closed" data-id="${data['comment_id']}">
+                    პასუხების ჩვენება (${data['childs_count']})
+                </div>
+                <div class="comment-replies-box"></div>`;
     }
 
-    html += '</div>';
+    html += `</div>`;
+
     return html
 }
 
-function makeCommentTextAreaHTML(parent_id,replying_to_id=NaN){
+function makeReplyCommentBoxHTML(data) {
     let html = '';
-    if(isNaN(replying_to_id)){
-        html += `<form class=\'comment-form\' style=\'padding: 15px 0\' method=\'POST\' data-id=\"${parent_id}\">`;
-    }else{
-        html += `<form class=\'comment-form\' style=\'padding: 15px 0\' method=\'POST\' data-id=\'${parent_id}\' data-it=\"${replying_to_id}\">`;
+    html += `<div class="comment">
+                    <a class="comment-user-img" href="/profile/${data['user_id']}/">
+                        <img src=${'/media/' + data.avatar} alt="avatar">
+                    </a>
+                    <div class="comment-body">
+                        <div class="comment-info">
+                            <a class='comment-user${data['user_id'] === request_user_id ? " mine" : ""}' href="/profile/${data['user_id']}/">${data.username}</a>`;
+
+    if (typeof request_user_id !== "undefined")
+        html += `<p class="reply-button" data-it="${data.parent_id}" data-id="${data['comment_id']}" data-username="${data.username}">
+                            <i class="fas fa-reply"></i> პასუხი
+                </p>`;
+
+    html += `<p class='comment-time'>${convertTimeGeo(data.time)}</p>
+                        </div>
+                        <p class="comment-text">${makeCommentTextHTML(data.body)}</p>
+                        <div class="comment-actions">
+                            <div class="comment-dl-buttons">
+                                <div class="comment-right-buttons" id='like-comment' style="color: #ff2e01;" >
+                                    <i class="fa${data['voted'] === 0 ? 's' : 'r'} fa-thumbs-up"></i>${data['likes']}
+                                </div>
+                                <div class="comment-right-buttons" id='dislike-comment' style="color: #ab3717;margin-right: 3px;">
+                                    <i class="fa${data['voted'] === 1 ? 's' : 'r'} fa-thumbs-down"></i>${data['dislikes']}
+                                </div>
+                            </div>`;
+
+    if (typeof request_user_id !== "undefined") {
+        html += `<div class="user-actions">`;
+
+        if (data['user_id'] === request_user_id) {
+            if (data['dislikes'] === 0 && data['likes'] === 0) {
+                html += `<div class="comment-right-buttons" id='edit-comment' style="margin-right: 3px"><i class="fas fa-edit"></i></div>`;
+            }
+            html += `<div class="comment-right-buttons" id='remove-comment'><i class="fas fa-trash"></i></div>`;
+        }
+
+        html += `<p class="reply-button touch" data-it="${data.parent_id}" data-id="${data['comment_id']}" data-username="${data.username}">
+                        <i class="fas fa-reply"></i>  პასუხი
+                </p>
+                </div>`;
     }
-    html += `<input type="hidden" name="csrfmiddlewaretoken" value="${getCookie('csrftoken')}">
-            <p> <textarea name="body" cols="40" rows="10" placeholder="კომენტარი" id="id_body"></textarea></p>
+
+    html += `</div></div></div>`;
+
+    return html
+}
+
+
+function makeDeletedCommentBoxHTML(data) {
+    let html = '';
+    html += `<div class="comment">
+                    <a class="comment-user-img" href="/profile/${data['user_id']}/">
+                        <img src=${'/media/' + data.avatar} alt="avatar">
+                    </a>
+                    <div class="comment-body">
+                        <div class="comment-info">
+                            <a class='comment-user' href="/profile/${data['user_id']}/">${data.username}</a>
+                            <p class='comment-time'>${convertTimeGeo(data.time)}</p>
+                        </div>
+                            <p class="deleted-comment">ეს კომენტარი წაშლილია</p>
+                    </div>`;
+    if (typeof data['active_childs_count'] !== "undefined" && data['active_childs_count'] > 0) {
+        html += `<div class="comment-replies-check closed" data-id="${data['comment_id']}">
+                    პასუხების ჩვენება (${data['childs_count']})
+                </div>
+                <div class="comment-replies-box"></div>`;
+    }
+    html += `</div>`;
+    return html
+}
+
+function makeCommentTextAreaHTML(parent_id, replying_to_id = NaN) {
+    let html = '';
+    if (isNaN(replying_to_id)) {
+        html += `<form class=\'comment-form\' style=\'padding: 15px 0\' data-id=\"${parent_id}\">`;
+    } else {
+        html += `<form class=\'comment-form\' style=\'padding: 15px 0\' data-id=\'${parent_id}\' data-it=\"${replying_to_id}\">`;
+    }
+    html += `<p> <textarea name="body" cols="40" rows="10" placeholder="კომენტარი" id="id_body"></textarea></p>
             <button class="spoiler-button">სპოილერი</button>
             <button type="submit">გაგზავნა</button>
             <button type="reset">გაუქმება</button>
@@ -156,61 +292,78 @@ function makeCommentTextAreaHTML(parent_id,replying_to_id=NaN){
     return html
 }
 
-function makeTextareaEdit(parent_id,spoiler){
+function makeEditTextarea(parent_id, spoiler) {
     let html = '';
     html += `<form class=\'comment-edit-form\' style=\'padding: 15px 0\' method=\'POST\' data-id=\"${parent_id}\">
-                <input type="hidden" name="csrfmiddlewaretoken" value="${getCookie('csrftoken')}">
                 <p><textarea name="body" cols="40" rows="10" placeholder="კომენტარი" id="id_body"></textarea></p>
-                <button class="spoiler-button" ${spoiler? 'disabled' : ''}>სპოილერი</button>
+                <button class="spoiler-button" ${spoiler ? 'disabled' : ''}>სპოილერი</button>
                 <button type="submit">შეცვლა</button>
                 <button type="reset">გაუქმება</button>
-                </form>`;
+            </form>`;
     return html
 }
 
-function getChildComments(that,parent_id, replying = false, more = 0){
-    var commentClosed = that.text().replace('დამალვა','ჩვენება');
-    var commentsOpened = that.text().replace('ჩვენება','დამალვა');
-    if(!that.hasClass('done') || more){
+function getChildComments(that, parent_id, replying = false) {
+    const commentClosed = that.text().replace('დამალვა', 'ჩვენება');
+    const commentsOpened = that.text().replace('ჩვენება', 'დამალვა');
+
+    if (!that.hasClass('done')) {
         that.html('მოიცადეთ...');
-        that.toggleClass('closed opened done');
+        that.toggleClass('closed opened');
+
         $.ajax({
-        method: "GET",
-        url: '/account/check_replies/'+parent_id,
-        data: {
-            'skip': 1,
-        },
-        success: function (data) {
-            that.html(commentsOpened);
-            data.time = convertTimeGeo(new Date().getTime()/1000);
-            let html = '';
+            method: "GET",
+            url: '/account/check_replies/' + parent_id,
+            data: {
+                'skip': 1,
+            },
+            success: function (e) {
+                let commentRepliesBox = that.next('.comment-replies-box');
+                let data = e['replies'];
 
-            for(let i=data.length-1;i>=0;i--)
-              html += makeCommentBoxHTML(data[i]);
+                that.addClass('done');
 
-            that.parent().find('.comment-replies-box').append(html);
-            if(replying)
-                that.parent().find('.comment-replies-box').show();
-            that.parent().find('.comment-replies-box').show(200);
-        },
-        error: function (data) {
-            console.log('error - pasuxebi am komentarze ar arsebobs',data);
-        },
-        complete:function () {
-            if(that.parent().find('.comment-form').length){
-                window.scroll({
-                    top: that.parent().find('.comment-form textarea').offset().top - screen.height/2 + 50,
-                    left: 0,
-                    behavior: 'smooth'
-                });
+                for (let i = data.length - 1; i >= 0; i--) {
+                    if (typeof data[i].deleted === "undefined") {
+                        commentRepliesBox.append(makeReplyCommentBoxHTML(data[i]));
+                        hideBigComment(commentRepliesBox.find('.comment:last'));
+                    } else
+                        commentRepliesBox.append(makeDeletedCommentBoxHTML(data[i]));
+                }
+
+                if (e['availablePages'] > 1) {
+                    that.addClass('more-replies');
+                    that.html(commentClosed);
+                    that.attr('data-repl',that.text().match(/\d+/g));
+                    that.attr('data-page',1);
+                    that.html(that.text().replace(/\d+/g,parseInt(that.text().match(/\d+/g))-6))
+                }else
+                    that.html(commentsOpened);
+
+                if (replying)
+                    that.parent().find('.comment-replies-box').show();
+                else
+                    that.parent().find('.comment-replies-box').hide().show(200);
+
+            },
+            error: function () {
+                console.log('error - pasuxebi am komentarze ar arsebobs');
+            },
+            complete: function () {
+                if (that.parent().find('.comment-form').length) {
+                    window.scroll({
+                        top: that.parent().find('.comment-form textarea').offset().top - screen.height / 2 + 50,
+                        left: 0,
+                        behavior: 'smooth'
+                    });
+                }
             }
-        }
-    }) // ajax end block
-    }else{
-        if(that.hasClass('opened')){
+        })
+    } else {
+        if (that.hasClass('opened')) {
             that.html(commentClosed);
             that.parent().find('.comment-replies-box').hide(200);
-        }else{
+        } else {
             that.html(commentsOpened);
             that.parent().find('.comment-replies-box').show(200);
         }
@@ -218,20 +371,39 @@ function getChildComments(that,parent_id, replying = false, more = 0){
     }
 }
 
-function convertTimeGeo(date) {
-    date = new Date(date*1000);
-    date = `${(date.getDate()<10?'0':'') + 
-    date.getDate()}/${((date.getMonth()+1)<10?'0':'') + 
-    (date.getMonth()+1)}/${date.getFullYear()} | ${(date.getHours()<10?'0':'') + 
-    date.getHours()}:${(date.getMinutes()<10?'0':'') + date.getMinutes()}`;
-    return date;
-}
-
-$('form').submit(function(){
-    $(':submit', this).attr('disabled',true);
+$('form').submit(function () {
+    $(':submit', this).attr('disabled', true);
 });
 
-$('.comment-form').submit(function(e){
+$('#mob-menu').click(function () {
+    $('nav').toggleClass('open');
+    $('.top-nav').toggleClass('open')
+});
+
+
+$('#login-focus').on('click', function () {
+    $('.login-form').toggleClass('show');
+});
+
+$('.read-more').on('click', function () {
+    let that = $(this);
+    that.next('.more-text').toggleClass('show');
+});
+
+$('.episode-select-button').on('click', function () {
+    let clickedButton = $(this);
+    let videoURL = clickedButton.data('url');
+    let itemPlayer = $('.item-player');
+
+    activateClassButton(clickedButton);
+    $('.item-player iframe').attr('src', videoURL);
+    if (itemPlayer.hasClass('hidden')) {
+        itemPlayer.removeClass('hidden');
+    }
+    setCookie(itemSlug.substring(7, itemSlug.length - 1), clickedButton.data('id'), 20);
+});
+
+$('.comment-form').submit(function (e) {
     e.preventDefault();
     let that = $(this);
     let submitButton = $(this).find('button[type="submit"]');
@@ -239,144 +411,115 @@ $('.comment-form').submit(function(e){
     let textArea = $(this).find('textarea').val();
 
     submitButton.attr('disabled', true);
-    if(!checkCommentContainsMoreSpoilers(textArea)) {
+
+    if (!checkCommentContainsMoreSpoilers(textArea)) {
         $.ajax({
             method: "POST",
-            url: window.location.origin + '/account/comment/',
+            url: '/account/comment/',
             data: $formDataSerialized + '&id=' + $('.item-page').data('id'),
             success: function (data) {
                 data.body = $(".comment-form textarea").val();
-                data.time = new Date().getTime() / 1000;
-                data.parent_id = data.comment_id;
-                let html = makeCommentBoxHTML(data);
+                let commentBox = $(".comments-box");
 
-                $(".comments-box").prepend(html);
+                commentBox.prepend(makeCommentBoxHTML(data));
+                hideBigComment(commentBox.find(".comment:first"));
+
                 $(".comments-box > .comment:first").hide(10).show(100);
                 that.trigger('reset');
-                $('.spoiler-button').attr('disabled',false);
+                $('.spoiler-button').attr('disabled', false);
             },
             error: function (data) {
-                if(data.responseJSON.body.length && data.responseJSON.body[0].code === 'required')
+                if (data.responseJSON.body.length && data.responseJSON.body[0].code === 'required')
                     alert("კომენტარი ვერ იქნება ცარიელი.");
-                else if(data.status === 500)
+                else if (data.status === 500)
                     alert("მოხდა ტექნიკური შეცდომა, გთხოვთ მიწეროთ ადმინისტრაციას.");
             },
-            complete : function () {
+            complete: function () {
                 submitButton.attr('disabled', false);
             }
         })
-    }else
+    } else
         alert('გთხოვთ, გამოიყენოთ მხოლოდ 1 სპოილერი!')
 });
 
-function ifCommentContainsSpoiler(text) {
-    while(text.includes('[spoiler]')) {
-        text = spoilerAlertBBToHTML(text);
-    }
-    return text
-}
+$('.comments-box, .comment-form').on('click', '.reply-button', function () {
+    let button = $(this);
+    let is_replying_parent = true;
+    let parent_id = button.data('id');
+    let username = button.data('username');
+    let lastComment = button.parents('.comment:last');
+    let replying_to_id;
+    let formHTML;
 
-function checkCommentContainsMoreSpoilers(text) {
-    return text.indexOf('[spoiler]') !== text.lastIndexOf('[spoiler]');
-}
 
-function spoilerAlertBBToHTML($str) {
-    let $format_search;
-    let $format_replace;
-
-    $format_search = /\[spoiler\](.*?)\[\/spoiler\]/ig;
-    $format_replace = '<span class="spoiler">$1</span><button id="reveal-spoiler">სპოილერი</button>';
-
-    return $str.replace($format_search, $format_replace);
-}
-
-function spoilerALertHTMLToBB(text) {
-    while(text.includes('<span')) {
-        text = text.replace(/<span (.*?)>(.*?)<\/span>/gi, "[spoiler]$2[/spoiler]");
-        text = text.replace(/<button (.*?)>(.*?)<\/button>/gi,'');
-    }
-    return text
-}
-
-$('.comments-box, .comment-form').on('click','.reply-button',function () {
-    var button = $(this);
-    var is_replying_parent = true;
-    var parent_id = button.data('id');
-    var replying_to_id;
-    var formHTML;
-    var username = button.data('username');
-    var lastComment = button.parents('.comment:last');
-
-    if (typeof button.data('it') !== 'undefined') {
+    if (typeof button.data('it') !== "undefined") {
         is_replying_parent = false;
     }
 
-    if(is_replying_parent){
+    if (is_replying_parent) {
         formHTML = makeCommentTextAreaHTML(parent_id);
-    }else{
+    } else {
         parent_id = button.data('it');
         replying_to_id = button.data('id');
-        formHTML = makeCommentTextAreaHTML(replying_to_id,parent_id);
+        formHTML = makeCommentTextAreaHTML(parent_id, replying_to_id);
     }
 
-    if(lastComment.find('.comment-form').length===0) {
+    button.parent().find('#edit-comment').hide();
+
+    if (lastComment.find('.comment-form').length === 0) {
         lastComment.append(formHTML);
-    }else{
+    } else {
         lastComment.find('.comment-form').replaceWith(formHTML);
     }
 
-    var commentForm = lastComment.find('.comment-form');
-    commentForm.find('textarea').val(username+', ').focus();
-    var checkRepliesButton = lastComment.find('.comment-replies-check');
-    if(checkRepliesButton.length === 1) {
-        if(checkRepliesButton.hasClass('closed'))
-            getChildComments(checkRepliesButton,parent_id,true);
+    let commentForm = lastComment.find('.comment-form');
+    commentForm.find('textarea').val(username + ', ').focus();
+    let checkRepliesButton = lastComment.find('.comment-replies-check');
+    if (checkRepliesButton.length === 1) {
+        if (checkRepliesButton.hasClass('closed'))
+            getChildComments(checkRepliesButton, parent_id, true);
     }
-}).on('click','.comment-replies-check',function () {
-    var that = $(this);
-    getChildComments(that,that.data('id'));
-}).on("click", ".comment .comment-form button[type=reset]", function(e) {
+}).on('click', '.comment-replies-check:not(.more-replies)', function () {
+    let that = $(this);
+    getChildComments(that, that.data('id'));
+}).on("click", ".comment .comment-form button[type=reset]", function (e) {
     e.preventDefault();
-    $(this).parent().remove();
-}).on("click", ".comment .comment-form button[type=submit]", function(event) {
-    event.preventDefault();
-    var that = $(this).parent();
-    var $formDataSerialized = that.serialize();
+    let parent = $(this).parent();
+    parent.prev().find('#edit-comment').show();
+    parent.remove();
+}).on("submit", ".comment .comment-form", function (e) {
+    e.preventDefault();
+    let that = $(this);
+    let $formDataSerialized = that.serialize();
 
-    if (typeof that.data('it') !== 'undefined') {
-        $formDataSerialized += `&parent_id=${that.data('it')}` + `&replying_to_id=${that.data('id')}`;
-    }else{
+    if (typeof that.data('it') !== "undefined") {
+        $formDataSerialized += `&parent_id=${that.data('id')}` + `&replying_to_id=${that.data('it')}`;
+    } else {
         $formDataSerialized += `&parent_id=${that.data('id')}`;
     }
 
     $.ajax({
         method: "POST",
-        url: '/account/comment/',
+        url: '/account/reply_comment/',
         data: $formDataSerialized,
         success: function (data) {
             data.body = that.find('textarea').val();
-            data.time = new Date().getTime()/1000;
-            data.parent_id = that.data('id');
             let html = '';
-            if(that.parent().has('.comment-replies-box').length){
-                html = makeCommentBoxHTML(data);
+            if (that.parent().has('.comment-replies-box').length) {
+                html = makeReplyCommentBoxHTML(data);
                 that.parent().children('.comment-replies-box').append(html)
-            }else {
+            } else {
                 that.parent().find('#edit-comment').remove();
-                html+= `<div class="comment-replies-check closed" data-id="${that.data('id')}">
-<!--                            <i class="fas fa-caret-down" aria-hidden="true"></i>-->
-                            პასუხების ჩვენება (0)
-                            </div>
-                            <div class="comment-replies-box">`;
-               html += '</div>';
-               that.parent().append(html);
+                html += `<div class="comment-replies-check closed" data-id="${that.data('id')}">
+                            პასუხების ჩვენება
+                         </div>
+                         <div class="comment-replies-box"></div>`;
+                that.parent().append(html);
             }
-            var replies_box = that.parent().find('.comment-replies-check');
+            let replies_box = that.parent().find('.comment-replies-check');
 
-            replies_box.text(replies_box.text().replace(/\d+/g,parseInt(replies_box.text().match(/\d+/g))+1));
-
-            if(replies_box.hasClass('closed'))
-                getChildComments(replies_box,that.data('id'));
+            if (that.parent().find('.comment-replies-check').hasClass('closed'))
+                getChildComments(replies_box, that.data('id'));
 
             that.remove();
         },
@@ -384,69 +527,50 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
             that.remove();
         },
     })
-}).on('click','.comment #remove-comment',function () {
-    if(confirm('დარწმუნებული ხართ, რომ კომენტარის წაშლა გინდათ? ამ ქმედების შემდეგ კომენტარს ვეღარ აღადგენთ.')) {
-        var that = $(this);
-        var id = that.parent().find('.reply-button').data('id');
+}).on('click', '.comment #remove-comment', function () {
+    if (confirm('დარწმუნებული ხართ, რომ კომენტარის წაშლა გინდათ? ამ ქმედების შემდეგ კომენტარს ვეღარ აღადგენთ.')) {
+        let that = $(this);
+        let parent = that.closest('.comment');
+
         $.ajax({
-            method: "POST",
-            url: '/account/comment/delete/',
-            data: {id: id},
+            method: "DELETE",
+            url: '/account/comment/delete/' + parent.find('.reply-button').data('id'),
             success: function (data) {
-                if (that.parents('.comment').attr('class') === 'comment clearfix') {
-                    that.parents('.comment').fadeOut(300, function () {
-                        $(this).remove();
-                    })
-                } else {
-                    var comment_box =  that.closest('.comment');
-                    data.username = that.parent().find('.comment-user').text();
-                    data.deleted = true;
-                    data.time = new Date().getTime() / 1000;
-                    data.avatar = comment_box.find('img').attr('src').match(/[\w-]+\.jpg/g);
-                    if(!(data.avatar == 'no-avatar.jpg')) {
-                        data.avatar = 'avatars/' + data.avatar;
-                    }
-                    comment_box.hide(100, function () {
-                        $(this).html(makeCommentBoxHTML(data)).show(200);
-                    })
-                }
+                parent.fadeOut(200, function () {
+                    parent.replaceWith(makeDeletedCommentBoxHTML(data));
+                });
             },
-            error: function (data) {
+            error: function () {
                 alert("მოხდა შეცდომა, თავიდან სცადეთ!");
             },
         })
     }
-}).on('click','.comment #edit-comment',function () {
+}).on('click', '.comment #edit-comment', function () {
     let that = $(this);
-    let id = that.parent().find('.reply-button').data('id');
     let commentBox = that.closest('.comment');
-    let hasSpoiler = that.parent().next().find('span').length > 0;
+    let id = commentBox.find('.reply-button').data('id');
     let commentText = commentBox.find('.comment-text');
+    let hasSpoiler = commentText.find('.spoiler').length > 0;
+    let textareaValue = spoilerALertHTMLToBB(commentText.html());
 
-    that.hide();
-    commentBox.find('.reply-button:first').hide();
-    commentBox.find('#like-comment:first').hide();
-    commentBox.find('#remove-comment:first').hide();
-    commentBox.find('#dislike-comment:first').hide();
-    var textareaValue = spoilerALertHTMLToBB(commentText.text());
+    that.toggleClass('hidden');
+    commentBox.find('.reply-button,#like-comment,#remove-comment,#dislike-comment,.comment-text').toggleClass('hidden');
 
-    commentText.hide();
-    commentBox.append(makeTextareaEdit(id,hasSpoiler));
+    commentBox.append(makeEditTextarea(id, hasSpoiler));
     commentBox.find('.comment-edit-form textarea').focus().val(textareaValue);
-}).on('click','.comment .comment-edit-form button[type=reset]',function (e) {
+}).on('click', '.comment .comment-edit-form button[type=reset]', function (e) {
     e.preventDefault();
-    var parent = $(this).parent();
-    parent.parent().find('*').show();
+    let parent = $(this).parent();
+    parent.parent().find('.reply-button,#like-comment,#edit-comment,#remove-comment,#dislike-comment,.comment-text').toggleClass('hidden');
     $(parent).prev().find('#reveal-spoiler').hide();
     parent.remove();
-}).on('click','.comment .comment-edit-form button[type=submit]',function (e) {
+}).on('click', '.comment .comment-edit-form button[type=submit]', function (e) {
     e.preventDefault();
     let parent = $(this).parent();
     let finText = parent.find('textarea').val();
 
-    if(spoilerALertHTMLToBB(parent.prev().find('p')[2].innerHTML) !== finText){
+    if (spoilerALertHTMLToBB(parent.prev().find('.comment-text')[0].innerHTML) !== finText) {
         let $formSerialized = parent.serialize();
-
         $.ajax({
             method: "POST",
             url: '/account/comment/edit/',
@@ -454,42 +578,45 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
             success: function (data) {
                 parent.parent().find('.comment-text').text(finText);
                 parent.parent().find('.comment-time').text(convertTimeGeo(data.time));
-                parent.parent().find('*').show();
+                parent.parent().find('.reply-button,#like-comment,#edit-comment,#remove-comment,#dislike-comment,.comment-text').toggleClass('hidden');
                 parent.remove();
             },
             error: function () {
-                parent.parent().find('*').show();
+                parent.parent().find('.reply-button,#like-comment,#edit-comment,#remove-comment,#dislike-comment,.comment-text').toggleClass('hidden');
                 parent.remove();
             },
         })
-    }else{
+    } else {
         alert('შეცვლა არ მოხდა, რადგან ტექსტი არ შეცვლილა!')
     }
-}).on('click','#like-comment',function () {
+}).on('click', '#like-comment', function () {
     let that = $(this);
-    let parent = $(this).parent().parent();
+    let parent = $(this).parents('.comment-body');
+
 
     if (!parent.find('.comment-user').hasClass('mine')) {
         let id = parent.find('.reply-button').data('id');
+
         $.ajax({
             method: "POST",
             url: '/account/comment/like/',
-            data: {id: id},
+            data: {
+                id: id
+            },
             success: function (data) {
-                if (data.type===1) {
-                    that.hide(100, function() {
+                if (data.type === 1) {
+                    that.hide(100, function () {
                         $(this).html(`<i class="fas fa-thumbs-up" aria-hidden="true"></i>` + (parseInt(that.text()) + 1)).show(200);
                     })
-                }
-                else if(data.type === 0)
-                    that.hide(100, function() {
+                } else if (data.type === 0)
+                    that.hide(100, function () {
                         $(this).html(`<i class="far fa-thumbs-up" aria-hidden="true"></i>` + (parseInt(that.text()) - 1)).show(200);
                     });
-                else if(data.type === 2){
+                else if (data.type === 2) {
                     parent.find('#dislike-comment').hide(100, function () {
                         $(this).html(`<i class="far fa-thumbs-down" aria-hidden="true"></i>` + (parseInt(that.parent().find('#dislike-comment').text()) - 1)).show(200);
                     });
-                    that.hide(100, function() {
+                    that.hide(100, function () {
                         $(this).html(`<i class="fas fa-thumbs-up" aria-hidden="true"></i>` + (parseInt(that.text()) + 1)).show(200);
                     })
                 }
@@ -498,42 +625,44 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
                 alert("ლაიქისთვის საჭიროა ავტორიზაცია!");
             },
         })
-    }else
-        alert('საკუთარი კომენტარის დალაიქება არ მოსულა!')
-}).on('click','#dislike-comment',function () {
+    } else
+        alert('საკუთარი კომენტარის მოწონება/არ მოწონება არ შეიძლება.')
+}).on('click', '#dislike-comment', function () {
     let that = $(this);
-    let parent = $(this).parent().parent();
+    let parent = $(this).parents('.comment-body');
+
     if (!parent.find('.comment-user').hasClass('mine')) {
+
         let id = parent.find('.reply-button').data('id');
         $.ajax({
             method: "POST",
             url: '/account/comment/dislike/',
             data: {id: id},
             success: function (data) {
-                if (data.type===1)
+                if (data.type === 1)
                     that.hide(100, function () {
                         $(this).html(`<i class="fas fa-thumbs-down" aria-hidden="true"></i>` + (parseInt(that.text()) + 1)).show(200);
                     });
-                else if(data.type===0)
+                else if (data.type === 0)
                     that.hide(100, function () {
                         $(this).html(`<i class="far fa-thumbs-down" aria-hidden="true"></i>` + (parseInt(that.text()) - 1)).show(200);
                     });
-                else if(data.type === 2){
+                else if (data.type === 2) {
                     parent.find('#like-comment').hide(100, function () {
                         $(this).html(`<i class="far fa-thumbs-up" aria-hidden="true"></i>` + (parseInt(that.parent().find('#like-comment').text()) - 1)).show(200);
                     });
-                    that.hide(100, function() {
+                    that.hide(100, function () {
                         $(this).html(`<i class="fas fa-thumbs-down" aria-hidden="true"></i>` + (parseInt(that.text()) + 1)).show(200);
                     })
                 }
             },
-            error: function (data) {
+            error: function () {
                 alert("დისლაიქისთვის საჭიროა ავტორიზაცია!");
             },
         })
-    }else
-        alert('რა იყო პიროვნების გაორება გაქვს?')
-}).on('click','.spoiler-button',function (e) {
+    } else
+        alert('საკუთარი კომენტარის მოწონება/არ მოწონება არ შეიძლება.')
+}).on('click', '.spoiler-button', function (e) {
     e.preventDefault();
     let tx = $(this).parent().find('textarea')[0];
     let start = tx.selectionStart;
@@ -541,32 +670,77 @@ $('.comments-box, .comment-form').on('click','.reply-button',function () {
     let sel = tx.value.substring(start, end);
     tx.value = tx.value.substring(0, start) + '[spoiler]' + sel + '[/spoiler]' + tx.value.substring(end);
     tx.focus();
-    tx.selectionEnd= end + 9;
-    $(this).attr('disabled',true);
-}).on('click','#reveal-spoiler',function (e) {
+    tx.selectionEnd = end + 9;
+    $(this).attr('disabled', true);
+}).on('click', '#reveal-spoiler', function (e) {
     e.stopPropagation();
     $(this).prev().fadeIn();
     $(this).hide();
-}).on('click','.spoiler',function (e) {
+}).on('click', '.spoiler', function (e) {
     e.stopPropagation();
     $(this).next().fadeIn();
     $(this).hide();
-}).on('keyup','textarea',function (e) {
-    if(!$(this).val().length)
+}).on('keyup', 'textarea', function () {
+    if (!$(this).val().length)
         $(this).parent().next().removeAttr('disabled');
+}).on('click', '.read-more', function (e) {
+    e.stopPropagation();
+    let that = $(this);
+    that.prev().toggleClass('hide-this');
+    that.text(function (i, text) {
+        return text === "სრულად" ? "დამალვა" : "სრულად";
+    });
+}).on('click', '.more-replies', function (e) {
+    let that = $(this);
+    let currentPage = parseInt(that.attr('data-page'));
+
+    $.ajax({
+        method: "GET",
+        url: '/account/check_replies/' + that.attr('data-id'),
+        data: {
+            'skip': currentPage + 1,
+        },
+        success: function (e) {
+            let commentRepliesBox = that.next('.comment-replies-box');
+            let data = e['replies'];
+
+            for (let i = 0; i < data.length; i++) {
+                if (typeof data[i].deleted === "undefined") {
+                    commentRepliesBox.prepend(makeReplyCommentBoxHTML(data[i]));
+                    hideBigComment(commentRepliesBox.find('.comment:first'));
+                } else
+                    commentRepliesBox.prepend(makeDeletedCommentBoxHTML(data[i]));
+            }
+
+            if (e['availablePages'] > currentPage + 1) {
+                that.attr('data-page', currentPage + 1);
+                that.html(that.text().replace(/\d+/g,parseInt(that.text().match(/\d+/g))-6))
+            } else {
+                that.removeClass('more-replies');
+                that.html(that.text().replace('ჩვენება', 'დამალვა'));
+                that.html(that.text().replace(/\d+/g,that.data('repl')))
+            }
+
+            commentRepliesBox.hide().fadeIn(50);
+
+        },
+        error: function () {
+            console.log('error - meti pasuxi am komentarze ar arsebobs');
+        },
+    })
 });
 
-$('.showmore').on('click',function () {
+$('.showmore').on('click', function () {
     let that = $(this);
     let current_page = parseInt(that.attr('data-page'));
-    let hasParentQueryString = urlForQueryParams.searchParams.has("parent");
+    let hasParentQueryString = urlForQueryParams.has("parent");
     let dataJson = {
-        'skip': current_page+1,
-        'id':$('.item-page').data('id'),
+        'skip': current_page + 1,
+        'id': $('.item-page').data('id'),
     };
 
-    if(hasParentQueryString){
-        dataJson.parent = urlForQueryParams.searchParams.get("parent");
+    if (hasParentQueryString) {
+        dataJson.parent = urlForQueryParams.get("parent");
     }
 
     $.ajax({
@@ -575,58 +749,39 @@ $('.showmore').on('click',function () {
         data: dataJson,
         success: function (data) {
             let html = '';
+            let commentBox = $(".comments-box");
 
-            for(let i=0;i<data.length;i++)
-              html += makeCommentBoxHTML(data[i]);
+            for (let i = 0; i < data.length; i++) {
+                if (typeof data[i].deleted === "undefined") // not deleted
+                    html += makeCommentBoxHTML(data[i]);
+                else
+                    html += makeDeletedCommentBoxHTML(data[i]);
+            }
 
-            that.attr('data-page',current_page+1);
-            $('.comments-box').append(html);
+            commentBox.append(html);
+            commentBox.find(`.comment:nth-child(n+${6 * current_page + 1})`).each(function (i, com) {
+                hideBigComment($(com))
+            });
 
-            if((current_page + 1).toString() === that.attr('data-max'))
+            that.attr('data-page', current_page + 1);
+            if ((current_page + 1).toString() === that.attr('data-max'))
                 that.remove();
         },
         error: function () {
             that.text('მეტი აღარ არის!');
-            that.attr('class','nomore');
+            that.attr('class', 'nomore');
             that.unbind('click');
         },
     })
 });
 
-
-function getYearsSelectOptionsHTML(startYear,EndYear) {
-    let html = '';
-    for(let i=EndYear;i>=startYear;i--){
-       html += '<option value="' + i + '">' + i + '</option>';
-    }
-    return html
-}
-
-function getMonthsSelectOptionsHTML() {
-    const monthNames = [ "იანვარი", "თებერვალი", "მარტი", "აპრილი", "მაისი", "ივნისი",
-                        "ივლისი", "აგვისტო", "სექტემბერი", "ოქტომბერი", "ნოემბერი", "დეკემბერი"];
-    let html = "";
-    for (let i = 1; i <= monthNames.length; i++) {
-        html += '<option value="' + i + '">' + monthNames[i-1] + '</option>';
-    }
-    return html
-}
-
-function getDaysSelectOptionsHTML(days) {
-    let html = '';
-    for(let i=1;i<=days;i++){
-       html += '<option value="' + i + '">' + i + '</option>';
-    }
-    return html
-}
-
-$('.profile-edit button[type=submit]').on('click',function (e) {
+$('.profile-edit button[type=submit]').on('click', function (e) {
     e.preventDefault();
     let selectedDay = parseInt($("select[name='birth-day'] option:selected").val());
     let selectedMon = parseInt($("select[name='birth-month'] option:selected").val());
     let selectedYea = parseInt($("select[name='birth-year'] option:selected").val());
-    if(selectedDay!==0 && selectedMon !== 0 && selectedYea !== 0)
-        $('input[name=birth]').val(selectedYea+'-'+selectedMon+'-'+selectedDay);
+    if (selectedDay !== 0 && selectedMon !== 0 && selectedYea !== 0)
+        $('input[name=birth]').val(selectedYea + '-' + selectedMon + '-' + selectedDay);
     else
         $('input[name=birth]').val(null);
 
@@ -634,38 +789,55 @@ $('.profile-edit button[type=submit]').on('click',function (e) {
 });
 
 
-$('.profile-details-input').on('click','#change-username-button',function (e) {
+$('.profile-details-input').on('click', '#change-username-button', function (e) {
     e.preventDefault();
     let that = $(this);
-    let parent = that.parent();
-    let inputEl = parent.find('input');
+    let inputEl = that.parent().find('input');
     let username = inputEl.val();
-    that.css('background-color','#333');
-    inputEl.attr('readonly',null);
-    inputEl.css('background-color','#FFF');
+    that.css('background-color', '#333');
+    inputEl.attr('readonly', null);
+    inputEl.css('background-color', '#FFF');
     inputEl.focus().val('').val(username);
     that.text('დადასტურება');
-    parent.append(`<button type="reset" class="cancel">გაუქმება</button>`);
-    that.attr('id','submit-username-button');
-}).on('click','.cancel',function (e) {
+    that.before(`<button type="reset" class="cancel">გაუქმება</button>`);
+    that.attr('id', 'submit-username-button');
+}).on('click', '.cancel', function (e) {
     e.preventDefault();
     let that = $(this);
     let parent = that.parent();
     let inputEl = parent.find('input');
     let submitButton = parent.find('#submit-username-button');
-    inputEl.attr('readonly','');
-    inputEl.css('background-color','#aaaa');
-    inputEl.val($('a[href="/account/profile/"]').text());
+    inputEl.attr('readonly', '');
+    inputEl.css('background-color', '#aaaa');
+    inputEl.val($('#profile-username').text());
     submitButton.text('შეცვლა');
-    submitButton.attr('id','change-username-button');
+    submitButton.attr('id', 'change-username-button');
     that.remove();
-}).on('click','#change-email-button',function (e) {
+}).on('click', '#change-email-button', function (e) {
     e.preventDefault();
     $.ajax({
         method: "GET",
         url: '/account/email_change/',
         success: function () {
             alert('მოთხოვნა გაიგზავნა თქვენს Email-ზე,გთხოვთ გადაამოწმოთ! შეამოწმეთ Spam ფაილიც!')
+        },
+        error: function () {
+            alert('მოხდა შეცდომა! თავიდან სცადეთ!');
+        }
+    });
+});
+
+$('.remove-notif').click(function (e) {
+    let that = $(this);
+
+    e.preventDefault();
+    $.ajax({
+        method: "DELETE",
+        url: '/account/notifications/delete/' + that.data('id'),
+        success: function () {
+            let notifCount = $('.notif-count');
+            notifCount.text(notifCount.text() - 1);
+            that.parents('li').hide(200).remove();
         },
         error: function () {
             alert('მოხდა შეცდომა! თავიდან სცადეთ!');

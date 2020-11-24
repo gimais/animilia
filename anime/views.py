@@ -1,46 +1,64 @@
 from django.core.paginator import Paginator
+from django.db.models import Q
 from django.db.models.expressions import RawSQL
 from django.http import JsonResponse
-from django.shortcuts import render
 from django.shortcuts import get_object_or_404
+from django.shortcuts import render
 
-from account.models import Comment
-from anime.models import Anime
 from account.forms import CommentForm
+from account.models import Comment, Notification
+from anime.models import Anime
+
+ERROR = {'error': 'moxda shecdoma!'}
 
 
-ERROR = {'error':'moxda shecdoma!'}
+def index_view(request):
+    animes_list = Anime.objects.values('name', 'slug', 'age', 'rating', 'views', 'poster', 'soon').all().order_by(
+        '-updated')
+    return render(request, 'home.html', {'animes_list': animes_list})
 
-def indexView(request):
-    animes_list = Anime.objects.values('name','slug','age','rating','views','poster').all().order_by('-updated')
-    return render(request,'home.html',{'animes_list':animes_list})
 
-def page_view(request,slug):
+def page_view(request, slug):
     template_name = 'anime/page.html'
-    anime = get_object_or_404(Anime.objects,slug__iexact=slug)
+    anime = get_object_or_404(Anime.objects, slug__iexact=slug)
     anime.increase_view_count(request.COOKIES)
     context = {
-        'anime':anime,
+        'anime': anime,
         'comment_form': CommentForm
     }
 
-    if not len(request.GET):
-        comments = anime.comments.with_annotates(request.user).filter(active=True, parent__isnull=True)
-    else:
-        comments = show_parent_comment_and_delete_notification(request,anime,context)
+    if 'parent' in request.GET.keys():
+        comments = anime.comments.related_objects_annotates(request.user).filter(
+            Q(active=True) | Q(active_replies_count__gte=1),
+            parent__isnull=True).order_by(
+            RawSQL('CASE WHEN "account_comment"."id" = %s THEN 1 ELSE 2 END', (request.GET['parent'],)), '-id')
 
-    paginator = Paginator(comments,6)
+        if 'notif' in request.GET.keys():
+            try:
+                notification = request.user.notification_set.get(id=int(request.GET['notif']),visited=False)
+            except (Notification.DoesNotExist,ValueError):
+                notification = None
+
+            if notification is not None:
+                notification.visited = True
+                notification.save()
+    else:
+        comments = anime.comments.related_objects_annotates(request.user).filter(
+            Q(active=True) | Q(active_replies_count__gte=1),
+            parent__isnull=True)
+
+    paginator = Paginator(comments, 6)
     comments = paginator.get_page(1)
 
     context['comments'] = comments
     context['max_page'] = paginator.num_pages
+    return render(request, template_name, context)
 
-    return render(request,template_name,context)
 
 def more_comments(request):
     try:
-        anime_id = int(request.GET.get('id',False))
-        page = int(request.GET.get('skip',False))
+        anime_id = int(request.GET.get('id', False))
+        page = int(request.GET.get('skip', False))
     except ValueError:
         anime_id = None
         page = None
@@ -48,68 +66,29 @@ def more_comments(request):
     if page and anime_id:
         try:
             parent_id = int(request.GET.get('parent', False))
-        except:
+        except ValueError:
             parent_id = None
 
         if parent_id:
-            comments = Comment.objects.with_annotates(request.user). \
-            filter(active=True, parent__isnull=True). \
-            annotate(target_item=RawSQL('"account_comment"."id" = %s', (parent_id,))).\
-            order_by('-target_item','-id')
+            comments = Comment.objects.related_objects_annotates(request.user).filter(
+                Q(active=True) | Q(active_replies_count__gte=1), parent__isnull=True, anime=anime_id).order_by(
+                RawSQL('CASE WHEN "account_comment"."id" = %s THEN 1 ELSE 2 END', (request.GET['parent'],)), '-id')
         else:
-            comments = Comment.objects.filter(anime_id=anime_id, active=True, parent__isnull=True)
+            comments = Comment.objects.related_objects_annotates(request.user).filter(
+                Q(active=True) | Q(active_replies_count__gte=1),
+                parent__isnull=True, anime_id=anime_id)
 
         paginator = Paginator(comments, 6)
 
         if paginator.num_pages >= page:
             result = list()
             for comment in paginator.get_page(page).object_list:
-                result.append(comment.get_more_comment_info(request.user.pk))
+                if comment.active:
+                    result.append(comment.get_more_comment_info(request.user.pk))
+                else:
+                    result.append(comment.get_deleted_comment_info())
             return JsonResponse(result, status=200, safe=False)
         else:
             return JsonResponse(ERROR, status=404)
     else:
         return JsonResponse(ERROR, status=400)
-
-
-def show_parent_comment_and_delete_notification(request,anime,context):
-    try:
-        parent_comment = int(request.GET.get('parent', False))
-    except ValueError:
-        parent_comment = None
-
-    if parent_comment:  # return parent_comment as first row, delete notification
-        comments = anime.comments.with_annotates(request.user). \
-            filter(active=True, parent__isnull=True). \
-            annotate(target_item=RawSQL('"account_comment"."id" = %s', (parent_comment,))).\
-            order_by('-target_item','-id')
-
-        try:
-            notif_id = int(request.GET.get('notif', False))
-        except ValueError:
-            notif_id = None
-
-        if notif_id:
-            from account.models import Notification
-            try:
-                notif_obj = Notification.objects.get(id=notif_id)
-            except Notification.DoesNotExist:
-                notif_obj = None
-
-            if notif_obj is not None and notif_obj.user_id == request.user.id:
-                notif_obj.delete()
-
-                if str(comments.first()) != str(parent_comment):  # if comment is deleted
-                    try:
-                        deleted_parent_comment = Comment.objects.get(id=parent_comment).\
-                            get_deleted_comment_for_notification_redirect()
-                    except Comment.DoesNotExist:
-                        deleted_parent_comment = None
-
-                    if deleted_parent_comment:
-                        context['deletedcomment'] = deleted_parent_comment
-
-    else:
-        comments = anime.comments.with_annotates(request.user).filter(active=True, parent__isnull=True)
-
-    return comments

@@ -8,7 +8,11 @@
 {% block content %}
     <div class="container">
         <div class="item-page clearfix" data-id="{{ anime.id }}">
-                <img class="item-page-img" src="/media/{{ anime.poster }}?r=1"  alt="სურათი არ არის">
+        {% if anime.poster %}
+                <img class="item-page-img" src="/media/{{ anime.poster }}?r=1"  alt={{ anime.name }}>
+        {% else %}
+                <img class="item-page-img" src="/static/img/no-poster-available.jpg"  alt={{ anime.name }}>
+        {% endif %}
             <div class="item-page-info">
                 <div class="item-page-head clearfix">
                     <div class="item-page-left">
@@ -38,6 +42,8 @@
                             <dd>სერიალი</dd>
                         {% elif anime.type == 1 %}
                             <dd>ფილმი</dd>
+                        {% elif anime.type == 2 %}
+                            <dd>OVA</dd>
                         {% endif %}
                         <dt>სტატუსი:</dt>
                         {% if anime.finished %}
@@ -62,6 +68,9 @@
                         {% if anime.type == 0 %}
                         <dt>სერიების რაოდენობა:</dt>
                         <dd>{{ anime.dubbed }}/{{anime.episodes}}</dd>
+                        {% elif anime.type == 2 %}
+                        <dt>რაოდენობა:</dt>
+                        <dd>{{ anime.dubbed }}/{{anime.episodes}}</dd>
                         {% endif %}
                         <dt>გამხმოვანებელი:</dt>
                         <dd>
@@ -76,11 +85,10 @@
                 <p>{{anime.description}}</p>
             </div>
             <hr>
-    {% with anime.series.all as exists %}
-        {% if exists|length %}
-            {% if anime.type == 0 %}
+        {% if not anime.soon %}
+            {% if anime.type == 0 or anime.type == 2 %}
             <div class="item-page-episodes">
-                {% for episode in exists|dictsort:"row" %}
+                {% for episode in anime.series.all|dictsort:"row" %}
                 <div class="episode-select-button" data-id="{{episode.row}}" data-url="{{episode.url}}">{{ episode.row }}</div>
                 {% endfor %}
             </div>
@@ -89,16 +97,14 @@
             </div>
             {% else %}
             <div class="item-player">
-                {% with exists|first as episode %}
+                {% with anime.series.all|first as episode %}
                     <iframe src="{{ episode.url }}" frameborder="0" allowfullscreen="true"></iframe>
-                </video>
                 {% endwith %}
             </div>
             {% endif %}
         {% else %}
             <div class="soon-player"></div>
         {% endif %}
-        {% endwith %}
             <hr>
             {% include "anime/comments.html" %}
         </div>
@@ -107,59 +113,29 @@
 
 {% block script %}
     <script>
-        var urlForQueryParams = new URL(window.location.href);
+        const urlForQueryParams = new URLSearchParams(window.location.search);
         {# urlForQueryParams - checking if parent param exists in url to sroll (used for notification redirect)#}
-        if(urlForQueryParams.searchParams.has("parent")) {
-            var parentId = urlForQueryParams.searchParams.get("parent");
-            var commentBox = $('.reply-button[data-id=' + parentId + ']').parents('.comment');
-            var commentRepliesCheck = commentBox.find('.comment-replies-check');
+        if(urlForQueryParams.has("parent")) {
+            let parentId = urlForQueryParams.get("parent");
+            let commentBox = $('.comment-replies-check[data-id=' + parentId + ']');
 
             if(commentBox.length) {
                 $([document.documentElement, document.body]).animate({
                     scrollTop: commentBox.offset().top - 50
-                }, 500, function () {
-                    if(commentRepliesCheck.length)
-                        getChildComments(commentRepliesCheck, commentRepliesCheck.data('id'));
-                });
-                if(commentRepliesCheck.length)
-                    commentRepliesCheck.toggleClass('closed opened');
+                }, 800);
+                getChildComments(commentBox, commentBox.data('id'));
             }
-            {% if deletedcomment %}
-            else{
-                var deletedObj = {
-                    'deleted' : true,
-                    'comment_id': {{ deletedcomment.comment_id }},
-                    'user_id': {{ deletedcomment.user_id }},
-                    'username': "{{ deletedcomment.username }}",
-                    'avatar': "{{ deletedcomment.avatar }}",
-                    'time': {{ deletedcomment.time }},
-                    'childs_count':{{ deletedcomment.childs_count }},
-                };
-                var html = makeCommentBoxHTML(deletedObj);
-                $(".comments-box").prepend(makeCommentBoxHTML(deletedObj));
-
-                commentBox = $('.comment-replies-check[data-id=' + parentId + ']');
-                $([document.documentElement, document.body]).animate({
-                    scrollTop: commentBox.parents('.comment').offset().top - 50
-                }, 500, function () {
-                    getChildComments(commentBox, parentId);
-                });
-            }
-            {% endif %}
         }
 
-        Array.prototype.forEach.call(document.getElementsByClassName('comment'), child => {
-            var com = $(child).find('.comment-body').find('p');
-            if(com.length > 2){
-                com = com[2] // authorized
-            }else{
-                com = com[1] // nonauthorized
-            }
-            com.innerHTML = ifCommentContainsSpoiler(com.innerHTML.trim());
+        Array.prototype.forEach.call(document.getElementsByClassName('comment'),child => {
+            let com = $(child).find('.comment-text');
+            com.html(makeSpoilerComment(com.text().trim()));
+
+            hideBigComment($(child));
         });
 
     {% if anime.type == 0 %}
-        var pageCookie = getCookie(itemSlug.substring(7,itemSlug.length-1));
+        let pageCookie = getCookie(itemSlug.substring(7,itemSlug.length-1));
         if (pageCookie !== "") {
             $('.item-page-episodes').find(`.episode-select-button[data-id=${pageCookie}]`).addClass('active');
         }

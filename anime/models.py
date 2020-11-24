@@ -28,7 +28,8 @@ class Dubber(models.Model):
 class Anime(models.Model):
     TYPES = (
         (0,'სერიალი'),
-        (1,'კინო')
+        (1,'კინო'),
+        (2,'OVA')
     )
 
     name = models.CharField(max_length=100,unique=True,verbose_name='სახელი')
@@ -52,6 +53,7 @@ class Anime(models.Model):
     dubbed = models.PositiveSmallIntegerField(default=0,verbose_name='გახმოვანებული',editable=False)
     slug = models.SlugField(unique=True,verbose_name='ლინკი')
     finished = models.BooleanField(default=False,verbose_name="დამთავრებულია")
+    soon = models.BooleanField(default=False,verbose_name="მალე")
 
     class Meta:
         db_table = 'animes_list'
@@ -63,7 +65,7 @@ class Anime(models.Model):
             Anime.objects.filter(pk=self.pk).update(views=F('views') + 1)
 
     def save(self, *args, **kwargs):
-        if self.type==1:
+        if self.type == 1:
             self.episodes = 1
 
         super(Anime, self).save(*args, **kwargs)

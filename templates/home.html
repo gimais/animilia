@@ -7,14 +7,17 @@
             {% if animes_list %}
                 <div class="items-list">
                     {% for anime in animes_list %}
-
                         <div class="item">
                             <a href = "/anime/{{ anime.slug }}">
-                                <div style="position: relative">
+                                <div style="position: relative;overflow: hidden">
                                     <div class="home-item-image">
-                                        <img src={% if anime.poster %}"/media/{{ anime.poster }}?r=1" {% else %} {% static 'img/no-poster-available.jpg' %} {% endif %} alt="პოსტერი">
+                                        <img src={% if anime.poster %}"/media/{{ anime.poster }}?r=1" {% else %} {% static 'img/no-poster-available.jpg' %} {% endif %} alt="{{ anime.name }}">
                                     </div>
-                                    <div class='age' style="padding: {% if anime.age >= 10 %}10px {% endif %} 5px">{{ anime.age }}+</div>
+                                    {% if anime.soon %}
+                                        <img class='soon' src="{% static 'img/soon_poster.svg' %}" alt="{{ anime.name }}">
+                                    {% else %}
+                                        <div class='age' style="padding: {% if anime.age >= 10 %}10px {% endif %} 5px">{{ anime.age }}+</div>
+                                    {% endif %}
                                     <div class="info">
                                         <div class='name'>{{ anime.name }}</div>
                                         <div class='details'>
@@ -25,7 +28,6 @@
                                 </div>
                             </a>
                         </div>
-
                     {% endfor %}
                 </div>
             {% endif %}

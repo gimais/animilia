@@ -37,16 +37,6 @@ html, body {
     overflow: auto;
 }
 
-/*
- * Remove text-shadow in selection highlight:
- * https://twitter.com/miketaylr/status/12228805301
- *
- * Vendor-prefixed and regular ::selection selectors cannot be combined:
- * https://stackoverflow.com/a/16982510/7133471
- *
- * Customize the background color to match your design.
- */
-
 ::-moz-selection {
   background: #b3d4fc;
   text-shadow: none;
@@ -108,26 +98,18 @@ textarea {
    ========================================================================== */
 
 .browserupgrade {
-  margin: 0.2em 0;
-  background: #ccc;
-  color: #000;
-  padding: 0.2em 0;
+    margin: 0.2em 0;
+    background: #ccc;
+    color: #000;
+    padding: 0.2em 0;
 }
 
-/* ==========================================================================
-   Author's custom styles
-   ========================================================================== */
-
-/* ==========================================================================
-   Helper classes
-   ========================================================================== */
-
-/*
- * Hide visually and from screen readers
- */
-
 .hidden {
-  display: none !important;
+    display: none !important;
+}
+
+.show {
+    display: block !important;
 }
 
 /*
@@ -210,28 +192,12 @@ nav{
     background-color: #1c150f;
 }
 
-
 .top-background{
    background: url('/static/img/background.webp') bottom 74% center;
     height: 190px;
     position: relative;
     background-size: cover;
 }
-
-/*header{*/
-/*   background: url('/static/img/background.jpg') bottom 74% center;*/
-/*    height: 190px;*/
-/*    position: relative;*/
-/*    background-size: cover;*/
-/*}*/
-
-/*#mob-menu{*/
-/*    display: none;*/
-/*    padding: 24px 0;*/
-/*    color: #fff;*/
-/*    text-transform: uppercase;*/
-/*    text-align: center;*/
-/*}*/
 
 .top-logo{
     margin: 0 0 0 60px;
@@ -334,12 +300,7 @@ a.menu-icon.fas.fa-sign-out-alt {
     padding: 28px 28px 10px;
 }
 
-#mob-home{
-    display: none;
-}
-
-ul.top-nav li > a:hover:not(.active),ul.top-nav li a.active,.showmore:hover,
-.comment-edit-form button[type=reset],.comment-form button[type=reset],div#login-focus:hover{
+ul.top-nav li a.active, .comment-edit-form button[type=reset], .comment-form button[type=reset] {
     background-color: #973116;
 }
 
@@ -509,9 +470,6 @@ section{
     border-top-left-radius: 10px;
 }
 
-
-/*ITEMS*/
-
 /*HOME*/
 .anime-content{
     display: flex;
@@ -524,14 +482,14 @@ section{
     font-size: 18px;
 }
 
-.item{
-	cursor:pointer;
+.item {
+    cursor: pointer;
     position: relative;
     background-color: white;
     padding: 0 5px;
-	float:left;
-    width:33.33%;
-    margin-top: 15px;
+    /*float:left;*/
+    width: 33.33%;
+    margin: 5px 0;
 }
 
 .item img{
@@ -555,7 +513,7 @@ section{
     box-sizing: border-box;
 }
 
-.item:hover .age{
+.age {
     padding: 5px;
     position: absolute;
     background-color: #2e2828bf;
@@ -563,22 +521,27 @@ section{
     top: 7px;
     right: 5px;
     font-size: 22px;
-    border: 5px solid;
+    border: 3px solid;
     border-radius: 35%;
-    display: inline-block;
+    display: none;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
 
-/*color:#ff2e01; */
-
-.info{
-	display:none;
+.item:hover .age {
+    display: inline-block;
 }
 
-.age{
-	display:none;
+/*color:#ff2e01; */
+
+.soon {
+    position: absolute;
+    top: 5%;
+    right: -22%;
+    transform: rotate(43deg);
+    max-width: 73% !important;
+    z-index: 1;
 }
 
 .name{
@@ -609,11 +572,13 @@ section{
 }
 
 
-.items-list{
+.items-list {
     margin-bottom: 30px;
     padding: 10px;
     background-color: white;
     overflow: auto;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .item-info::-webkit-scrollbar {
@@ -728,7 +693,7 @@ div#login-focus {
     text-decoration: none;
 }
 
-.login-form{
+.login-form {
     text-align: center;
     width: 258px;
     background-color: rgba(41, 32, 24, 0.8);
@@ -737,7 +702,7 @@ div#login-focus {
     border: 2px solid #953116;
     display: none;
     position: absolute;
-    z-index: 1;
+    z-index: 2;
 }
 
 .login-form input{
@@ -812,6 +777,7 @@ form.login-form a{
 .item-page-left {
     display: inline-block;
     float: left;
+    width: calc(100% - 75px);
 }
 
 .profile-row{
@@ -835,11 +801,12 @@ form.login-form a{
 }
 
 
-.item-page-row dd,.profile-row dd{
+.item-page-row dd, .profile-row dd {
     line-height: 1.5em;
     font-size: 15px;
 }
-.item-page-row dd > li,.profile-row dd >li{
+
+.item-page-row dd > li, .profile-row dd > li, .upload-demo.ready .upload-result {
     display: inline-block;
 }
 
@@ -895,10 +862,6 @@ dd.not-finished{
     border-radius: 40%;
 }
 
-.episode-select-button:hover{
-    background: #973116;
-}
-
 .episode-select-button.active{
     background: #973116;
 }
@@ -948,8 +911,8 @@ dd.not-finished{
     margin-top: 65px;
 }
 
-.deleted-comment{
-    border: 1px solid black;
+.deleted-comment {
+    border: 1px solid #9a9595;
     text-align: center;
     color: #ff2e01;
     height: 29px;
@@ -993,11 +956,12 @@ button.spoiler-button:disabled {
     padding: 5px;
 }
 
-.spoiler{
+.spoiler {
     display: none;
     background: #f3f3f3;
     border-radius: 5px;
     padding: 2px;
+    line-height: normal;
 }
 
 #reveal-spoiler{
@@ -1005,10 +969,6 @@ button.spoiler-button:disabled {
     font-size: 12px;
     background: #e2e2e2e2;
     border-radius: 5px;
-}
-
-#reveal-spoiler:hover, .spoiler:hover{
-    cursor: pointer;
 }
 
 .comment-user-img {
@@ -1023,10 +983,11 @@ button.spoiler-button:disabled {
     height: 100%;
 }
 
-.comment-body{
+.comment-body {
     display: inline-block;
     vertical-align: middle;
     width: calc(100% - 105px);
+    position: relative;
     min-height: 100px;
     margin-left: 10px;
     padding: 5px 10px;
@@ -1035,25 +996,20 @@ button.spoiler-button:disabled {
     background-color: #FFF;
 }
 
-.comment-info > .comment-user{
-    color:#ff2e01;
-    font-size: 18px;
+.comment-info > .comment-user {
+    color: #ff2e01;
+    font-size: 16px;
     display: inline-block;
     text-decoration: none;
 }
 
-.comment-info > .comment-time{
-    color:black;
-    font-size: 12px
+.comment-info > .comment-time {
+    color: #555;
+    font-size: 12px;
 }
 
-.comment-info{
-    position: relative;
-}
-
-.comment-buttons:after{
-    content: "";
-    clear: both;
+.comment-actions {
+    margin-top: 16px;
 }
 
 .comment-buttons{
@@ -1061,13 +1017,20 @@ button.spoiler-button:disabled {
     padding: 2px;
 }
 
-.reply-button {
+.reply-button, .read-more {
     margin-left: 5px;
     cursor: pointer;
     display: inline-block;
-    border: 1px solid;
+    border: 1px solid #a09999;
     border-radius: 3px;
-    padding: 1px 6px;
+    padding: 1px 6px 2px;
+    line-height: 19px;
+    color: #555555;
+}
+
+.read-more {
+    background-color: #ffffff;
+    margin: 6px 0 0 0;
 }
 
 .comment-replies-box {
@@ -1076,7 +1039,7 @@ button.spoiler-button:disabled {
     padding: 0 10px;
 }
 
-.comment-replies-box > .comment{
+.comment-replies-box > .comment {
     border: none;
     border-bottom: 1px solid #e2e2e2;
 }
@@ -1088,7 +1051,7 @@ button.spoiler-button:disabled {
 }
 
 .comment-info > p {
-    line-height: 20px;
+    line-height: 18px;
 }
 
 .comment-replies-box > .comment:last-child {
@@ -1097,7 +1060,6 @@ button.spoiler-button:disabled {
 
 .comment-text{
     word-break: break-word;
-    white-space: pre;
 }
 
 .comment-replies-check,.password-change-container{
@@ -1119,37 +1081,36 @@ button.spoiler-button:disabled {
     width: 100%;
 }
 
-.comment-replies-check:hover,.password-change-container:hover{
-    color: #973116;
-}
-
 .comment-replies-check.closed:before,.password-change-container.closed:before {
     content: "\f0d7";
-    font-family: "Font Awesome 5 Pro";
+    font-family: "Font Awesome 5 Pro", serif;
     font-weight: 900;
 }
 
-.comment-replies-check.opened:before,.password-change-container.opened:before  {
+.comment-replies-check.opened:before,.password-change-container.opened:before {
     content: "\f0d8";
-    font-family: "Font Awesome 5 Pro";
+    font-family: "Font Awesome 5 Pro", serif;
     font-weight: 900;
 }
 
-i.fas.fa-caret-down:hover {
-    color: #973116;
+.comment-replies-check.opened.more-replies:before {
+    content: "\f0d7";
 }
 
-div.comment-right-buttons{
-    float: right;
-    margin-left: 5px;
+div.comment-right-buttons {
+    display: inline-block;
     font-size: 19px;
     cursor: pointer;
+    color: #333333;
 }
 
+.user-actions {
+    display: inline-block;
+    float: right;
+}
 
 .comment-dl-buttons {
     display: inline-block;
-    float: right;
 }
 
 .profile-page {
@@ -1237,11 +1198,12 @@ div.comment-right-buttons{
     margin: 0;
 }
 
-#profile-username{
+#profile-username {
     padding: 2px 8px;
     display: inline-block;
     font-size: 1.3rem;
     text-transform: uppercase;
+    word-break: break-word;
 }
 
 #profile-group{
@@ -1293,26 +1255,25 @@ div.comment-right-buttons{
     margin-bottom: 10px;
 }
 
-.profile-details-input #id_email,.profile-details-input #id_username,.profile-details-input #id_password{
+.profile-details-input #id_email,.profile-details-input #id_username,.profile-details-input #id_password {
     width: 100%;
     cursor: auto;
     background-color: #aaaaaa;
+    margin-top: 2px;
 }
 
-p.username-info{
-    left: 5px;
-    bottom: -25px;
-    position: absolute;
+p.username-info {
+    margin-top: 8px;
     color: red;
     text-align: center;
     font-size: 15px;
     font-weight: 800;
 }
 
-.change-button,.profile-details-input .cancel{
+.change-button,.profile-details-input .cancel {
     position: absolute;
     right: 1px;
-    bottom: 1px;
+    top: 19px;
     background-color: #333;
     padding: 10px;
     border-radius: 4px;
@@ -1334,13 +1295,12 @@ a.change-pass-button {
     text-decoration: none;
 }
 
-.profile-details-input .cancel{
-    right: 106px;
+.profile-details-input .cancel {
+    right: 115px;
     background-color: #973116;
 }
 
-
-.profile-details input{
+.profile-details input, .upload-demo.ready .upload-demo-wrap {
     display: block;
 }
 
@@ -1355,17 +1315,7 @@ a.change-pass-button {
 }
 
 /*================*/
-.upload-demo .upload-demo-wrap,
-.upload-demo .upload-result,
-.upload-demo.ready .upload-msg {
-    display: none;
-}
-.upload-demo.ready .upload-demo-wrap {
-    display: block;
-}
-.upload-demo.ready .upload-result {
-    display: inline-block;
-}
+
 .upload-demo-wrap {
     width: auto;
     height: auto;
@@ -1390,22 +1340,20 @@ a.change-pass-button {
     height: 240px;
 }
 
-/* The Modal (background) */
 #avatarCroppieModal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  padding-top: 100px; /* Location of the box */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    display: none;
+    position: fixed;
+    z-index: 1;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
-/* Modal Content */
 .modal-content {
   background-color: #fefefe;
   margin: auto;
@@ -1414,7 +1362,6 @@ a.change-pass-button {
   width: 60%;
 }
 
-/* The Close Button */
 .close {
   color: #aaaaaa;
   float: right;
@@ -1468,6 +1415,10 @@ a.change-pass-button {
     margin: 6px auto;
 }
 
+.notifications li.visited{
+    background-color: #7b7a7a;
+}
+
 .notif-info {
     margin-left: 15px;
 }
@@ -1477,15 +1428,42 @@ a.change-pass-button {
 }
 
 .notif-time {
-    margin-right: 15px;
+    margin-right: 10px;
     float: right;
 }
 
-/*================================*/
-
-.show{
-    display: block;
+.remove-notif {
+    font-size: 15px;
+    margin-right: 5px;
+    float: right;
+    cursor: pointer;
 }
+
+.hide-this {
+    max-height: 33px;
+    overflow: hidden;
+    position: relative;
+}
+
+.hide-this:after {
+    content: '';
+    display: block;
+    position: absolute;
+    height: 30px;
+    background: linear-gradient(to top, #ffffffb0, rgba(255, 255, 255, 0));
+    width: 100%;
+    bottom: 0;
+}
+
+
+/*hiddens*/
+#mob-home, .upload-demo .upload-demo-wrap,
+.upload-demo .upload-result,
+.upload-demo.ready .upload-msg, .info, .age, .reply-button:not(.touch) {
+    display: none;
+}
+
+/*Responsive*/
 
 @media (max-width: 1260px) {
 
@@ -1494,7 +1472,7 @@ a.change-pass-button {
         clear: both;
     }
 
-    .top-nav{
+    .top-nav {
         margin: 0 25px 0 0;
     }
 
@@ -1520,14 +1498,9 @@ a.change-pass-button {
     .items-list {
         margin: auto;
     }
-
 }
 
 @media (max-width: 900px) {
-
-    .top-nav li a {
-        padding: 16px 21px;
-    }
 
     .items-list {
         padding: 0;
@@ -1537,11 +1510,16 @@ a.change-pass-button {
         width: 95%;
     }
 
-    .top-logo{
+    .top-logo {
         margin: 0 0 0 30px;
     }
-}
 
+    .notif-time {
+        margin-left: 15px;
+        float: none;
+        display: block;
+    }
+}
 
 @media (max-width: 768px) {
     .top-background{
@@ -1556,7 +1534,7 @@ a.change-pass-button {
         height: 185px;
     }
 
-    #mob-home {
+    #mob-home, .age {
         display: block;
     }
 
@@ -1601,21 +1579,21 @@ a.change-pass-button {
         width: 100%;
     }
 
-    .login-form input{
-        width: 70%;
-        height: 20%;
-        margin: 5px auto;
-        padding: 10px;
+    .login-form input {
+        width: 77%;
+        height: 19%;
+        margin: 8px auto;
+        padding: 14px;
     }
 
     .top-nav li a{
         width: 100%;
-        font-size: 85%;
         padding: 16px 0;
     }
 
     form.login-form a {
         font-size: 16px;
+        padding: 8px 0;
     }
 
     .item-page-info {
@@ -1643,29 +1621,49 @@ a.change-pass-button {
         left: 51%;
     }
 
-    .notif-time {
-        margin-left: 15px;
-        float: none;
-        display: block;
-    }
-
     .notifications {
         padding: 10px 20px;
+    }
+
+    .remove-notif {
+        font-size: 20px;
+        margin-top: 4px;
+    }
+
+    #submit-username-button, .profile-details-input .cancel {
+        position: unset;
+        display: inline-block;
+        width: 49%;
+        margin: 7px 1px;
     }
 }
 
 @media screen and (max-width: 560px) {
 
-    .footer-logo{
+    .footer-logo {
         display: none;
     }
 
-   .form-container{
+    .form-container {
         width: 100%;
         padding: 20px 30px;
     }
 
-    .item-page{
+    .form-container.notifications {
+        padding: 20px;
+    }
+
+    .notif-info a {
+        display: block;
+        margin-left: 15px;
+    }
+
+    .remove-notif {
+        font-size: 25px;
+        margin: -22px 10px;
+    }
+
+    .item-page {
         padding: 5px;
     }
 
@@ -1679,9 +1677,9 @@ a.change-pass-button {
     }
 
     .profile-avatar-container, .profile-display, .profile-row dl,
-    .profile-row,.item, .profile-details-input, .item-page-img, .login-form{
+    .profile-row, .item, .profile-details-input, .item-page-img {
         float: none;
-        width:100%;
+        width: 100%;
     }
 
     .profile-display,.item-page-img,.item-page-info,.item img,.profile-page {
@@ -1701,28 +1699,107 @@ a.change-pass-button {
         margin: 0 auto;
     }
 
-    .profile-main.clearfix{
+    .profile-main.clearfix {
         padding: 10px 20px;
     }
 
-    .modal-content{
+    .modal-content {
         width: 90%;
+    }
+
+    .item-page-left {
+        display: block;
+        float: none;
+        width: 100%;
+    }
+
+    .item-page-right {
+        margin-top: 5px;
+        display: block;
+        float: none;
     }
 }
 
 
 @media screen and (max-width: 414px) {
+
+    .login-form {
+        width: 100%;
+        float: none;
+        height: 40vh;
+    }
+
     .signup-content {
         padding: 50px 25px;
     }
 
-    .item img{
+    .item img {
         width: 100%;
         height: auto;
     }
 
+    .remove-notif {
+        font-size: 20px;
+        margin-top: -8px;
+    }
+
     .top-nav li a span.notif-count {
         left: 51.6%;
+    }
+
+    .comment-user-img {
+        width: 60px;
+        height: 60px;
+    }
+
+    .comment-info > .comment-user {
+        font-size: 16px;
+        word-break: break-word;
+    }
+
+    .deleted-comment {
+        margin-top: 8px;
+    }
+
+    .comment-body {
+        width: calc(100% - 70px);
+        padding: 1px;
+        min-height: 70px;
+    }
+
+    .comment-replies-box {
+        margin-left: 14px;
+    }
+}
+
+@media screen and (min-width: 560px) {
+
+    .comment-info {
+        width: calc(100% - 100px);
+    }
+
+    .comment-body {
+        position: relative;
+    }
+
+    .comment-actions {
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin-top: 2px;
+    }
+
+    .reply-button.touch {
+        display: none;
+    }
+
+    .reply-button:not(.touch) {
+        display: inline-block;
+        margin-left: 2px;
+    }
+
+    .user-actions {
+        float: none;
     }
 }
 
@@ -1732,11 +1809,26 @@ a.change-pass-button {
         margin: 0;
     }
 
-    .top-background{
+    .top-background {
         height: 280px;
     }
 
     .logo {
         top: 265px;
+    }
+}
+
+@media (hover: hover) {
+    .showmore:hover, div#login-focus:hover, ul.top-nav li > a:hover:not(.active),
+    .episode-select-button:hover, i.fas.fa-caret-down:hover {
+        background-color: #973116;
+    }
+
+    .comment-replies-check:hover, .password-change-container:hover {
+        color: #973116;
+    }
+
+    #reveal-spoiler:hover, .spoiler:hover {
+        cursor: pointer;
     }
 }
