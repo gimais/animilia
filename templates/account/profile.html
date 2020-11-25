@@ -38,11 +38,11 @@ $('.profile-details-input').on('click','#submit-username-button',function (e) {
     let username = $('#profile-username');
     let new_username = that.parent().find('input[name=username]').val();
     if(username.text() === new_username)
-        $('.username-info').html('თქვენ ეს ნიკი ისედაც გაქვთ!');
+        $('.username-info').html('თქვენ ისედაც ეს ნიკი გაქვთ.');
     else if(new_username.length<3)
-        $('.username-info').html('ნიკი მინიმუმ 3 სიმბოლოსგან უნდა შედგებოდეს!');
+        $('.username-info').html('ნიკი მინიმუმ 3 სიმბოლოსგან უნდა შედგებოდეს.');
     else if(new_username.length>16)
-        $('.username-info').html('ნიკი მაქსიმუმ 16 სიმბოლოსგან უნდა შედგებოდეს!');
+        $('.username-info').html('ნიკი მაქსიმუმ 16 სიმბოლოსგან უნდა შედგებოდეს.');
     else{
         let now = new Date();
         if(!(now.getTime()/1000 >= $username_updated))

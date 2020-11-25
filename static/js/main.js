@@ -14,7 +14,11 @@ function escapeHTML(txt) {
 }
 
 function newLineToBr(txt) {
-    return txt.replace(/(?:\r\n|\r|\n)/g, '<br/>');
+    return txt.replace(/(?:\r\n|\r|\n)/g, '<br>');
+}
+
+function brTonewLine(text) {
+    return text.replace(/<br\s*[\/]?>/gi, "\n");
 }
 
 function activateClassButton(button) {
@@ -92,24 +96,29 @@ $.ajaxSetup({
 });
 
 function makeSpoilerComment(text) {
-    while (text.includes('[spoiler]'))
+    while (text.match(/\[spoiler\](.*?)\[\/spoiler\]/ig) !== null)
         text = spoilerAlertBBToHTML(text);
     return text
 }
 
-
-function checkCommentContainsMoreSpoilers(text) {
-    return text.indexOf('[spoiler]') !== text.lastIndexOf('[spoiler]')
+function validateComment(text) {
+    if (text.length < 6)
+        return 'კომენტარი მინიმუმ 6 სიმბოლოსგან უნდა შედგებოდეს';
+    else if (text.length > 4000)
+        return 'კომენტარი მაქსიმუმ 4000 სიმბოლოსგან უნდა შედგებოდეს';
+    else if (text.indexOf('[spoiler]') !== text.lastIndexOf('[spoiler]'))
+        return "გთხოვთ, გამოიყენოთ მხოლოდ 1 სპოილერი.";
+    else if (text.match(/\[spoiler\](.*?)\[\/spoiler\]/ig) !== null)
+        if (text.match(/\[spoiler\](.*?)\[\/spoiler\]/ig)[0].length < 21)
+            return "სპოილერი მინიმუმ 2 სიმბოლოსგან უნდა შედგებოდეს.";
+    return null;
 }
 
 function spoilerAlertBBToHTML($str) {
-    let $format_search;
-    let $format_replace;
+    let format_search = /\[spoiler](.*?)\[\/spoiler]/ig;
+    let format_replace = '<span class="spoiler">$1</span><button id="reveal-spoiler">სპოილერი</button>';
 
-    $format_search = /\[spoiler](.*?)\[\/spoiler]/ig;
-    $format_replace = '<span class="spoiler">$1</span><button id="reveal-spoiler">სპოილერი</button>';
-
-    return $str.replace($format_search, $format_replace);
+    return $str.replace(format_search, format_replace);
 }
 
 function spoilerALertHTMLToBB(text) {
@@ -117,17 +126,15 @@ function spoilerALertHTMLToBB(text) {
         text = text.replace(/<span (.*?)>(.*?)<\/span>/gi, "[spoiler]$2[/spoiler]");
         text = text.replace(/<button (.*?)>(.*?)<\/button>/gi, '');
     }
-    return text
+
+    return brTonewLine(text);
 }
 
-// function stripHTML(html){
-//     return html.replace(/<\/?[^>]+(>|$)/g, "");
-// }
 
-function hideBigComment(comment) {
+function readMoreComment(comment) {
     let text = comment.find('.comment-text');
 
-    if (text.length && (text.height() * 4) + (text.width() / 3) > 400) {
+    if (text.height() > 95) {
         text.addClass('hide-this');
         text.after('<button class="read-more">სრულად</button>')
     }
@@ -150,7 +157,7 @@ function makeCommentBoxHTML(data) {
     let html = '';
     html += `<div class="comment clearfix">
                     <a class="comment-user-img" href="/profile/${data['user_id']}/">
-                        <img src=${'/media/' + data.avatar} alt="avatar">
+                        <img src=${'/media/' + data.avatar} alt="avatar" loading="lazy">
                     </a>
                     <div class="comment-body">
                         <div class="comment-info">
@@ -208,7 +215,7 @@ function makeReplyCommentBoxHTML(data) {
     let html = '';
     html += `<div class="comment">
                     <a class="comment-user-img" href="/profile/${data['user_id']}/">
-                        <img src=${'/media/' + data.avatar} alt="avatar">
+                        <img src=${'/media/' + data.avatar} alt="avatar" loading="lazy">
                     </a>
                     <div class="comment-body">
                         <div class="comment-info">
@@ -258,7 +265,7 @@ function makeDeletedCommentBoxHTML(data) {
     let html = '';
     html += `<div class="comment">
                     <a class="comment-user-img" href="/profile/${data['user_id']}/">
-                        <img src=${'/media/' + data.avatar} alt="avatar">
+                        <img src=${'/media/' + data.avatar} alt="avatar" loading="lazy">
                     </a>
                     <div class="comment-body">
                         <div class="comment-info">
@@ -326,7 +333,7 @@ function getChildComments(that, parent_id, replying = false) {
                 for (let i = data.length - 1; i >= 0; i--) {
                     if (typeof data[i].deleted === "undefined") {
                         commentRepliesBox.append(makeReplyCommentBoxHTML(data[i]));
-                        hideBigComment(commentRepliesBox.find('.comment:last'));
+                        readMoreComment(commentRepliesBox.find('.comment:last'));
                     } else
                         commentRepliesBox.append(makeDeletedCommentBoxHTML(data[i]));
                 }
@@ -408,11 +415,11 @@ $('.comment-form').submit(function (e) {
     let that = $(this);
     let submitButton = $(this).find('button[type="submit"]');
     let $formDataSerialized = $(this).serialize();
-    let textArea = $(this).find('textarea').val();
+    let validation = validateComment($(this).find('textarea').val());
 
     submitButton.attr('disabled', true);
 
-    if (!checkCommentContainsMoreSpoilers(textArea)) {
+    if (validation === null) {
         $.ajax({
             method: "POST",
             url: '/account/comment/',
@@ -422,7 +429,7 @@ $('.comment-form').submit(function (e) {
                 let commentBox = $(".comments-box");
 
                 commentBox.prepend(makeCommentBoxHTML(data));
-                hideBigComment(commentBox.find(".comment:first"));
+                readMoreComment(commentBox.find(".comment:first"));
 
                 $(".comments-box > .comment:first").hide(10).show(100);
                 that.trigger('reset');
@@ -438,8 +445,10 @@ $('.comment-form').submit(function (e) {
                 submitButton.attr('disabled', false);
             }
         })
-    } else
-        alert('გთხოვთ, გამოიყენოთ მხოლოდ 1 სპოილერი!')
+    } else {
+        alert(validation);
+        submitButton.attr('disabled', false);
+    }
 });
 
 $('.comments-box, .comment-form').on('click', '.reply-button', function () {
@@ -491,42 +500,46 @@ $('.comments-box, .comment-form').on('click', '.reply-button', function () {
     e.preventDefault();
     let that = $(this);
     let $formDataSerialized = that.serialize();
+    let validation = validateComment($(this).find('textarea').val());
 
-    if (typeof that.data('it') !== "undefined") {
-        $formDataSerialized += `&parent_id=${that.data('id')}` + `&replying_to_id=${that.data('it')}`;
-    } else {
-        $formDataSerialized += `&parent_id=${that.data('id')}`;
-    }
+    if (validation === null) {
+        if (typeof that.data('it') !== "undefined") {
+            $formDataSerialized += `&parent_id=${that.data('id')}` + `&replying_to_id=${that.data('it')}`;
+        } else {
+            $formDataSerialized += `&parent_id=${that.data('id')}`;
+        }
 
-    $.ajax({
-        method: "POST",
-        url: '/account/reply_comment/',
-        data: $formDataSerialized,
-        success: function (data) {
-            data.body = that.find('textarea').val();
-            let html = '';
-            if (that.parent().has('.comment-replies-box').length) {
-                html = makeReplyCommentBoxHTML(data);
-                that.parent().children('.comment-replies-box').append(html)
-            } else {
-                that.parent().find('#edit-comment').remove();
-                html += `<div class="comment-replies-check closed" data-id="${that.data('id')}">
-                            პასუხების ჩვენება
-                         </div>
-                         <div class="comment-replies-box"></div>`;
-                that.parent().append(html);
-            }
-            let replies_box = that.parent().find('.comment-replies-check');
+        $.ajax({
+            method: "POST",
+            url: '/account/reply_comment/',
+            data: $formDataSerialized,
+            success: function (data) {
+                data.body = that.find('textarea').val();
+                let html = '';
+                if (that.parent().has('.comment-replies-box').length) {
+                    html = makeReplyCommentBoxHTML(data);
+                    that.parent().children('.comment-replies-box').append(html)
+                } else {
+                    that.parent().find('#edit-comment').remove();
+                    html += `<div class="comment-replies-check closed" data-id="${that.data('id')}">
+                                პასუხების ჩვენება
+                             </div>
+                             <div class="comment-replies-box"></div>`;
+                    that.parent().append(html);
+                }
+                let replies_box = that.parent().find('.comment-replies-check');
 
-            if (that.parent().find('.comment-replies-check').hasClass('closed'))
-                getChildComments(replies_box, that.data('id'));
+                if (that.parent().find('.comment-replies-check').hasClass('closed'))
+                    getChildComments(replies_box, that.data('id'));
 
-            that.remove();
-        },
-        error: function () {
-            that.remove();
-        },
-    })
+                that.remove();
+            },
+            error: function () {
+                that.remove();
+            },
+        })
+    } else
+        alert(validation)
 }).on('click', '.comment #remove-comment', function () {
     if (confirm('დარწმუნებული ხართ, რომ კომენტარის წაშლა გინდათ? ამ ქმედების შემდეგ კომენტარს ვეღარ აღადგენთ.')) {
         let that = $(this);
@@ -568,26 +581,30 @@ $('.comments-box, .comment-form').on('click', '.reply-button', function () {
     e.preventDefault();
     let parent = $(this).parent();
     let finText = parent.find('textarea').val();
+    let validation = validateComment(finText);
 
-    if (spoilerALertHTMLToBB(parent.prev().find('.comment-text')[0].innerHTML) !== finText) {
-        let $formSerialized = parent.serialize();
-        $.ajax({
-            method: "POST",
-            url: '/account/comment/edit/',
-            data: $formSerialized + '&id=' + parent.data('id'),
-            success: function (data) {
-                parent.parent().find('.comment-text').text(finText);
-                parent.parent().find('.comment-time').text(convertTimeGeo(data.time));
-                parent.parent().find('.reply-button,#like-comment,#edit-comment,#remove-comment,#dislike-comment,.comment-text').toggleClass('hidden');
-                parent.remove();
-            },
-            error: function () {
-                parent.parent().find('.reply-button,#like-comment,#edit-comment,#remove-comment,#dislike-comment,.comment-text').toggleClass('hidden');
-                parent.remove();
-            },
-        })
+    if (validation === null) {
+        if (spoilerALertHTMLToBB(parent.prev().find('.comment-text')[0].innerHTML) !== finText) {
+            let $formSerialized = parent.serialize();
+            $.ajax({
+                method: "POST",
+                url: '/account/comment/edit/',
+                data: $formSerialized + '&id=' + parent.data('id'),
+                success: function (data) {
+                    parent.parent().find('.comment-text').text(finText);
+                    parent.parent().find('.comment-time').text(convertTimeGeo(data.time));
+                    parent.parent().find('.reply-button,#like-comment,#edit-comment,#remove-comment,#dislike-comment,.comment-text').toggleClass('hidden');
+                    parent.remove();
+                },
+                error: function () {
+                    parent.parent().find('.reply-button,#like-comment,#edit-comment,#remove-comment,#dislike-comment,.comment-text').toggleClass('hidden');
+                    parent.remove();
+                },
+            })
+        } else
+            alert('შეცვლა არ მოხდა, რადგან ტექსტი არ შეცვლილა!')
     } else {
-        alert('შეცვლა არ მოხდა, რადგან ტექსტი არ შეცვლილა!')
+        alert(validation);
     }
 }).on('click', '#like-comment', function () {
     let that = $(this);
@@ -707,7 +724,7 @@ $('.comments-box, .comment-form').on('click', '.reply-button', function () {
             for (let i = 0; i < data.length; i++) {
                 if (typeof data[i].deleted === "undefined") {
                     commentRepliesBox.prepend(makeReplyCommentBoxHTML(data[i]));
-                    hideBigComment(commentRepliesBox.find('.comment:first'));
+                    readMoreComment(commentRepliesBox.find('.comment:first'));
                 } else
                     commentRepliesBox.prepend(makeDeletedCommentBoxHTML(data[i]));
             }
@@ -760,7 +777,7 @@ $('.showmore').on('click', function () {
 
             commentBox.append(html);
             commentBox.find(`.comment:nth-child(n+${6 * current_page + 1})`).each(function (i, com) {
-                hideBigComment($(com))
+                readMoreComment($(com))
             });
 
             that.attr('data-page', current_page + 1);

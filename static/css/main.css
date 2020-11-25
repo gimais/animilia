@@ -1260,19 +1260,19 @@ div.comment-right-buttons {
     cursor: auto;
     background-color: #aaaaaa;
     margin-top: 2px;
+    margin-left: 3px;
 }
 
 p.username-info {
     margin-top: 8px;
     color: red;
-    text-align: center;
     font-size: 15px;
     font-weight: 800;
 }
 
 .change-button,.profile-details-input .cancel {
     position: absolute;
-    right: 1px;
+    right: -2px;
     top: 19px;
     background-color: #333;
     padding: 10px;
@@ -1296,7 +1296,7 @@ a.change-pass-button {
 }
 
 .profile-details-input .cancel {
-    right: 115px;
+    right: 104px;
     background-color: #973116;
 }
 
@@ -1685,7 +1685,10 @@ a.change-pass-button {
     .profile-display,.item-page-img,.item-page-info,.item img,.profile-page {
         width: 100%;
         margin: 0;
-        padding: 2px;
+    }
+
+    p.username-info {
+        text-align: center;
     }
 
     a.change-pass-button,select.birthselector {

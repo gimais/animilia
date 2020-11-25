@@ -69,7 +69,7 @@
                         <dt>სერიების რაოდენობა:</dt>
                         <dd>{{ anime.dubbed }}/{{anime.episodes}}</dd>
                         {% elif anime.type == 2 %}
-                        <dt>რაოდენობა:</dt>
+                        <dt>სერიების რაოდენობა:</dt>
                         <dd>{{ anime.dubbed }}/{{anime.episodes}}</dd>
                         {% endif %}
                         <dt>გამხმოვანებელი:</dt>
@@ -129,9 +129,10 @@
 
         Array.prototype.forEach.call(document.getElementsByClassName('comment'),child => {
             let com = $(child).find('.comment-text');
-            com.html(makeSpoilerComment(com.text().trim()));
 
-            hideBigComment($(child));
+            com[0].innerHTML = makeSpoilerComment(com[0].innerHTML.trim());
+
+            readMoreComment($(child));
         });
 
     {% if anime.type == 0 %}

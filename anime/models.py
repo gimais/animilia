@@ -1,7 +1,9 @@
 from datetime import datetime
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import F
+
 
 class Category(models.Model):
     name = models.CharField(max_length=18,unique=True)
@@ -27,9 +29,11 @@ class Dubber(models.Model):
 
 class Anime(models.Model):
     TYPES = (
-        (0,'სერიალი'),
-        (1,'კინო'),
-        (2,'OVA')
+        (0, 'სერიალი'),
+        (1, 'კინო'),
+        (2, 'OVA'),
+        (3, 'ONA'),
+        (4, 'ანიმაციური ფილმი')
     )
 
     name = models.CharField(max_length=100,unique=True,verbose_name='სახელი')

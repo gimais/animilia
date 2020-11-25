@@ -21,12 +21,12 @@
 
         module.hide();
 
-        if ($(this).children("option:selected").val() === '1') {
+        if (['1','4'].indexOf(type.val()) > -1) {
             $(".field-episodes").hide();
         }
 
         type.change(function () {
-            if ($(this).children("option:selected").val() === '1') {
+            if (['1','4'].indexOf(type.val()) > -1) {
                 $(".field-episodes").hide();
                 toggleRowAddButton(false)
             } else {
