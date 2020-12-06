@@ -489,9 +489,11 @@ $('.comments-box, .comment-form').on('click', '.reply-button', function () {
     getChildComments(that, that.data('id'));
 }).on("click", ".comment .comment-form button[type=reset]", function (e) {
     e.preventDefault();
-    let parent = $(this).parent();
-    parent.prev().find('#edit-comment').show();
-    parent.remove();
+    if (confirm('ნამდვილად გსურთ გაუქმება?')) {
+        let parent = $(this).parent();
+        parent.prev().find('#edit-comment').show();
+        parent.remove();
+    }
 }).on("submit", ".comment .comment-form", function (e) {
     e.preventDefault();
     let that = $(this);
@@ -569,9 +571,11 @@ $('.comments-box, .comment-form').on('click', '.reply-button', function () {
     commentBox.find('.comment-edit-form textarea').focus().val(textareaValue.trim());
 }).on('click', '.comment .comment-edit-form button[type=reset]', function (e) {
     e.preventDefault();
-    let parent = $(this).parent();
-    parent.parent().find('.reply-button,#like-comment,#edit-comment,#remove-comment,#dislike-comment,.comment-text').toggleClass('hidden');
-    parent.remove();
+    if (confirm('ნამდვილად გსურთ გაუქმება?')) {
+        let parent = $(this).parent();
+        parent.parent().find('.reply-button,#like-comment,#edit-comment,#remove-comment,#dislike-comment,.comment-text').toggleClass('hidden');
+        parent.remove();
+    }
 }).on('click', '.comment .comment-edit-form button[type=submit]', function (e) {
     e.preventDefault();
     let parent = $(this).parent();
