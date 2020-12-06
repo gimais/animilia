@@ -31,9 +31,6 @@ body {
     color: #333;
     min-height: 100%;
     position: relative;
-}
-
-html, body {
     overflow: auto;
 }
 
@@ -261,7 +258,7 @@ nav{
 .top-nav li a {
     cursor: pointer;
     display: block;
-    color: white;
+    color: #ffffff;
     text-align: center;
     padding: 16px 28px;
     text-decoration: none;
@@ -406,7 +403,7 @@ section{
       outline: none;
   }
     .form-input:focus::-webkit-input-placeholder {
-      color: white; }
+      color: #ffffff; }
     .form-input:focus::-moz-placeholder {
       color: #222; }
     .form-input:focus:-ms-input-placeholder {
@@ -440,7 +437,7 @@ section{
 .flash-message{
     padding:5px;
     text-align: center;
-    color:white;
+    color:#ffffff;
 }
 
 /*profile tabs*/
@@ -476,7 +473,7 @@ section{
 }
 
 .info-page{
-    background-color: white;
+    background-color: #ffffff;
     padding: 20px;
     text-align: center;
     font-size: 18px;
@@ -485,7 +482,7 @@ section{
 .item {
     cursor: pointer;
     position: relative;
-    background-color: white;
+    background-color: #ffffff;
     padding: 0 5px;
     /*float:left;*/
     width: 33.33%;
@@ -502,7 +499,7 @@ section{
     padding: 10px 10px 0;
     position: absolute;
     background-color: rgba(15, 15, 15, 0.67);
-    color: white;
+    color: #ffffff;
     bottom: 0;
     left:0;
     max-height: 50%;
@@ -575,7 +572,7 @@ section{
 .items-list {
     margin-bottom: 30px;
     padding: 10px;
-    background-color: white;
+    background-color: #ffffff;
     overflow: auto;
     display: flex;
     flex-wrap: wrap;
@@ -621,7 +618,7 @@ section{
     width: 150px;
     background-color: #555555;
     border-radius: 4px;
-    color: white;
+    color: #ffffff;
     padding: 10px;
     text-align: center;
     cursor: pointer;
@@ -641,7 +638,7 @@ body footer{
     position: absolute;
     bottom: 0;
     background-color: #1c150f;
-    color:white;
+    color:#ffffff;
     padding: 10px;
 }
 
@@ -687,7 +684,7 @@ body::after {
 div#login-focus {
     position: relative;
     cursor: pointer;
-    color: white;
+    color: #ffffff;
     text-align: center;
     padding: 16px 28px;
     text-decoration: none;
@@ -715,7 +712,7 @@ div#login-focus {
 .login-form input[type=submit]{
     width: 50%;
     background-color: #953116;
-    color: white;
+    color: #ffffff;
     margin-top: 8px;
     cursor: pointer;
 }
@@ -730,7 +727,7 @@ form.login-form a{
 .item-page{
     width: 85%;
     margin: auto;
-    background: white;
+    background: #ffffff;
     padding: 15px;
     border-radius: 4px;
 }
@@ -944,7 +941,7 @@ dd.not-finished{
 button.spoiler-button {
     float: left;
     background: #e0e0e0;
-    color: black;
+    color: #000000;
 }
 
 button.spoiler-button:disabled {
@@ -1060,6 +1057,7 @@ button.spoiler-button:disabled {
 
 .comment-text{
     word-break: break-word;
+    line-height: normal;
 }
 
 .comment-replies-check,.password-change-container{
@@ -1117,7 +1115,7 @@ div.comment-right-buttons {
     width: 95%;
     padding: 8px;
     margin: auto;
-    background-color: white;
+    background-color: #ffffff;
 }
 
 .profile-main.clearfix {
@@ -1142,7 +1140,7 @@ div.comment-right-buttons {
     right: 5px;
     top: 5px;
     font-size: 22px;
-    color: white;
+    color: #ffffff;
     cursor: pointer;
 }
 
@@ -1156,7 +1154,7 @@ div.comment-right-buttons {
     background-color: #913015;
     vertical-align: middle;
     font-size: 16px;
-    color: white;
+    color: #ffffff;
     cursor: pointer;
     line-height: 30px;
     display: inline-block;
@@ -1181,7 +1179,7 @@ div.comment-right-buttons {
 }
 
 .errorlist li{
-    color: red;
+    color: #FF0000;
     margin: 10px 0;
     font-weight: 800;
 }
@@ -1265,9 +1263,10 @@ div.comment-right-buttons {
 
 p.username-info {
     margin-top: 8px;
-    color: red;
+    color: #FF0000;
     font-size: 15px;
     font-weight: 800;
+    margin-left: 6px;
 }
 
 .change-button,.profile-details-input .cancel {
@@ -1326,7 +1325,7 @@ a.change-pass-button {
     margin: 10px auto 0;
     padding: 15px;
     background-color: #571d0d;
-    color: white;
+    color: #ffffff;
     cursor: pointer;
     display: block;
 }
@@ -1381,14 +1380,14 @@ a.change-pass-button {
     font-size: 20px;
     float: left;
     left: 200px;
-    color: red;
+    color: #FF0000;
     cursor: default;
 }
 
 .tooltip .tooltiptext {
     visibility: hidden;
     background-color: #1b1a1a;
-    color: white;
+    color: #ffffff;
     text-align: center;
     border-radius: 6px;
     padding: 10px;
@@ -1440,7 +1439,7 @@ a.change-pass-button {
 }
 
 .hide-this {
-    max-height: 33px;
+    max-height: 67px;
     overflow: hidden;
     position: relative;
 }
@@ -1449,8 +1448,8 @@ a.change-pass-button {
     content: '';
     display: block;
     position: absolute;
-    height: 30px;
-    background: linear-gradient(to top, #ffffffb0, rgba(255, 255, 255, 0));
+    height: 18px;
+    background: linear-gradient(to top, #ffffffdb, #ffffff73);
     width: 100%;
     bottom: 0;
 }
@@ -1543,7 +1542,7 @@ a.change-pass-button {
         padding: 10px 10px 0;
         position: absolute;
         background-color: rgba(15, 15, 15, 0.67);
-        color: white;
+        color: #ffffff;
         bottom: 0;
         left:0;
         max-height: 50%;
@@ -1672,8 +1671,8 @@ a.change-pass-button {
         margin-top: 8px;
     }
 
-    .item-page-desc {
-        padding: 8px 0;
+    .item-page-desc,.item-page-info {
+        padding: 8px 12px;
     }
 
     .profile-avatar-container, .profile-display, .profile-row dl,
@@ -1714,6 +1713,7 @@ a.change-pass-button {
         display: block;
         float: none;
         width: 100%;
+        margin-top: 7px;
     }
 
     .item-page-right {
@@ -1729,7 +1729,6 @@ a.change-pass-button {
     .login-form {
         width: 100%;
         float: none;
-        height: 40vh;
     }
 
     .signup-content {

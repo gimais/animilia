@@ -9,9 +9,9 @@
     <div class="container">
         <div class="item-page clearfix" data-id="{{ anime.id }}">
         {% if anime.poster %}
-                <img class="item-page-img" src="/media/{{ anime.poster }}?r=1"  alt={{ anime.name }}>
+                <img class="item-page-img" src="/media/{{ anime.poster }}?r=1"  alt="{{ anime.name }}">
         {% else %}
-                <img class="item-page-img" src="/static/img/no-poster-available.jpg"  alt={{ anime.name }}>
+                <img class="item-page-img" src="/static/img/no-poster-available.jpg"  alt="{{ anime.name }}">
         {% endif %}
             <div class="item-page-info">
                 <div class="item-page-head clearfix">
@@ -130,7 +130,7 @@
         Array.prototype.forEach.call(document.getElementsByClassName('comment'),child => {
             let com = $(child).find('.comment-text');
 
-            com[0].innerHTML = makeSpoilerComment(com[0].innerHTML.trim());
+            com.html(BBtoHTML(com.html()));
 
             readMoreComment($(child));
         });

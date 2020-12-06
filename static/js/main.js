@@ -17,7 +17,7 @@ function newLineToBr(txt) {
     return txt.replace(/(?:\r\n|\r|\n)/g, '<br>');
 }
 
-function brTonewLine(text) {
+function brToNewLine(text) {
     return text.replace(/<br\s*[\/]?>/gi, "\n");
 }
 
@@ -31,6 +31,15 @@ function activateClassButton(button) {
 
 function cT() {
     return new Date().getTime()
+}
+
+function convertTimeGeo(date) {
+    date = new Date(date * 1000);
+    date = `${(date.getDate() < 10 ? '0' : '') +
+    date.getDate()}/${((date.getMonth() + 1) < 10 ? '0' : '') +
+    (date.getMonth() + 1)}/${date.getFullYear()} | ${(date.getHours() < 10 ? '0' : '') +
+    date.getHours()}:${(date.getMinutes() < 10 ? '0' : '') + date.getMinutes()}`;
+    return date;
 }
 
 function getYearsSelectOptionsHTML(startYear, EndYear) {
@@ -83,23 +92,13 @@ function getCookie(cname) {
     return "";
 }
 
-function csrfSafeMethod(method) {
-    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-}
-
 $.ajaxSetup({
     beforeSend: function (xhr, settings) {
-        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+        if (!/^(GET|HEAD|OPTIONS|TRACE)$/.test(settings.type) && !this.crossDomain) {
             xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
         }
     }
 });
-
-function makeSpoilerComment(text) {
-    while (text.match(/\[spoiler\](.*?)\[\/spoiler\]/ig) !== null)
-        text = spoilerAlertBBToHTML(text);
-    return text
-}
 
 function validateComment(text) {
     if (text.length < 6)
@@ -114,43 +113,41 @@ function validateComment(text) {
     return null;
 }
 
-function spoilerAlertBBToHTML($str) {
-    let format_search = /\[spoiler](.*?)\[\/spoiler]/ig;
-    let format_replace = '<span class="spoiler">$1</span><button id="reveal-spoiler">სპოილერი</button>';
-
-    return $str.replace(format_search, format_replace);
-}
-
-function spoilerALertHTMLToBB(text) {
-    while (text.includes('<span')) {
+function HTMLToBB(text) {
+    while (text.includes('class="spoiler"')) {
         text = text.replace(/<span (.*?)>(.*?)<\/span>/gi, "[spoiler]$2[/spoiler]");
         text = text.replace(/<button (.*?)>(.*?)<\/button>/gi, '');
     }
 
-    return brTonewLine(text);
+    while (text.match(/\<a[^>]+href=\"(.*?)\"[^>]*>(.*?)<\/a>/g) != null)
+        text = text.replace(/\<a[^>]+href=\"(.*?)\"[^>]*>(.*?)<\/a>/g, "[url=$1]$2[/url]");
+
+    return brToNewLine(text);
 }
 
+function BBtoHTML(text) {
+    while (text.match(/\[url=(.*?)\](.*?)\[\/url\]/ig) != null)
+        text = text.replace(/\[url=(http[s]?:\/\/)?(.*?)\](.*?)\[\/url\]/ig, '<a href="http://$2" rel="nofollow">$3</a>');
+
+
+    while (text.match(/\[spoiler\](.*?)\[\/spoiler\]/ig) != null)
+        text = text.replace(/\[spoiler](.*?)\[\/spoiler]/ig, '<span class="spoiler">$1</span><button id="reveal-spoiler">სპოილერი</button>');
+
+    return text;
+}
 
 function readMoreComment(comment) {
     let text = comment.find('.comment-text');
 
-    if (text.height() > 95) {
+    if (text.height() > 50) {
         text.addClass('hide-this');
         text.after('<button class="read-more">სრულად</button>')
     }
 }
 
-function convertTimeGeo(date) {
-    date = new Date(date * 1000);
-    date = `${(date.getDate() < 10 ? '0' : '') +
-    date.getDate()}/${((date.getMonth() + 1) < 10 ? '0' : '') +
-    (date.getMonth() + 1)}/${date.getFullYear()} | ${(date.getHours() < 10 ? '0' : '') +
-    date.getHours()}:${(date.getMinutes() < 10 ? '0' : '') + date.getMinutes()}`;
-    return date;
-}
 
 function makeCommentTextHTML(body) {
-    return makeSpoilerComment(newLineToBr(escapeHTML(body)));
+    return BBtoHTML(newLineToBr(escapeHTML(body)));
 }
 
 function makeCommentBoxHTML(data) {
@@ -263,7 +260,7 @@ function makeReplyCommentBoxHTML(data) {
 
 function makeDeletedCommentBoxHTML(data) {
     let html = '';
-    html += `<div class="comment">
+    html += `<div class="comment ${data['active_childs_count'] ? 'clearfix' : ''}">
                     <a class="comment-user-img" href="/profile/${data['user_id']}/">
                         <img src=${'/media/' + data.avatar} alt="avatar" loading="lazy">
                     </a>
@@ -392,10 +389,10 @@ $('#login-focus').on('click', function () {
     $('.login-form').toggleClass('show');
 });
 
-$('.read-more').on('click', function () {
-    let that = $(this);
-    that.next('.more-text').toggleClass('show');
-});
+// $('.read-more').on('click', function () {
+//     let that = $(this);
+//     that.next('.more-text').slideDown();
+// });
 
 $('.episode-select-button').on('click', function () {
     let clickedButton = $(this);
@@ -413,13 +410,11 @@ $('.episode-select-button').on('click', function () {
 $('.comment-form').submit(function (e) {
     e.preventDefault();
     let that = $(this);
-    let submitButton = $(this).find('button[type="submit"]');
     let $formDataSerialized = $(this).serialize();
-    let validation = validateComment($(this).find('textarea').val());
+    let text = that.find('textarea').val();
+    let validation = validateComment(text);
 
-    submitButton.attr('disabled', true);
-
-    if (validation === null) {
+    if (validation == null) {
         $.ajax({
             method: "POST",
             url: '/account/comment/',
@@ -433,7 +428,6 @@ $('.comment-form').submit(function (e) {
 
                 $(".comments-box > .comment:first").hide(10).show(100);
                 that.trigger('reset');
-                $('.spoiler-button').attr('disabled', false);
             },
             error: function (data) {
                 if (data.responseJSON.body.length && data.responseJSON.body[0].code === 'required')
@@ -442,13 +436,16 @@ $('.comment-form').submit(function (e) {
                     alert("მოხდა ტექნიკური შეცდომა, გთხოვთ მიწეროთ ადმინისტრაციას.");
             },
             complete: function () {
-                submitButton.attr('disabled', false);
+                that.find('.spoiler-button').attr('disabled', false);
             }
         })
     } else {
+        if (text.match(/\[spoiler\](.*?)\[\/spoiler\]/ig) == null)
+            that.find('.spoiler-button').attr('disabled', false);
         alert(validation);
-        submitButton.attr('disabled', false);
     }
+    that.find('button[type="submit"]').attr('disabled', false);
+
 });
 
 $('.comments-box, .comment-form').on('click', '.reply-button', function () {
@@ -459,7 +456,6 @@ $('.comments-box, .comment-form').on('click', '.reply-button', function () {
     let lastComment = button.parents('.comment:last');
     let replying_to_id;
     let formHTML;
-
 
     if (typeof button.data('it') !== "undefined") {
         is_replying_parent = false;
@@ -502,7 +498,7 @@ $('.comments-box, .comment-form').on('click', '.reply-button', function () {
     let $formDataSerialized = that.serialize();
     let validation = validateComment($(this).find('textarea').val());
 
-    if (validation === null) {
+    if (validation == null) {
         if (typeof that.data('it') !== "undefined") {
             $formDataSerialized += `&parent_id=${that.data('id')}` + `&replying_to_id=${that.data('it')}`;
         } else {
@@ -564,18 +560,17 @@ $('.comments-box, .comment-form').on('click', '.reply-button', function () {
     let id = commentBox.find('.reply-button').data('id');
     let commentText = commentBox.find('.comment-text');
     let hasSpoiler = commentText.find('.spoiler').length > 0;
-    let textareaValue = spoilerALertHTMLToBB(commentText.html());
+    let textareaValue = HTMLToBB(commentText.html());
 
     that.toggleClass('hidden');
     commentBox.find('.reply-button,#like-comment,#remove-comment,#dislike-comment,.comment-text').toggleClass('hidden');
 
     commentBox.append(makeEditTextarea(id, hasSpoiler));
-    commentBox.find('.comment-edit-form textarea').focus().val(textareaValue);
+    commentBox.find('.comment-edit-form textarea').focus().val(textareaValue.trim());
 }).on('click', '.comment .comment-edit-form button[type=reset]', function (e) {
     e.preventDefault();
     let parent = $(this).parent();
     parent.parent().find('.reply-button,#like-comment,#edit-comment,#remove-comment,#dislike-comment,.comment-text').toggleClass('hidden');
-    $(parent).prev().find('#reveal-spoiler').hide();
     parent.remove();
 }).on('click', '.comment .comment-edit-form button[type=submit]', function (e) {
     e.preventDefault();
@@ -583,15 +578,15 @@ $('.comments-box, .comment-form').on('click', '.reply-button', function () {
     let finText = parent.find('textarea').val();
     let validation = validateComment(finText);
 
-    if (validation === null) {
-        if (spoilerALertHTMLToBB(parent.prev().find('.comment-text')[0].innerHTML) !== finText) {
+    if (validation == null) {
+        if (HTMLToBB(parent.prev().find('.comment-text')[0].innerHTML) !== finText) {
             let $formSerialized = parent.serialize();
             $.ajax({
                 method: "POST",
                 url: '/account/comment/edit/',
                 data: $formSerialized + '&id=' + parent.data('id'),
                 success: function (data) {
-                    parent.parent().find('.comment-text').text(finText);
+                    parent.parent().find('.comment-text').html(makeCommentTextHTML(finText));
                     parent.parent().find('.comment-time').text(convertTimeGeo(data.time));
                     parent.parent().find('.reply-button,#like-comment,#edit-comment,#remove-comment,#dislike-comment,.comment-text').toggleClass('hidden');
                     parent.remove();
@@ -703,7 +698,13 @@ $('.comments-box, .comment-form').on('click', '.reply-button', function () {
 }).on('click', '.read-more', function (e) {
     e.stopPropagation();
     let that = $(this);
-    that.prev().toggleClass('hide-this');
+    that.prev().toggle();
+    if (that.prev().is(':hidden')) {
+        that.prev().toggleClass('hide-this');
+        that.prev().slideDown(0);
+    } else {
+        that.prev().toggleClass('hide-this');
+    }
     that.text(function (i, text) {
         return text === "სრულად" ? "დამალვა" : "სრულად";
     });
@@ -811,7 +812,6 @@ $('.profile-details-input').on('click', '#change-username-button', function (e) 
     let that = $(this);
     let inputEl = that.parent().find('input');
     let username = inputEl.val();
-    that.css('background-color', '#333');
     inputEl.attr('readonly', null);
     inputEl.css('background-color', '#FFF');
     inputEl.focus().val('').val(username);
@@ -852,8 +852,10 @@ $('.remove-notif').click(function (e) {
         method: "DELETE",
         url: '/account/notifications/delete/' + that.data('id'),
         success: function () {
-            let notifCount = $('.notif-count');
-            notifCount.text(notifCount.text() - 1);
+            if (!that.parent().hasClass('visited')) {
+                let notifCount = $('.notif-count');
+                notifCount.text(notifCount.text() - 1);
+            }
             that.parents('li').hide(200).remove();
         },
         error: function () {
