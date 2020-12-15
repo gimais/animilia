@@ -2,9 +2,10 @@ from django.contrib import messages
 from django.shortcuts import render
 from .forms import FeedbackForm
 
+
 # Create your views here.
 
-def feedback_form(request):
+def feedback(request):
     if request.method == 'POST':
         form = FeedbackForm(request.POST)
         if form.is_valid():
@@ -23,10 +24,10 @@ def feedback_form(request):
 
             form.save()
             messages.success(request, 'თქვენი წერილი წარმატებით გაიგზავნა.', extra_tags='welcome')
-            return render(request,'feedback.html',{'form':FeedbackForm()})
+            return render(request, 'feedback.html', {'form': FeedbackForm()})
     else:
         if request.user.is_authenticated:
-            form = FeedbackForm(user_username=request.user.get_username(),user_email=request.user.email)
+            form = FeedbackForm(user_username=request.user.get_username(), user_email=request.user.email)
         else:
             form = FeedbackForm()
     return render(request, 'feedback.html', {'form': form})

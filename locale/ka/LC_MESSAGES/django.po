@@ -72,3 +72,9 @@ msgstr "ბოლო ქმედებები"
 
 msgid "My actions"
 msgstr "ჩემი ქმედებები"
+
+msgid "Django site admin"
+msgstr "სამართავი პანელი"
+
+msgid "Django administration"
+msgstr "Admin Panel"

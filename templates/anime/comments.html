@@ -38,6 +38,9 @@
                                 <i class="fas fa-reply"></i> პასუხი
                             </p>
                         {% endif %}
+                        {% if comment.priority != None %}
+                            <i class="fas fa-thumbtack" style="transform: scale(1.5,1.2) rotate(90deg);margin-left: 3px"></i>
+                        {% endif %}
                         <p class='comment-time'>{{ comment.created|date:"d/m/Y | H:i" }}</p>
                         </div>
                         <p class="comment-text">

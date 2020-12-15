@@ -1,12 +1,11 @@
 from django.contrib import admin
 from django.db import models
 from django.forms import CheckboxSelectMultiple
-from .models import Category, Anime, AnimeSeries,Dubber
+
+from .models import Category, Anime, AnimeSeries, Dubber, Schedule
+
 
 # Register your models here.
-
-admin.site.site_header = 'Admin Panel'
-admin.site.site_title = "სამართავი პანელი"
 
 
 class ChoiceInline(admin.TabularInline):
@@ -19,7 +18,7 @@ class AnimeAdmin(admin.ModelAdmin):
         models.ManyToManyField: {'widget': CheckboxSelectMultiple},
     }
 
-    list_display = ("name",'dubbed', "type", 'slug', 'updated','finished')
+    list_display = ("name", 'dubbed', "type", 'slug', 'updated', 'finished')
     inlines = [ChoiceInline]
 
     class Media:
@@ -28,4 +27,5 @@ class AnimeAdmin(admin.ModelAdmin):
 
 admin.site.register(Category)
 admin.site.register(Dubber)
+admin.site.register(Schedule)
 admin.site.register(Anime, AnimeAdmin)

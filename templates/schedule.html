@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}განრიგი - Animilia.ge{% endblock %}
+{% block logout_redirect %}/schedule/{% endblock %}
+{% load static %}
+{% block content %}
+    <div class="container">
+            {% if schedule %}
+                {% for row in schedule %}
+                    <div class="info-page schedule clearfix">
+                        <div class="schedule-poster">
+                            <img src="/media/{{ row.anime__poster }}?r=1" alt="poster">
+                        </div>
+                        <div class="schedule-right">
+                            <p class="schedule-name">{{ row.anime__name}}</p>
+                            <hr class="schedule-hr">
+                            <div class="schedule-info">
+                            {% if row.text == "" %}
+                                {% load account_tags %}
+                                <p class="schedule-pg">{{ row.date|date:"d.m.Y (l)" }}</p><br>
+                                <p class="schedule-pg">{{ row.from_time|time:"H:i" }} - {{ row.to_time|time:"H:i" }}</p>
+                                <p class="schedule-max">{{ row.max|geo_number }} სერია</p>
+                            {% else %}
+                                <p class="schedule-text">{{ row.text }}</p>
+                            {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="info-page">ამჟამად განრიგი არ არის.</div>
+            {% endif %}
+    </div>
+{% endblock %}
+
+{#{% block script %}#}
+{#    <script>#}
+{##}
+{#    </script>#}
+{#{% endblock %}#}

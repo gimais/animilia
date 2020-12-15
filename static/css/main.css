@@ -185,7 +185,7 @@ textarea {
 nav{
     border-bottom: 2px solid #973116;
     border-top: 2px solid #973116;
-    height: 72px;
+    height: 70px;
     background-color: #1c150f;
 }
 
@@ -239,7 +239,7 @@ nav{
     list-style-type: none;
     padding: 0;
     display:inline-block;
-    line-height: 38px;
+    line-height: 34px;
     float: right;
 }
 
@@ -260,7 +260,7 @@ nav{
     display: block;
     color: #ffffff;
     text-align: center;
-    padding: 16px 28px;
+    padding: 16px 22px;
     text-decoration: none;
 }
 
@@ -289,7 +289,7 @@ nav{
 }
 
 .top-nav li > a.menu-icon{
-    padding: 22px 28px 18px;
+    padding: 20px 28px 18px;
     position: relative;
 }
 
@@ -467,7 +467,6 @@ section{
     border-top-left-radius: 10px;
 }
 
-/*HOME*/
 .anime-content{
     display: flex;
 }
@@ -479,12 +478,58 @@ section{
     font-size: 18px;
 }
 
+.schedule {
+    width: 70%;
+    margin: 15px auto;
+    padding: 8px;
+}
+
+.schedule-poster{
+    float: left;
+    width: 18%;
+}
+
+.schedule-poster img{
+    width: 100%;
+    height: 100%;
+}
+
+.schedule-right{
+    width: 79%;
+    float: right;
+    margin-top: 6px;
+}
+
+.schedule-info{
+    margin-top: 12px;
+}
+
+.schedule-pg{
+    display: inline-block;
+    font-size: 1.5vw;
+    word-break: break-word;
+    margin-bottom: 15px;
+}
+
+.schedule-max{
+    font-size: 1.2vw;
+}
+
+.schedule-text{
+    font-size: 1.5vw;
+    word-break: break-word;
+}
+
+.schedule-name{
+    font-size: 1.4vw;
+    font-weight: 600;
+}
+
 .item {
     cursor: pointer;
     position: relative;
     background-color: #ffffff;
     padding: 0 5px;
-    /*float:left;*/
     width: 33.33%;
     margin: 5px 0;
 }
@@ -568,7 +613,6 @@ section{
     padding: 5px 0;
 }
 
-
 .items-list {
     margin-bottom: 30px;
     padding: 10px;
@@ -576,27 +620,6 @@ section{
     overflow: auto;
     display: flex;
     flex-wrap: wrap;
-}
-
-.item-info::-webkit-scrollbar {
-    width: 10px;
-}
-
-/* Track */
-.item-info::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 5px grey;
-    border-radius: 10px;
-}
-
-/* Handle */
-.item-info::-webkit-scrollbar-thumb {
-    background: #973116;
-    border-radius: 10px;
-}
-
-/* Handle on hover */
-.item-info::-webkit-scrollbar-thumb:hover {
-    background: #b30000;
 }
 
 .categories-list li:after {
@@ -692,7 +715,7 @@ div#login-focus {
 
 .login-form {
     text-align: center;
-    width: 258px;
+    width: 246px;
     background-color: rgba(41, 32, 24, 0.8);
     padding: 15px;
     border-radius: 0 0 9px 9px;
@@ -703,10 +726,10 @@ div#login-focus {
 }
 
 .login-form input{
-    width: 180px;
+    width: 170px;
     border-radius: 5px;
     border: none;
-    padding: 7px;
+    padding: 6px;
 }
 
 .login-form input[type=submit]{
@@ -1439,7 +1462,7 @@ a.change-pass-button {
 }
 
 .hide-this {
-    max-height: 67px;
+    max-height: 50px;
     overflow: hidden;
     position: relative;
 }
@@ -1527,10 +1550,6 @@ a.change-pass-button {
 
     .logo,.web-name,.tooltip {
         display: none;
-    }
-
-    nav.open{
-        height: 185px;
     }
 
     #mob-home, .age {
@@ -1635,6 +1654,26 @@ a.change-pass-button {
         width: 49%;
         margin: 7px 1px;
     }
+
+    .schedule{
+        width: 85%;
+    }
+
+    .schedule-info{
+        margin-top: 3px;
+    }
+
+    .schedule-pg,.schedule-text{
+        font-size: 2.2vw;
+    }
+
+    .schedule-max,.schedule-name{
+        font-size: 2vw;
+    }
+
+    .schedule-hr{
+        margin: 8px 0;
+    }
 }
 
 @media screen and (max-width: 560px) {
@@ -1720,6 +1759,31 @@ a.change-pass-button {
         margin-top: 5px;
         display: block;
         float: none;
+    }
+
+    .schedule{
+        width: 95%;
+    }
+
+    .schedule-pg,.schedule-text{
+        margin-bottom: 0;
+        font-size: 3.2vw;
+    }
+
+    .schedule-info {
+        margin: 0;
+    }
+
+    .schedule-hr{
+        margin: 3px 0 0;
+    }
+
+    .schedule-text{
+        margin-top: 6px;
+    }
+
+    .schedule-max,.schedule-name{
+        font-size: 3vw;
     }
 }
 

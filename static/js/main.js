@@ -21,14 +21,6 @@ function brToNewLine(text) {
     return text.replace(/<br\s*[\/]?>/gi, "\n");
 }
 
-function activateClassButton(button) {
-    let activatedButton = $('.item-page-episodes').find('.episode-select-button.active');
-    if (button !== activatedButton) {
-        activatedButton.removeClass('active');
-        button.addClass('active');
-    }
-}
-
 function cT() {
     return new Date().getTime()
 }
@@ -127,7 +119,7 @@ function HTMLToBB(text) {
 
 function BBtoHTML(text) {
     while (text.match(/\[url=(.*?)\](.*?)\[\/url\]/ig) != null)
-        text = text.replace(/\[url=(http[s]?:\/\/)?(.*?)\](.*?)\[\/url\]/ig, '<a href="http://$2" rel="nofollow">$3</a>');
+        text = text.replace(/\[url=(http[s]?:\/\/)?(.*?)\](.*?)\[\/url\]/ig, '<a href="http://$2" rel="nofollow" target="_blank">$3</a>');
 
 
     while (text.match(/\[spoiler\](.*?)\[\/spoiler\]/ig) != null)
@@ -136,15 +128,12 @@ function BBtoHTML(text) {
     return text;
 }
 
-function readMoreComment(comment) {
-    let text = comment.find('.comment-text');
-
-    if (text.height() > 50) {
+function readMoreComment(text) {
+    if (text.height() > 72) {
         text.addClass('hide-this');
         text.after('<button class="read-more">სრულად</button>')
     }
 }
-
 
 function makeCommentTextHTML(body) {
     return BBtoHTML(newLineToBr(escapeHTML(body)));
@@ -330,7 +319,7 @@ function getChildComments(that, parent_id, replying = false) {
                 for (let i = data.length - 1; i >= 0; i--) {
                     if (typeof data[i].deleted === "undefined") {
                         commentRepliesBox.append(makeReplyCommentBoxHTML(data[i]));
-                        readMoreComment(commentRepliesBox.find('.comment:last'));
+                        readMoreComment(commentRepliesBox.find('.comment:last').find(".comment-text"));
                     } else
                         commentRepliesBox.append(makeDeletedCommentBoxHTML(data[i]));
                 }
@@ -379,32 +368,27 @@ $('form').submit(function () {
     $(':submit', this).attr('disabled', true);
 });
 
-$('#mob-menu').click(function () {
-    $('nav').toggleClass('open');
-    $('.top-nav').toggleClass('open')
-});
-
-
 $('#login-focus').on('click', function () {
     $('.login-form').toggleClass('show');
 });
-
-// $('.read-more').on('click', function () {
-//     let that = $(this);
-//     that.next('.more-text').slideDown();
-// });
 
 $('.episode-select-button').on('click', function () {
     let clickedButton = $(this);
     let videoURL = clickedButton.data('url');
     let itemPlayer = $('.item-player');
+    let activatedButton = $('.episode-select-button.active');
 
-    activateClassButton(clickedButton);
     $('.item-player iframe').attr('src', videoURL);
+
+    if (clickedButton !== activatedButton) {
+        activatedButton.removeClass('active');
+        clickedButton.addClass('active');
+    }
+
     if (itemPlayer.hasClass('hidden')) {
         itemPlayer.removeClass('hidden');
     }
-    setCookie(itemSlug.substring(7, itemSlug.length - 1), clickedButton.data('id'), 20);
+    setCookie(itemSlug.substring(7, itemSlug.length - 1), clickedButton.data('id'), 30);
 });
 
 $('.comment-form').submit(function (e) {
@@ -424,7 +408,7 @@ $('.comment-form').submit(function (e) {
                 let commentBox = $(".comments-box");
 
                 commentBox.prepend(makeCommentBoxHTML(data));
-                readMoreComment(commentBox.find(".comment:first"));
+                readMoreComment(commentBox.find(".comment:first").find('.comment-text'));
 
                 $(".comments-box > .comment:first").hide(10).show(100);
                 that.trigger('reset');
@@ -637,7 +621,7 @@ $('.comments-box, .comment-form').on('click', '.reply-button', function () {
                     })
                 }
             },
-            error: function (data) {
+            error: function () {
                 alert("ლაიქისთვის საჭიროა ავტორიზაცია!");
             },
         })
@@ -702,13 +686,8 @@ $('.comments-box, .comment-form').on('click', '.reply-button', function () {
 }).on('click', '.read-more', function (e) {
     e.stopPropagation();
     let that = $(this);
-    that.prev().toggle();
-    if (that.prev().is(':hidden')) {
-        that.prev().toggleClass('hide-this');
-        that.prev().slideDown(0);
-    } else {
-        that.prev().toggleClass('hide-this');
-    }
+    // TODO slideDown
+    that.prev().toggleClass('hide-this');
     that.text(function (i, text) {
         return text === "სრულად" ? "დამალვა" : "სრულად";
     });
@@ -729,7 +708,7 @@ $('.comments-box, .comment-form').on('click', '.reply-button', function () {
             for (let i = 0; i < data.length; i++) {
                 if (typeof data[i].deleted === "undefined") {
                     commentRepliesBox.prepend(makeReplyCommentBoxHTML(data[i]));
-                    readMoreComment(commentRepliesBox.find('.comment:first'));
+                    readMoreComment(commentRepliesBox.find('.comment:first').find('.comment-text'));
                 } else
                     commentRepliesBox.prepend(makeDeletedCommentBoxHTML(data[i]));
             }
@@ -782,7 +761,7 @@ $('.showmore').on('click', function () {
 
             commentBox.append(html);
             commentBox.find(`.comment:nth-child(n+${6 * current_page + 1})`).each(function (i, com) {
-                readMoreComment($(com))
+                readMoreComment($(com).find(('.comment-text')))
             });
 
             that.attr('data-page', current_page + 1);

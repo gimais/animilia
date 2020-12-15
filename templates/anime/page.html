@@ -48,7 +48,7 @@
                         <dt>სტატუსი:</dt>
                         {% if anime.finished %}
                             <dd class="anime-status finished">გახმოვანებული</dd>
-                        {% else%}
+                        {% else %}
                             <dd class="anime-status not-finished">გახმოვანების პროცესში</dd>
                         {% endif %}
                         <dt>სტუდია:</dt>
@@ -127,11 +127,10 @@
             }
         }
 
-        Array.prototype.forEach.call(document.getElementsByClassName('comment'),child => {
-            let com = $(child).find('.comment-text');
+        Array.prototype.forEach.call(document.querySelectorAll('.comment-text'),child => {
+            let com = $(child);
 
             com.html(BBtoHTML(com.html()));
-
             readMoreComment($(child));
         });
 

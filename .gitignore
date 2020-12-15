@@ -221,3 +221,4 @@ animilia/urls.py
 db.sqlite3
 media/posters/
 media/avatars/
+/animilia/staff.py

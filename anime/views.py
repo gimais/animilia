@@ -1,5 +1,5 @@
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.db.models.expressions import RawSQL
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -7,7 +7,7 @@ from django.shortcuts import render
 
 from account.forms import CommentForm
 from account.models import Comment, Notification
-from anime.models import Anime
+from anime.models import Anime, Schedule
 
 ERROR = {'error': 'moxda shecdoma!'}
 
@@ -31,12 +31,13 @@ def page_view(request, slug):
         comments = anime.comments.related_objects_annotates(request.user).filter(
             Q(active=True) | Q(active_replies_count__gte=1),
             parent__isnull=True).order_by(
-            RawSQL('CASE WHEN "account_comment"."id" = %s THEN 1 ELSE 2 END', (request.GET['parent'],)), '-id')
+            RawSQL('CASE WHEN "account_comment"."id" = %s THEN 1 ELSE 2 END', (request.GET['parent'],)), '-priority',
+            '-id')
 
         if 'notif' in request.GET.keys():
             try:
-                notification = request.user.notification_set.get(id=int(request.GET['notif']),visited=False)
-            except (Notification.DoesNotExist,ValueError):
+                notification = request.user.notification_set.get(id=int(request.GET['notif']), visited=False)
+            except (Notification.DoesNotExist, ValueError):
                 notification = None
 
             if notification is not None:
@@ -72,7 +73,9 @@ def more_comments(request):
         if parent_id:
             comments = Comment.objects.related_objects_annotates(request.user).filter(
                 Q(active=True) | Q(active_replies_count__gte=1), parent__isnull=True, anime=anime_id).order_by(
-                RawSQL('CASE WHEN "account_comment"."id" = %s THEN 1 ELSE 2 END', (request.GET['parent'],)), '-id')
+                RawSQL('CASE WHEN "account_comment"."id" = %s THEN 1 ELSE 2 END', (request.GET['parent'],)),
+                '-priority',
+                '-id')
         else:
             comments = Comment.objects.related_objects_annotates(request.user).filter(
                 Q(active=True) | Q(active_replies_count__gte=1),
@@ -92,3 +95,10 @@ def more_comments(request):
             return JsonResponse(ERROR, status=404)
     else:
         return JsonResponse(ERROR, status=400)
+
+
+def schedule(request):
+    objs = Schedule.objects.select_related('anime').values('date', 'from_time', 'text', 'to_time', 'anime__name',
+                                                           'anime__poster', 'anime__slug',
+                                                           max=Count('anime__series__row') + 1).all().order_by('-date')
+    return render(request, 'schedule.html', {'schedule': objs})

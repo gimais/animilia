@@ -223,7 +223,6 @@ def add_comment(request):
                         'username': request.user.username,
                         'avatar': request.user.profile.avatar.name,
                         'user_id': request.user.id,
-                        # ar washalooo ? edit da remove functiebistvis rom daadasturos js-shi
                         'comment_id': comment.id,
                         'time': datetime.datetime.timestamp(comment.created),
                         'likes': 0,
@@ -288,7 +287,6 @@ def reply_comment(request):
                         'username': request.user.username,
                         'avatar': request.user.profile.avatar.name,
                         'user_id': request.user.id,
-                        # ar washalooo ? edit da remove functiebistvis rom daadasturos js-shi
                         'comment_id': reply_comment.id,
                         'parent_id': reply_comment.parent.id,
                         'time': datetime.datetime.timestamp(reply_comment.created),
@@ -318,7 +316,7 @@ def check_replies(request, id):
         if page is not None:
             paginator = Paginator(Comment.objects.filter(parent=id), 6)
 
-            if paginator.num_pages >= page and page > 0:
+            if paginator.num_pages >= page > 0:
                 result = {'replies': [], 'availablePages': paginator.num_pages}
                 for reply in paginator.get_page(page).object_list:
                     result['replies'].append(reply.get_reply_comment_info(request.user.pk))
@@ -431,7 +429,7 @@ def dislike_comment(request):
     if request.user.is_authenticated:
         try:
             comment_id = Comment.objects.prefetch_related('dislike', 'like').get(id=request.POST.get('id', False))
-        except (TypeError, ValueError, OverflowError, Comment.DoesNotExist, Comment.MultipleObjectsReturned):
+        except (TypeError, ValueError, OverflowError, Comment.DoesNotExist):
             comment_id = None
 
         if comment_id and comment_id.user != request.user:

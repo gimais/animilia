@@ -8,11 +8,12 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from account.models import Comment, Profile, Settings
-from account.validators import MyUnicodeUsernameValidator,blacklist,ERRORS
+from account.validators import MyUnicodeUsernameValidator, blacklist, ERRORS
 
 User._meta.get_field('username').validators[0] = MyUnicodeUsernameValidator()
 User._meta.get_field('username').validators[1] = MaxLengthValidator(16)
 User._meta.get_field('username').validators.append(MinLengthValidator(3))
+
 
 class SignUpForm(UserCreationForm):
     use_required_attribute = False
@@ -101,7 +102,7 @@ class MyAuthenticationForm(AuthenticationForm):
         else:
             raise forms.ValidationError(
                 ERRORS['empty_fields'],
-                code='empty_fields'
+                code='empty_fields',
             )
 
         return self.cleaned_data
@@ -116,7 +117,8 @@ class MyPasswordResetForm(PasswordResetForm):
         widget=forms.TextInput(attrs={'autocomplete': 'email', 'class': 'form-input', 'placeholder': 'Email'})
     )
 
-#check
+
+# check
 class MySetPasswordForm(SetPasswordForm):
     use_required_attribute = False
 
@@ -159,6 +161,7 @@ class MyPasswordChangeForm(PasswordChangeForm):
 
     field_order = ['old_password', 'new_password1', 'new_password2']
 
+
 class CommentForm(forms.ModelForm):
     body = forms.CharField(
         label="",
@@ -168,6 +171,7 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ('body',)
+
 
 class UpdateUsernameForm(forms.ModelForm):
     error_messages = {
@@ -243,6 +247,7 @@ class ShowProfileForm(forms.ModelForm):
     class Meta:
         model = Settings
         fields = ('show_gender', 'show_birth',)
+
 
 class EmailChangeForm(forms.Form):
     use_required_attribute = False
