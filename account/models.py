@@ -43,7 +43,7 @@ class Comment(models.Model):
     objects = CommentManager()
 
     class Meta:
-        ordering = ['-priority','-id']
+        ordering = ['priority','-id']
         verbose_name = 'კომენტარი'
         verbose_name_plural = 'კომენტარი'
 
