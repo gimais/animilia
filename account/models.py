@@ -37,7 +37,7 @@ class Comment(models.Model):
     dislike = models.ManyToManyField(User, blank=True, editable=False, related_name='dislikes')
     created = models.DateTimeField(auto_now_add=True, verbose_name='თარიღი')
     active = models.BooleanField(default=True, verbose_name='აქტიურია')
-    priority = models.PositiveSmallIntegerField(null=True, verbose_name='პრიორიტეტი')
+    priority = models.PositiveSmallIntegerField(blank=True, null=True, verbose_name='პრიორიტეტი')
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
 
     objects = CommentManager()
