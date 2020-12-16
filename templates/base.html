@@ -16,10 +16,11 @@
     <link rel="icon" sizes="144x144" href="{% static "icon-144.png" %}">
 
     {% block extra %}{% endblock %}
-    <link rel="stylesheet" href="//cdn.web-fonts.ge/fonts/dejavu-sans-condensed/css/dejavu-sans-condensed.min.css?display=swap">
-{#    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap">#}
+    <link rel="stylesheet"
+          href="//cdn.web-fonts.ge/fonts/dejavu-sans-condensed/css/dejavu-sans-condensed.min.css?display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap">
     <link rel="stylesheet" href="{% static "css/normalize.css" %}">
-    <link rel="stylesheet" href="{% static "css/main.css" %}?v=4">
+    <link rel="stylesheet" href="{% static "css/main.css" %}?v=5">
 
     <script src="https://kit.fontawesome.com/98d783368d.js" crossorigin="anonymous"></script>
     <meta name="theme-color" content="#973116">
@@ -30,36 +31,39 @@
         გთხოვთ, რომ <a href="https://browsehappy.com/">გაანახლოთ ბრაუზერი</a> .</p>
   <![endif]-->
 
-    <header>
-        <div class="top-background"></div>
-        <nav>
-            <div class="top-menu">
-                <div class="top-logo">
-                    <a class="logo" href="/"></a>
-                    <a class="web-name"></a>
-                </div>
-                <ul class="top-nav">
-                    <li style="width: 100%"><a id="mob-home" href="/">მთავარი</a></li>
-                    <li><a href="{% url 'schedule' %}">განრიგი</a></li>
-                    <li><a href="{% url 'feedback' %}">კონტაქტი</a></li>
-                    {% if user.is_anonymous %}
-                        <li>
-                            <div id="login-focus">შესვლა</div>
-                                <form class="login-form" method="post" action="{% url 'login' %}?next={{ request.path }}">
-                                    {% csrf_token %}
-                                    <input type="text" name="username" class="form-input pad" autofocus placeholder="ნიკი" autocapitalize="none" autocomplete="off">
-                                    <input type="password" name="password" autocomplete="current-password" class="form-input pad" placeholder="პაროლი" id="id_password">
-                                    <input type="submit" value="შესვლა">
-                                    <a  href="{% url 'password_reset' %}">არ მახსოვს პაროლი...</a>
-                                </form>
-                        </li>
-                        <li><a href="{% url 'signup' %}">რეგისტრაცია</a></li>
-                    {% else %}
-                        {% if user.is_staff %}
-                            <li><a href="/admin/" target="_blank">პანელი</a></li>
-                        {% endif %}
-                        {% load account_tags %}
-                        {% with notification_count=user|notif_count %}
+<header>
+    <div class="top-background"></div>
+    <nav>
+        <div class="top-menu">
+            <div class="top-logo">
+                <a class="logo" href="/"></a>
+                <a class="web-name"></a>
+            </div>
+            <ul class="top-nav">
+                <li {% if user.is_anonymous %} style="width: 100%" {% else %} style="width: 50%"{% endif %}><a
+                        id="mob-home" href="/">მთავარი</a></li>
+                <li><a href="{% url 'schedule' %}">განრიგი</a></li>
+                <li><a href="{% url 'feedback' %}">კონტაქტი</a></li>
+                {% if user.is_anonymous %}
+                    <li>
+                        <div id="login-focus">შესვლა</div>
+                        <form class="login-form" method="post" action="{% url 'login' %}?next={{ request.path }}">
+                            {% csrf_token %}
+                            <input type="text" name="username" class="form-input pad" autofocus placeholder="ნიკი"
+                                   autocapitalize="none" autocomplete="off">
+                            <input type="password" name="password" autocomplete="current-password"
+                                   class="form-input pad" placeholder="პაროლი" id="id_password">
+                            <input type="submit" value="შესვლა">
+                            <a href="{% url 'password_reset' %}">არ მახსოვს პაროლი...</a>
+                        </form>
+                    </li>
+                    <li><a href="{% url 'signup' %}">რეგისტრაცია</a></li>
+                {% else %}
+                    {% if user.is_staff %}
+                        <li><a href="/admin/" target="_blank">პანელი</a></li>
+                    {% endif %}
+                    {% load account_tags %}
+                    {% with notification_count=user|notif_count %}
                         <li>
                             <a class="menu-icon fas fa-bell" href="{% url 'notification' %}">
                             {% if notification_count %}
@@ -118,7 +122,7 @@
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <script>window.jQuery || document.write('<script src="/static/js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
     <script src="{% static "js/plugins.js" %}"></script>
-    <script src="{% static "js/main.js" %}?v=4"></script>
+    <script src="{% static "js/main.js" %}?v=5"></script>
 
     {% block script %}{% endblock %}
 

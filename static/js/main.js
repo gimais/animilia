@@ -686,8 +686,13 @@ $('.comments-box, .comment-form').on('click', '.reply-button', function () {
 }).on('click', '.read-more', function (e) {
     e.stopPropagation();
     let that = $(this);
-    // TODO slideDown
-    that.prev().toggleClass('hide-this');
+    that.prev().toggle();
+    if (that.prev().is(':hidden')) {
+        that.prev().toggleClass('hide-this');
+        that.prev().slideDown(0);
+    } else {
+        that.prev().toggleClass('hide-this');
+    }
     that.text(function (i, text) {
         return text === "სრულად" ? "დამალვა" : "სრულად";
     });

@@ -495,33 +495,27 @@ section{
 }
 
 .schedule-right{
-    width: 79%;
+    width: 81%;
     float: right;
     margin-top: 6px;
 }
 
-.schedule-info{
-    margin-top: 12px;
+.schedule-pg, .schedule-text {
+    font-size: 1.2em;
+    word-break: break-word;
 }
 
-.schedule-pg{
+.schedule-max {
+    font-size: 0.9em;
+}
+
+.schedule-pg {
     display: inline-block;
-    font-size: 1.5vw;
-    word-break: break-word;
-    margin-bottom: 15px;
+    margin-bottom: 3%;
 }
 
-.schedule-max{
-    font-size: 1.2vw;
-}
-
-.schedule-text{
-    font-size: 1.5vw;
-    word-break: break-word;
-}
-
-.schedule-name{
-    font-size: 1.4vw;
+.schedule-name {
+    font-size: 1em;
     font-weight: 600;
 }
 
@@ -534,10 +528,10 @@ section{
     margin: 5px 0;
 }
 
-.item img{
-	max-width: 100%;
-	height: auto;
-	display: block; /* remove extra space below image */
+.item img {
+    max-width: 100%;
+    height: auto;
+    display: block;
 }
 
 .item:hover .info{
@@ -574,8 +568,6 @@ section{
 .item:hover .age {
     display: inline-block;
 }
-
-/*color:#ff2e01; */
 
 .soon {
     position: absolute;
@@ -636,8 +628,7 @@ section{
   clear: both;
 }
 
-.showmore{
-    margin: auto;
+.showmore {
     width: 150px;
     background-color: #555555;
     border-radius: 4px;
@@ -645,7 +636,7 @@ section{
     padding: 10px;
     text-align: center;
     cursor: pointer;
-    margin-top: 15px;
+    margin: 15px auto 0;
 }
 
 .nomore{
@@ -665,13 +656,12 @@ body footer{
     padding: 10px;
 }
 
-.footer-logo{
-    background: url('/static/img/footer_logo.png');
+.footer-logo {
     width: 219px;
     height: 65px;
     margin-top: 10px;
     margin-left: 60px;
-    background-repeat: no-repeat;
+    background: url('/static/img/footer_logo.png') no-repeat;
     float: left;
 }
 
@@ -778,9 +768,8 @@ form.login-form a{
     font-family: "DejaVu Sans Condensed", sans-serif;
 }
 
-.item-page-head h1{
-    margin: auto;
-    margin-bottom: 7px;
+.item-page-head h1 {
+    margin: auto auto 7px;
 }
 
 .item-page-right {
@@ -901,18 +890,16 @@ dd.not-finished{
     height: 100%;
 }
 
-.soon-player{
+.soon-player {
     display: block;
-    width: 100%;height: 400px;
-    background: #000000ed;
+    width: 100%;
+    height: 400px;
     text-align: center;
     font-size: 25px;
     color: #fff;
     line-height: 15em;
     border-radius: 4px;
-    background-image: url('/static/img/soon_transparent.svg');
-    background-repeat: no-repeat;
-    background-position: center;
+    background: #000000ed url('/static/img/soon_transparent.svg') no-repeat center;
     background-size: 50%;
 }
 
@@ -1505,6 +1492,10 @@ a.change-pass-button {
 }
 
 @media (max-width: 1024px) {
+    .web-name {
+        display: none;
+    }
+
     #sidebar {
         display: none;
     }
@@ -1520,6 +1511,10 @@ a.change-pass-button {
     .items-list {
         margin: auto;
     }
+
+    .schedule-hr {
+        margin: 12px 0;
+    }
 }
 
 @media (max-width: 900px) {
@@ -1532,15 +1527,16 @@ a.change-pass-button {
         width: 95%;
     }
 
-    .top-logo {
-        margin: 0 0 0 30px;
-    }
-
     .notif-time {
         margin-left: 15px;
         float: none;
         display: block;
     }
+
+    .schedule {
+        width: 85%;
+    }
+
 }
 
 @media (max-width: 768px) {
@@ -1604,9 +1600,9 @@ a.change-pass-button {
         padding: 14px;
     }
 
-    .top-nav li a{
+    .top-nav li a {
         width: 100%;
-        padding: 16px 0;
+        padding: 17px 0;
     }
 
     form.login-form a {
@@ -1655,24 +1651,20 @@ a.change-pass-button {
         margin: 7px 1px;
     }
 
-    .schedule{
-        width: 85%;
+    .schedule-pg, .schedule-text {
+        font-size: 1.1em;
     }
 
-    .schedule-info{
-        margin-top: 3px;
+    .schedule-max {
+        font-size: 0.8em;
     }
 
-    .schedule-pg,.schedule-text{
-        font-size: 2.2vw;
+    .schedule-name {
+        font-size: 0.9em;
     }
 
-    .schedule-max,.schedule-name{
-        font-size: 2vw;
-    }
-
-    .schedule-hr{
-        margin: 8px 0;
+    .schedule {
+        width: 95%;
     }
 }
 
@@ -1761,29 +1753,12 @@ a.change-pass-button {
         float: none;
     }
 
-    .schedule{
-        width: 95%;
+    .schedule-poster {
+        width: 25%;
     }
 
-    .schedule-pg,.schedule-text{
-        margin-bottom: 0;
-        font-size: 3.2vw;
-    }
-
-    .schedule-info {
-        margin: 0;
-    }
-
-    .schedule-hr{
-        margin: 3px 0 0;
-    }
-
-    .schedule-text{
-        margin-top: 6px;
-    }
-
-    .schedule-max,.schedule-name{
-        font-size: 3vw;
+    .schedule-right {
+        width: 74%;
     }
 }
 
@@ -1835,6 +1810,22 @@ a.change-pass-button {
 
     .comment-replies-box {
         margin-left: 14px;
+    }
+
+    .schedule-pg, .schedule-text {
+        font-size: 0.8em;
+    }
+
+    .schedule-max {
+        font-size: 0.7em;
+    }
+
+    .schedule-name {
+        font-size: 0.7em;
+    }
+
+    .schedule-hr {
+        margin: 6px 0;
     }
 }
 
