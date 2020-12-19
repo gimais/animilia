@@ -440,6 +440,10 @@ section{
     color:#ffffff;
 }
 
+.flash-message a{
+    color: #ffffff;
+}
+
 /*profile tabs*/
 
 .tabs {

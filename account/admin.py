@@ -1,7 +1,9 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
 
-from .models import Comment, Profile, Settings
+from .models import User, Comment, Profile, Settings
 
 
 # Register your models here.
@@ -14,7 +16,6 @@ class CommentAdmin(admin.ModelAdmin):
     actions = ('active_comments', 'inactive_comments')
     readonly_fields = ('created', 'user', 'anime', 'parent_link', 'body')
     exclude = ('parent',)
-
 
     def get_exclude(self, request, obj=None):
         excluded = super().get_exclude(request, obj)
@@ -86,6 +87,32 @@ class SettingsAdmin(admin.ModelAdmin):
         return queryset
 
 
+class CustomUserAdmin(UserAdmin):
+    add_form_template = 'admin/auth/user/add_form.html'
+    change_user_password_template = None
+    fieldsets = (
+        (None, {'fields': ('username', 'password', 'email')}),
+        (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',
+                                       'groups', 'user_permissions')}),
+        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'password1', 'password2'),
+        }),
+    )
+
+    list_display = ('username', 'email', 'is_staff')
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
+    search_fields = ('username', 'email')
+    ordering = ('id',)
+    filter_horizontal = ('groups', 'user_permissions',)
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+admin.site.register(User, CustomUserAdmin)
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(Settings, SettingsAdmin)
