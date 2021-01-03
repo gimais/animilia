@@ -1,6 +1,7 @@
 from django.http import HttpResponseRedirect
 
-def anonymous_required(function=None,redirect_field_name='/account/profile'):
+
+def anonymous_required(function=None, redirect_field_name='/account/profile'):
     """ Check that the user is NOT logged in. """
 
     def _dec(view_func):

@@ -2,7 +2,7 @@
 {% block title %}ჩემი პროფილი{% endblock %}
 {% block logout_redirect %}/{% endblock %}
 {% load static %}
-{% load account_tags %}
+{% load extra_tags %}
 {% block extra %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.2/croppie.css" />
 {% endblock %}
@@ -20,7 +20,7 @@ $(document).ready(function () {
     $("select[name='birth-day']").append(getDaysSelectOptionsHTML(31,22));
     $("select[name='birth-month']").append(getMonthsSelectOptionsHTML());
     $("select[name='birth-year']").append(getYearsSelectOptionsHTML(1940,2019));
-
+    // TODO change array to object
     var pickedDate = [{{ user.profile.birth.day }},{{ user.profile.birth.month }},{{ user.profile.birth.year }}];
 
     $(`select[name='birth-day'] option[value=${pickedDate[0]}]`).attr('selected','');

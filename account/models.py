@@ -1,77 +1,52 @@
 from datetime import datetime, timedelta
 
-from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.models import  AbstractUser, UserManager, PermissionsMixin
-from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.core.mail import send_mail
+from django.core.validators import MinLengthValidator
 from django.db import models
 from django.db.models import Count, Exists, OuterRef, Subquery, Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from account.validators import MyUnicodeUsernameValidator
 from anime.models import Anime
 
 
-class CustomUserManager(UserManager):
+class CustomUserManager(BaseUserManager):
+
+    def get_queryset(self):
+        return super(CustomUserManager, self).get_queryset().annotate(
+            notif=Count('notification', filter=Q(notification__visited=False)))
+
+    def create_user(self, username, email, password, is_staff=False, is_superuser=False, **extra_fields):
+        if not username:
+            raise ValueError(_('The given username must be set'))
+        if not email:
+            raise ValueError(_('The given email must be set'))
+
+        email = self.normalize_email(email)
+        username = self.model.normalize_username(username)
+        user = self.model(username=username, email=email, **extra_fields)
+        user.set_password(password)
+        user.is_staff = is_staff
+        user.is_superuser = is_superuser
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, username, email, password, **extra_fields):
+        return self.create_user(username, email, password, True, True, **extra_fields)
+
     def get_by_natural_key(self, username):
-        case_insensitive_username_field = '{}__iexact'.format(self.model.USERNAME_FIELD)
-        return self.get(**{case_insensitive_username_field: username})
-
-
-class User(AbstractBaseUser, PermissionsMixin):
-    username_validator = UnicodeUsernameValidator()
-
-    username = models.CharField(
-        max_length=16,
-        unique=True,
-        help_text=_('Required. 16 characters or fewer. Letters, digits and @/./+/-/_ only.'),
-        validators=[username_validator],
-        error_messages={
-            'unique': _("A user with that username already exists."),
-        },
-        verbose_name='ნიკი'
-    )
-    email = models.EmailField(_('email address'), unique=True)
-    is_staff = models.BooleanField(
-        _('staff status'),
-        default=False,
-        help_text=_('Designates whether the user can log into this admin site.'),
-    )
-    is_active = models.BooleanField(
-        _('active'),
-        default=True,
-        help_text=_(
-            'Designates whether this user should be treated as active. '
-            'Unselect this instead of deleting accounts.'
-        ),
-    )
-    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
-
-    objects = CustomUserManager()
-
-    EMAIL_FIELD = 'email'
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email',]
-
-    class Meta:
-        verbose_name = _('user')
-        verbose_name_plural = _('users')
-        swappable = "AUTH_USER_MODEL"
-        db_table = "auth_user"
-
-    def clean(self):
-        super().clean()
-        self.email = self.__class__.objects.normalize_email(self.email)
-
-    def email_user(self, subject, message, from_email=None, **kwargs):
-        """Send an email to this user."""
-        send_mail(subject, message, from_email, [self.email], **kwargs)
+        return self.get(**{'{}__iexact'.format(self.model.USERNAME_FIELD): username})
 
 
 class CommentManager(models.Manager):
     def related_objects_annotates(self, user_obj):
         profiles = Profile.objects.filter(user_id=OuterRef('user_id'))
-        user = User.objects.filter(pk=OuterRef('user_id'))
+        user = get_user_model().objects.filter(pk=OuterRef('user_id'))
         params = {'avatar': Subquery(profiles.values('avatar')[:1]),
                   'username': Subquery(user.values('username')[:1]),
                   'like_count': Count('like', distinct=True),
@@ -89,13 +64,58 @@ class CommentManager(models.Manager):
         return self.get_queryset().annotate(**params)
 
 
+class User(AbstractBaseUser, PermissionsMixin):
+    username_validator = MyUnicodeUsernameValidator()
+    username_min_length = MinLengthValidator(3)
+
+    username = models.CharField(
+        max_length=16,
+        unique=True,
+        validators=[username_validator, username_min_length],
+        verbose_name='ნიკი'
+    )
+
+    email = models.EmailField(unique=True, verbose_name='Email')
+
+    is_staff = models.BooleanField(
+        default=False,
+        verbose_name='თანამშრომლობის სტატუსი'
+    )
+
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name='აქტიურია'
+    )
+
+    date_joined = models.DateTimeField(default=timezone.now, verbose_name='გაწევრიანების თარიღი')
+
+    objects = CustomUserManager()
+
+    EMAIL_FIELD = 'email'
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
+
+    class Meta:
+        verbose_name = _('user')
+        verbose_name_plural = _('users')
+        db_table = "user"
+
+    def clean(self):
+        super().clean()
+        self.email = self.__class__.objects.normalize_email(self.email)
+
+    def email_user(self, subject, message, from_email=None, **kwargs):
+        send_mail(subject, message, from_email, [self.email], **kwargs)
+
+
+# TODO check like dislike blank
 class Comment(models.Model):
     anime = models.ForeignKey(Anime, on_delete=models.CASCADE, related_name='comments', verbose_name='გვერდი')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comment',
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='comment',
                              verbose_name='მომხმარებელი')
     body = models.TextField(verbose_name='ტექსტი')
-    like = models.ManyToManyField(User, blank=True, editable=False, related_name='likes')
-    dislike = models.ManyToManyField(User, blank=True, editable=False, related_name='dislikes')
+    like = models.ManyToManyField(settings.AUTH_USER_MODEL, editable=False, related_name='likes')
+    dislike = models.ManyToManyField(settings.AUTH_USER_MODEL, editable=False, related_name='dislikes')
     created = models.DateTimeField(auto_now_add=True, verbose_name='თარიღი')
     active = models.BooleanField(default=True, verbose_name='აქტიურია')
     priority = models.PositiveSmallIntegerField(null=True, verbose_name='პრიორიტეტი')
@@ -107,6 +127,7 @@ class Comment(models.Model):
         ordering = ['priority', '-id']
         verbose_name = 'კომენტარი'
         verbose_name_plural = 'კომენტარი'
+        db_table = "comment"
 
     def get_more_comment_info(self, request_user):
         vote = None
@@ -180,7 +201,7 @@ class Profile(models.Model):
         (1, 'მდედრობითი')
     )
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     avatar = models.ImageField(upload_to='avatars/', default='no-avatar.jpg', blank=True, verbose_name='ავატარი')
     gender = models.PositiveSmallIntegerField(choices=TYPES, blank=True, null=True, verbose_name='სქესი')
     birth = models.DateField(blank=True, null=True, verbose_name='დაბადების თარიღი')
@@ -188,6 +209,7 @@ class Profile(models.Model):
     class Meta:
         verbose_name = 'პროფილი'
         verbose_name_plural = "პროფილი"
+        db_table = 'user_profile'
 
     def __str__(self):
         return '{}-ის პროფილი'.format(self.user.username)
@@ -202,7 +224,7 @@ def sub_seven_days():
 
 
 class Settings(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     ip = models.GenericIPAddressField(verbose_name='IP', null=True)
     username_updated = models.DateTimeField(default=sub_seven_days)
     avatar_updated = models.DateTimeField(default=sub_three_days)
@@ -212,16 +234,20 @@ class Settings(models.Model):
     class Meta:
         verbose_name = 'პარამეტრი'
         verbose_name_plural = "პარამეტრები"
+        db_table = 'user_settings'
 
     def __str__(self):
         return "{}-ის პარამეტრები".format(self.user.username)
 
 
 class Notification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='notifications')
     reply_comment = models.ForeignKey(Comment, blank=True, on_delete=models.CASCADE)
     visited = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'user_notification'
 
     def __str__(self):
         return "comment_id: {}, reply_id: {}, user_id : {}".format(self.comment.id, self.reply_comment.id,

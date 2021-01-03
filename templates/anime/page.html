@@ -88,7 +88,7 @@
         {% if not anime.soon %}
             {% if anime.type == 0 or anime.type == 2 %}
             <div class="item-page-episodes">
-                {% for episode in anime.series.all|dictsort:"row" %}
+                {% for episode in anime.videos.all|dictsort:"row" %}
                 <div class="episode-select-button" data-id="{{episode.row}}" data-url="{{episode.url}}">{{ episode.row }}</div>
                 {% endfor %}
             </div>
@@ -97,7 +97,7 @@
             </div>
             {% else %}
             <div class="item-player">
-                {% with anime.series.all|first as episode %}
+                {% with anime.videos.all|first as episode %}
                     <iframe src="{{ episode.url }}" frameborder="0" allowfullscreen="true"></iframe>
                 {% endwith %}
             </div>

@@ -27,7 +27,6 @@ class FeedbackForm(forms.ModelForm):
     email = forms.EmailField(max_length=254)
 
     details = forms.CharField(
-        label="",
         widget=forms.Textarea(attrs={'placeholder': 'წერილი', 'class': 'form-input', })
     )
 

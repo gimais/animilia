@@ -15,7 +15,7 @@
                             <hr class="schedule-hr">
                             <div class="schedule-info">
                             {% if row.text == "" %}
-                                {% load account_tags %}
+                                {% load extra_tags %}
                                 <p class="schedule-pg">{{ row.date|date:"d.m.Y (l)" }}</p><br>
                                 <p class="schedule-pg">{{ row.from_time|time:"H:i" }} - {{ row.to_time|time:"H:i" }}</p>
                                 <p class="schedule-max">{{ row.max|geo_number }} სერია</p>

@@ -1,8 +1,7 @@
 import datetime
 
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
@@ -21,6 +20,8 @@ from .tokens import email_change_token
 
 ERROR = {'error': 'moxda shecdoma!'}
 
+User = get_user_model()
+
 
 def login_view(request):
     next_page = request.GET.get('next') or request.META.get('HTTP_REFERER', '/')
@@ -32,8 +33,8 @@ def login_view(request):
             return redirect(next_page)
         else:
             try:
-                error = form.errors.as_data()['__all__'][0].message
-            except IndexError:
+                error = form.non_field_errors().as_data()[0].messages[0]
+            except:
                 error = "მოხდა კრიტიკული შეცდომა, გთხოვთ მიწეროთ ადმინისტრაციას დეტალებისთვის."
             messages.error(request, error, extra_tags='failedAuth')
             return redirect(next_page)
@@ -56,12 +57,12 @@ def signup_view(request):
                 x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
 
                 if x_forwarded_for:
-                    ipaddress = x_forwarded_for.split(',')[-1].strip()
+                    ip_address = x_forwarded_for.split(',')[-1].strip()
                 else:
-                    ipaddress = request.META.get('REMOTE_ADDR')
+                    ip_address = request.META.get('REMOTE_ADDR')
 
                 save_ip = Settings.objects.get(user_id=user.pk)
-                save_ip.ip = ipaddress
+                save_ip.ip = ip_address
                 save_ip.save()
                 return redirect('profile')
         else:
@@ -455,7 +456,7 @@ def check_notification(request):
         notifications = Notification.objects.select_related('user', 'reply_comment', 'comment'). \
             filter(user_id=request.user).values_list(
             'reply_comment_id', 'reply_comment__body', 'comment__created',
-            'comment__anime__slug', 'reply_comment__parent', 'id','visited').order_by('-comment__created')
+            'comment__anime__slug', 'reply_comment__parent', 'id', 'visited').order_by('-comment__created')
 
         return render(request, 'account/notifications.html', {'notifications': notifications})
     else:

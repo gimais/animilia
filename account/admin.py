@@ -1,12 +1,15 @@
 from django.contrib import admin
+from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from .models import User, Comment, Profile, Settings
-
+from .models import Comment, Profile, Settings
 
 # Register your models here.
+
+User = get_user_model()
+
 
 class CommentAdmin(admin.ModelAdmin):
     list_per_page = 20
@@ -111,6 +114,7 @@ class CustomUserAdmin(UserAdmin):
 
     def has_add_permission(self, request, obj=None):
         return False
+
 
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Comment, CommentAdmin)

@@ -28,7 +28,7 @@ msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
-"ნიკი ან პაროლი არასწორია. "
+"%(username)s ან პაროლი არასწორია. "
 "თავიდან სცადეთ."
 
 #, python-format სტაფი

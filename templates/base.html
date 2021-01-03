@@ -62,16 +62,13 @@
                     {% if user.is_staff %}
                         <li><a href="/admin/" target="_blank">პანელი</a></li>
                     {% endif %}
-                    {% load account_tags %}
-                    {% with notification_count=user|notif_count %}
                         <li>
                             <a class="menu-icon fas fa-bell" href="{% url 'notification' %}">
-                            {% if notification_count %}
-                                <span class="notif-count">{{ notification_count }}</span>
+                            {% if user.notif %}
+                                <span class="notif-count">{{ user.notif }}</span>
                             {% endif %}
                             </a>
                         </li>
-                       {% endwith %}
                         <li><a class='active' href="{% url 'profile' %}" data-id="{{ user.id }}">პროფილი</a></li>
                         <li><a class="menu-icon fas fa-sign-out-alt" href="{% url 'logout' %}?next={% block logout_redirect %}{% endblock %}">
                             <span>გასვლა</span>

@@ -13,11 +13,11 @@ def feedback(request):
             x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
 
             if x_forwarded_for:
-                ipaddress = x_forwarded_for.split(',')[-1].strip()
+                ip_address = x_forwarded_for.split(',')[-1].strip()
             else:
-                ipaddress = request.META.get('REMOTE_ADDR')
+                ip_address = request.META.get('REMOTE_ADDR')
 
-            form.ip = ipaddress
+            form.ip = ip_address
 
             if request.user.is_authenticated:
                 form.registered_user = request.user

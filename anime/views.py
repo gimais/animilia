@@ -27,11 +27,12 @@ def page_view(request, slug):
         'comment_form': CommentForm
     }
 
+    # todo change account_comment to relative table
     if 'parent' in request.GET.keys():
         comments = anime.comments.related_objects_annotates(request.user).filter(
             Q(active=True) | Q(active_replies_count__gte=1),
             parent__isnull=True).order_by(
-            RawSQL('CASE WHEN "account_comment"."id" = %s THEN 1 ELSE 2 END', (request.GET['parent'],)), '-priority',
+            RawSQL('CASE WHEN "comment"."id" = %s THEN 1 ELSE 2 END', (request.GET['parent'],)), '-priority',
             '-id')
 
         if 'notif' in request.GET.keys():
@@ -73,7 +74,7 @@ def more_comments(request):
         if parent_id:
             comments = Comment.objects.related_objects_annotates(request.user).filter(
                 Q(active=True) | Q(active_replies_count__gte=1), parent__isnull=True, anime=anime_id).order_by(
-                RawSQL('CASE WHEN "account_comment"."id" = %s THEN 1 ELSE 2 END', (request.GET['parent'],)),
+                RawSQL('CASE WHEN "comment"."id" = %s THEN 1 ELSE 2 END', (request.GET['parent'],)),
                 '-priority',
                 '-id')
         else:
@@ -100,5 +101,5 @@ def more_comments(request):
 def schedule(request):
     objs = Schedule.objects.select_related('anime').values('date', 'from_time', 'text', 'to_time', 'anime__name',
                                                            'anime__poster', 'anime__slug',
-                                                           max=Count('anime__series__row') + 1).all().order_by('-date')
+                                                           max=Count('anime__videos__row') + 1).all().order_by('-date')
     return render(request, 'schedule.html', {'schedule': objs})

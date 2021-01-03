@@ -5,10 +5,10 @@ from django.db.models import F
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=18, unique=True)
+    name = models.CharField(max_length=18, unique=True, verbose_name='სახელი')
 
     class Meta:
-        db_table = 'categories'
+        db_table = 'category'
         verbose_name = 'კატეგორია'
         verbose_name_plural = 'კატეგორია'
 
@@ -17,10 +17,10 @@ class Category(models.Model):
 
 
 class Dubber(models.Model):
-    name = models.CharField(max_length=16, unique=True)
+    name = models.CharField(max_length=16, unique=True, verbose_name='სახელი')
 
     class Meta:
-        db_table = 'dubbers'
+        db_table = 'dubber'
         verbose_name = 'გამხმოვანებელი'
         verbose_name_plural = 'გამხმოვანებელი'
 
@@ -61,7 +61,7 @@ class Anime(models.Model):
     soon = models.BooleanField(default=False, verbose_name="მალე")
 
     class Meta:
-        db_table = 'animes_list'
+        db_table = 'anime'
         verbose_name = 'ანიმე'
         verbose_name_plural = 'ანიმე'
 
@@ -82,27 +82,26 @@ class Anime(models.Model):
         return self.name
 
 
-class AnimeSeries(models.Model):
-    anime = models.ForeignKey(Anime, on_delete=models.CASCADE, verbose_name='ანიმე', limit_choices_to={'type': 0},
-                              related_name='series')
+class Video(models.Model):
+    anime = models.ForeignKey(Anime, on_delete=models.CASCADE, limit_choices_to={'type': 0}, related_name='videos')
     url = models.CharField(max_length=100, verbose_name='ვიდეოს ლინკი')
-    row = models.PositiveSmallIntegerField(default=1, verbose_name='მერამდენე ეპიზოდია', editable=False)
+    row = models.PositiveSmallIntegerField(default=1, verbose_name='ეპიზოდი', editable=False)
 
     class Meta:
-        db_table = 'animes_series'
-        verbose_name = 'ანიმე სერია'
-        verbose_name_plural = 'ანიმე სერიები'
+        db_table = 'anime_video'
+        verbose_name = 'ვიდეო'
+        verbose_name_plural = 'ვიდეოები'
 
     def delete(self, using=None, keep_parents=False):
-        super(AnimeSeries, self).delete()
+        super(Video, self).delete()
 
-        largest = AnimeSeries.objects.filter(anime=self.anime).aggregate(largest=models.Max('row'))['largest']
+        largest = Video.objects.filter(anime=self.anime).aggregate(largest=models.Max('row'))['largest']
         Anime.objects.filter(pk=self.anime.pk).update(dubbed=largest)
 
     def save(self, *args, **kwargs):
         # Todo Optimize
         if self._state.adding:
-            last_id = AnimeSeries.objects.filter(anime=self.anime).aggregate(largest=models.Max('row'))['largest']
+            last_id = Video.objects.filter(anime=self.anime).aggregate(largest=models.Max('row'))['largest']
 
             if self.anime.type == 1 and last_id is not None:
                 return
@@ -110,13 +109,13 @@ class AnimeSeries(models.Model):
             if last_id is not None:
                 self.row = last_id + 1
 
-        super(AnimeSeries, self).save(*args, **kwargs)
+        super(Video, self).save(*args, **kwargs)
 
         Anime.objects.get(pk=self.anime.pk).updated = datetime.now()  # update after adding episodes
 
         Anime.save(self.anime)
 
-        largest = AnimeSeries.objects.filter(anime=self.anime).aggregate(largest=models.Max('row'))['largest']
+        largest = Video.objects.filter(anime=self.anime).aggregate(largest=models.Max('row'))['largest']
         Anime.objects.filter(pk=self.anime.pk).update(dubbed=largest)
 
     def __str__(self):

@@ -2,14 +2,14 @@ from django.contrib import admin
 from django.db import models
 from django.forms import CheckboxSelectMultiple
 
-from .models import Category, Anime, AnimeSeries, Dubber, Schedule
+from .models import Category, Anime, Video, Dubber, Schedule
 
 
 # Register your models here.
 
 
 class ChoiceInline(admin.TabularInline):
-    model = AnimeSeries
+    model = Video
     extra = 1
 
 

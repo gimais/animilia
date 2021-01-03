@@ -1,14 +1,15 @@
-from account.models import User
+from django.contrib.auth import get_user_model
 from django.db import models
 
-
 # Create your models here.
+
+User = get_user_model()
 
 
 class Feedback(models.Model):
     customer_name = models.CharField(max_length=120, verbose_name='სახელი')
     email = models.EmailField()
-    details = models.TextField(verbose_name='წერილი')
+    details = models.CharField(verbose_name='წერილი',max_length=2000)
     date = models.DateTimeField(auto_now_add=True, verbose_name="თარიღი")
     ip = models.GenericIPAddressField(verbose_name='IP')
     closed = models.BooleanField(default=False, verbose_name='დახურული')

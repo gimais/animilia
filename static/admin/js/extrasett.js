@@ -5,7 +5,7 @@
 
         function toggleRowAddButton(type) {
             let addButton = module.find('.add-row');
-            let emptyInput = module.find('#series-empty');
+            let emptyInput = module.find('#videos-empty');
 
             if (type) {
                 addButton.show();

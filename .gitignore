@@ -7,7 +7,6 @@
 *.pot
 *.pyc
 __pycache__/
-local_settings.py
 #db.sqlite3
 db.sqlite3-journal
 #media
@@ -213,12 +212,10 @@ fabric.properties
 !.elasticbeanstalk/*.global.yml
 .ebextensions/
 
-animilia-env/
-animilia/settings.py
-animilia/urls.py
+env/
+/animilia/
 **/migrations/
 
 db.sqlite3
 media/posters/
 media/avatars/
-/animilia/staff.py

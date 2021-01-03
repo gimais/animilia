@@ -1,18 +1,14 @@
 from django import forms
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordResetForm, \
     PasswordChangeForm, SetPasswordForm
-from django.contrib.auth.models import User
-from django.core.validators import MinLengthValidator, MaxLengthValidator
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
-from account.models import Comment, Profile, Settings
-from account.validators import MyUnicodeUsernameValidator, blacklist, ERRORS
+from account.models import Comment, Settings, Profile
+from account.validators import blacklist, ERRORS
 
-User._meta.get_field('username').validators[0] = MyUnicodeUsernameValidator()
-User._meta.get_field('username').validators[1] = MaxLengthValidator(16)
-User._meta.get_field('username').validators.append(MinLengthValidator(3))
+User = get_user_model()
 
 
 class SignUpForm(UserCreationForm):
@@ -26,16 +22,12 @@ class SignUpForm(UserCreationForm):
         attrs={'class': 'form-input', 'placeholder': 'Email'}))
 
     password1 = forms.CharField(
-        label="",
-        strip=False,
         widget=forms.PasswordInput(attrs={'class': 'form-input', 'placeholder': 'პაროლი (მინ 4 სიმბოლო)'}),
-        help_text='',
+        strip=False,
     )
     password2 = forms.CharField(
-        label='',
         widget=forms.PasswordInput(attrs={'class': 'form-input', 'placeholder': 'გაიმეორეთ პაროლი'}),
         strip=False,
-        help_text="",
     )
 
     def clean_username(self):
@@ -52,12 +44,12 @@ class SignUpForm(UserCreationForm):
                 ERRORS['unique'],
                 code='unique'
             )
-
         return username
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        if User.objects.filter(email=email).exists():
+
+        if User.objects.filter(email__iexact=email).exists():
             raise forms.ValidationError(
                 mark_safe(ERRORS['unique_email']),
                 code='unique_email'
@@ -81,21 +73,14 @@ class MyAuthenticationForm(AuthenticationForm):
         password = self.cleaned_data.get('password')
 
         if username is not None and password:
-            if '@' in username:
-                try:
-                    user = User.objects.get(email=username)
-                except User.DoesNotExist:
-                    raise self.get_invalid_login_error()
-            else:
-                try:
-                    user = User.objects.get(username__iexact=username)
-                except User.DoesNotExist:
-                    raise self.get_invalid_login_error()
+            param = {'email__iexact' if '@' in username else 'username__iexact': username}
+            try:
+                user = User.objects.get(**param)
+            except User.DoesNotExist:
+                raise self.get_invalid_login_error()
 
-            if user.check_password(password):
-                self.confirm_login_allowed(user)
-
-            self.user_cache = authenticate(self.request, username=user, password=password)
+            self.confirm_login_allowed(user)
+            self.user_cache = authenticate(self.request, username=user.username, password=password)
 
             if self.user_cache is None:
                 raise self.get_invalid_login_error()
@@ -112,24 +97,20 @@ class MyPasswordResetForm(PasswordResetForm):
     use_required_attribute = False
 
     email = forms.EmailField(
-        label='',
         max_length=254,
         widget=forms.TextInput(attrs={'autocomplete': 'email', 'class': 'form-input', 'placeholder': 'Email'})
     )
 
 
-# check
 class MySetPasswordForm(SetPasswordForm):
     use_required_attribute = False
 
     new_password1 = forms.CharField(
-        label='',
+        strip=False,
         widget=forms.PasswordInput(
             attrs={'autocomplete': 'new-password', 'class': 'form-input', 'placeholder': 'ახალი პაროლი'}),
-        strip=False,
     )
     new_password2 = forms.CharField(
-        label='',
         strip=False,
         widget=forms.PasswordInput(
             attrs={'autocomplete': 'new-password', 'class': 'form-input', 'placeholder': 'გაიმეორეთ ახალი პაროლი'}),
@@ -140,20 +121,17 @@ class MyPasswordChangeForm(PasswordChangeForm):
     use_required_attribute = False
 
     old_password = forms.CharField(
-        label='',
         strip=False,
         widget=forms.PasswordInput(attrs={'autocomplete': 'current-password', 'class': 'form-input',
                                           'placeholder': 'ძველი პაროლი'}),
     )
 
     new_password1 = forms.CharField(
-        label='',
+        strip=False,
         widget=forms.PasswordInput(
             attrs={'autocomplete': 'new-password', 'class': 'form-input', 'placeholder': 'ახალი პაროლი'}),
-        strip=False,
     )
     new_password2 = forms.CharField(
-        label="",
         strip=False,
         widget=forms.PasswordInput(
             attrs={'autocomplete': 'new-password', 'class': 'form-input', 'placeholder': 'გაიმეორეთ ახალი პაროლი'}),
@@ -276,7 +254,7 @@ class EmailChangeForm(forms.Form):
                     self.error_messages['not_changed'],
                     code='not_changed',
                 )
-            if User.objects.filter(email=new_email1).exists():
+            if User.objects.filter(email__iexact=new_email1).exists():
                 raise forms.ValidationError(
                     mark_safe(ERRORS['unique_email']),
                     code='unique_email'
