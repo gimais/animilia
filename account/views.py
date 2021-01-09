@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
+from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -15,7 +16,7 @@ from django.views.decorators.cache import never_cache
 from account.forms import SignUpForm, MyAuthenticationForm, CommentForm, \
     UpdateProfileForm, UpdateUsernameForm, EmailChangeForm, ShowProfileForm
 from anime.models import Anime
-from .models import Comment, Profile, Notification, Settings
+from .models import Comment, Profile, Notification, Settings, Reply
 from .tokens import email_change_token
 
 ERROR = {'error': 'moxda shecdoma!'}
@@ -34,7 +35,7 @@ def login_view(request):
         else:
             try:
                 error = form.non_field_errors().as_data()[0].messages[0]
-            except:
+            except IndexError:
                 error = "მოხდა კრიტიკული შეცდომა, გთხოვთ მიწეროთ ადმინისტრაციას დეტალებისთვის."
             messages.error(request, error, extra_tags='failedAuth')
             return redirect(next_page)
@@ -49,8 +50,8 @@ def signup_view(request):
             if form.is_valid():
                 form.save()
                 username = form.cleaned_data.get('username')
-                raw_password = form.cleaned_data.get('password1')
-                user = authenticate(username=username, password=raw_password)
+                password = form.cleaned_data.get('password1')
+                user = authenticate(username=username, password=password)
                 login(request, user)
 
                 # add ip field to settings
@@ -211,7 +212,9 @@ def add_comment(request):
                 try:
                     anime = Anime.objects.get(id=request.POST.get('id', False))
                 except (TypeError, ValueError, OverflowError, Anime.DoesNotExist):
-                    anime = None
+                    return JsonResponse({
+                        'error': 'ასეთი ანიმე არ არსებობს!',
+                    }, status=404)
 
                 if anime:
                     comment = form.save(commit=False)
@@ -220,29 +223,22 @@ def add_comment(request):
 
                     comment.save()
 
-                    response_data = {
-                        'username': request.user.username,
-                        'avatar': request.user.profile.avatar.name,
-                        'user_id': request.user.id,
-                        'comment_id': comment.id,
-                        'time': datetime.datetime.timestamp(comment.created),
-                        'likes': 0,
-                        'dislikes': 0
-                    }
-
-                    status = 200
-                else:
-                    response_data = {
-                        'error': 'aseti anime bazashi ar aris!',
-                    }
-                    status = 404
-                return JsonResponse(response_data, status=status)
+                return JsonResponse({
+                    'username': request.user.username,
+                    'avatar': request.user.profile.avatar.name,
+                    'user_id': request.user.id,
+                    'comment_id': comment.id,
+                    'editable': True,
+                    'time': datetime.datetime.timestamp(comment.created),
+                    'likes': 0,
+                    'dislikes': 0
+                }, status=200)
             else:
                 return JsonResponse(form.errors.get_json_data(), status=400)
         else:
-            return JsonResponse({'error': "araavtorizebuli motxovna!"}, status=401)
+            return JsonResponse({'error': "არაავტორიზებული მოთხოვნა!"}, status=401)
     else:
-        return JsonResponse({'error': "arasowri motxovna!"}, status=405)
+        return JsonResponse({'error': "არასწორი მოთხოვნა!"}, status=405)
 
 
 def reply_comment(request):
@@ -251,54 +247,38 @@ def reply_comment(request):
             form = CommentForm(request.POST)
             if form.is_valid():
                 try:
-                    parent_id = int(request.POST.get('parent_id', False))
-                    parent_comment = Comment.objects.get(id=parent_id)
-                except (TypeError, ValueError, OverflowError, Comment.DoesNotExist):
-                    parent_comment = None
+                    parent_comment = Comment.objects.get(id=int(request.POST.get('parent_id', False)))
+                except (ValueError, Comment.DoesNotExist):
+                    return JsonResponse({'error': 'ასეთი კომენტარი არ არსებობს!'}, status=404)
 
-                if parent_comment:
-                    # send notification to replying_comment_author
-                    try:
-                        replying_to_id = int(request.POST.get('replying_to_id', False))
-                        replying_to_comment_obj = Comment.objects.get(id=replying_to_id)
-                    except (TypeError, ValueError, OverflowError, Comment.DoesNotExist):
-                        replying_to_comment_obj = None
+                try:
+                    to_comment = Comment.objects.get(id=int(request.POST.get('replying_to_id', False)))
+                except (ValueError, Comment.DoesNotExist):
+                    to_comment = parent_comment
 
-                    if replying_to_comment_obj:
-                        replying_comment_author = replying_to_comment_obj.user_id
-                    else:
-                        replying_to_comment_obj = parent_comment
-                        replying_comment_author = parent_comment.user_id
+                reply_comment = form.save(commit=False)
+                reply_comment.anime = parent_comment.anime
+                reply_comment.parent = parent_comment
+                reply_comment.user = request.user
 
-                    reply_comment = form.save(commit=False)
-                    reply_comment.anime = parent_comment.anime
-                    reply_comment.parent = parent_comment
-                    reply_comment.user = request.user
+                reply_comment.save()
 
-                    reply_comment.save()
+                Reply.objects.create(
+                    to_comment=to_comment,
+                    reply_comment=reply_comment
+                )
 
-                    if not replying_comment_author == request.user.id:
-                        Notification.objects.create(
-                            reply_comment_id=replying_to_comment_obj.id,
-                            user_id=replying_comment_author,
-                            comment_id=reply_comment.id
-                        )
-
-                    response_data = {
-                        'username': request.user.username,
-                        'avatar': request.user.profile.avatar.name,
-                        'user_id': request.user.id,
-                        'comment_id': reply_comment.id,
-                        'parent_id': reply_comment.parent.id,
-                        'time': datetime.datetime.timestamp(reply_comment.created),
-                        'likes': 0,
-                        'dislikes': 0
-                    }
-                    status = 200
-                else:
-                    response_data = {'error': 'aseti komentari ar arseobs!'}
-                    status = 404
-                return JsonResponse(response_data, status=status)
+                return JsonResponse({
+                    'username': request.user.username,
+                    'avatar': request.user.profile.avatar.name,
+                    'user_id': request.user.id,
+                    'editable': True,
+                    'comment_id': reply_comment.id,
+                    'parent_id': reply_comment.parent.id,
+                    'time': datetime.datetime.timestamp(reply_comment.created),
+                    'likes': 0,
+                    'dislikes': 0
+                }, status=200)
             else:
                 return JsonResponse(form.errors.get_json_data(), status=400)
         else:
@@ -320,7 +300,7 @@ def check_replies(request, id):
             if paginator.num_pages >= page > 0:
                 result = {'replies': [], 'availablePages': paginator.num_pages}
                 for reply in paginator.get_page(page).object_list:
-                    result['replies'].append(reply.get_reply_comment_info(request.user.pk))
+                    result['replies'].append(reply.get_reply_comment_info(request.user))
                 return JsonResponse(result, status=200)
         return JsonResponse(ERROR, status=404)
     return JsonResponse(ERROR, status=405)
@@ -359,32 +339,26 @@ def edit_comment(request):
     if request.is_ajax() and request.method == "POST":
         if request.user.is_authenticated:
             try:
-                comment_id = Comment.objects.get(id=request.POST.get('id', False))
+                comment = Comment.objects.get(id=request.POST.get('id', False))
             except (TypeError, ValueError, OverflowError, Comment.DoesNotExist):
-                comment_id = None
+                return JsonResponse({'error': 'moxda shecdoma!'}, status=400)
 
             body = request.POST.get('body', None)
 
-            if comment_id and body:
+            if body and request.user == comment.user and comment.like.count() == 0 and \
+                    comment.dislike.count() == 0 and comment.children.filter(active=True). \
+                    exclude(user_id=request.user).count() == 0 and \
+                    comment.replies.exclude(reply_comment__user=request.user).count() == 0 and comment.active:
 
-                if request.user == comment_id.user and comment_id.like.count() == 0 and \
-                        comment_id.dislike.count() == 0 and comment_id.replies.filter(active=True). \
-                        count() == 0 and comment_id.active:
+                comment.body = body
+                comment.created = timezone.now()
+                comment.save()
 
-                    comment_id.body = body
-                    comment_id.created = timezone.now()
-                    comment_id.save()
-
-                    response_data = {
-                        'info': 'komentari sheicvala!',
-                        'time': datetime.datetime.timestamp(comment_id.created),
-                    }
-                    status = 200
-                else:
-                    response_data = {
-                        'error': 'moxda shecdoma!'
-                    }
-                    status = 401 if request.user.id != comment_id.user.id else 400
+                response_data = {
+                    'success': True,
+                    'time': datetime.datetime.timestamp(comment.created),
+                }
+                status = 200
             else:
                 response_data = {
                     'error': 'moxda shecdoma!'
@@ -401,23 +375,23 @@ def edit_comment(request):
 def like_comment(request):
     if request.user.is_authenticated:
         try:
-            comment_id = Comment.objects.prefetch_related('like', 'dislike').get(id=request.POST.get('id', False))
+            comment = Comment.objects.prefetch_related('like', 'dislike').get(id=request.POST.get('id', False))
         except (TypeError, ValueError, OverflowError, Comment.DoesNotExist):
-            comment_id = None
+            comment = None
 
-        if comment_id and comment_id.user != request.user:
+        if comment and comment.user != request.user:
 
-            if comment_id.dislike.filter(
+            if comment.dislike.filter(
                     id=request.user.id).exists():  # თუ დისლაიქი აქვს კომს წაშალე დისლაქი და დაამატე ლაიქი
-                comment_id.dislike.remove(request.user)
-                comment_id.like.add(request.user)
+                comment.dislike.remove(request.user)
+                comment.like.add(request.user)
                 return JsonResponse({'type': 2}, status=200)
-            elif comment_id.like.filter(
+            elif comment.like.filter(
                     id=request.user.id).exists():  # თუ ლაიქი აქვს უკვე,ესეიგი ანლაიქი უნდა და წაშალე ლაიქი
-                comment_id.like.remove(request.user)
+                comment.like.remove(request.user)
                 return JsonResponse({'type': 0}, status=200)
             else:  # არაფერი ეწინააღმდეგება ,უბრალოდ დაამატე ლაიქი
-                comment_id.like.add(request.user)
+                comment.like.add(request.user)
                 return JsonResponse({'type': 1}, status=200)
 
         else:
@@ -429,38 +403,56 @@ def like_comment(request):
 def dislike_comment(request):
     if request.user.is_authenticated:
         try:
-            comment_id = Comment.objects.prefetch_related('dislike', 'like').get(id=request.POST.get('id', False))
+            comment = Comment.objects.prefetch_related('dislike', 'like').get(id=request.POST.get('id', False))
         except (TypeError, ValueError, OverflowError, Comment.DoesNotExist):
-            comment_id = None
+            return JsonResponse({'error': 'dafiqsirda shecdoma!'}, status=400)
 
-        if comment_id and comment_id.user != request.user:
+        if comment.user != request.user:
 
-            if comment_id.like.filter(id=request.user.id).exists():
-                comment_id.like.remove(request.user)
-                comment_id.dislike.add(request.user)
+            if comment.like.filter(id=request.user.id).exists():
+                comment.like.remove(request.user)
+                comment.dislike.add(request.user)
                 return JsonResponse({'type': 2}, status=200)
-            elif comment_id.dislike.filter(id=request.user.id).exists():
-                comment_id.dislike.remove(request.user)
+            elif comment.dislike.filter(id=request.user.id).exists():
+                comment.dislike.remove(request.user)
                 return JsonResponse({'type': 0}, status=200)
             else:
-                comment_id.dislike.add(request.user)
+                comment.dislike.add(request.user)
                 return JsonResponse({'type': 1}, status=200)
-        else:
-            return JsonResponse({'error': 'dafiqsirda shecdoma!'}, status=400)
-    else:
-        return JsonResponse({'error': "araavtorizebuli motxovna!"}, status=401)
+    return JsonResponse({'error': "araavtorizebuli motxovna!"}, status=401)
 
 
 def check_notification(request):
     if request.user.is_authenticated:
-        notifications = Notification.objects.select_related('user', 'reply_comment', 'comment'). \
-            filter(user_id=request.user).values_list(
-            'reply_comment_id', 'reply_comment__body', 'comment__created',
-            'comment__anime__slug', 'reply_comment__parent', 'id', 'visited').order_by('-comment__created')
+        notifications = request.user.notifications
 
-        return render(request, 'account/notifications.html', {'notifications': notifications})
-    else:
-        return redirect('home')
+        reply = notifications.filter(content_type__model='reply').count()
+        admin_message = notifications.filter(content_type__model='message').count()
+
+        replies = notifications.filter(content_type__model='reply').prefetch_related(
+            'content_object').values(
+            'id', 'reply__to_comment', 'reply__to_comment__body', 'reply__reply_comment__created',
+            'reply__to_comment__anime__slug', 'reply__to_comment__parent_id', 'seen').order_by(
+            '-reply__reply_comment__created')
+
+        return render(request, 'account/notifications.html',
+                      {'total': {'reply': reply, 'admin_message': admin_message}, 'replies': replies})
+    return redirect('home')
+
+
+def check_notification_message(request):
+    if request.user.is_authenticated:
+        notifications = Notification.objects.filter(user_id=request.user)
+
+        reply = notifications.filter(content_type__model='reply').count()
+        admin_message = notifications.filter(content_type__model='message').count()
+
+        message = notifications.filter(content_type__model='message').prefetch_related('content_object').values(
+            'id', 'message__subject', 'message__id', 'message__created', 'seen').order_by('-message__created')
+
+        return render(request, 'account/message.html',
+                      {'total': {'reply': reply, 'admin_message': admin_message}, 'msgs': message})
+    return redirect('home')
 
 
 def delete_notification(request, id):
@@ -474,7 +466,7 @@ def delete_notification(request, id):
             if notification is not None and notification.user_id == request.user.id:
                 notification.delete()
 
-            return JsonResponse({'info': "waishala"}, status=200)
+            return JsonResponse({'success': True}, status=200)
         else:
             return JsonResponse({'error': "araavtorizebuli motxovna!"}, status=401)
     else:

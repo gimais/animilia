@@ -1,0 +1,59 @@
+{% extends "account/notifications.html" %}
+
+{% block notif_content %}
+    <ul class="notifications">
+        {% for msg in msgs %}
+            <li {% if msg.seen %}class="visited"{% endif %}>
+                {#                <div class="message-info">#}
+                <span class="notif-info">
+                        {{ msg.message__subject }}
+                        <a data-id="{{ msg.message__id }}" class="show-message-body">ნახვა</a>
+                    </span>
+                <span class="remove-notif" data-id="{{ msg.id }}" title="წაშლა">
+                        <i class="fas fa-trash" aria-hidden="true"></i>
+                    </span>
+                <span class="notif-time">{{ msg.message__created|date:"d/m/Y | H:i" }}</span>
+                {#                </div>#}
+                <p class="message-body"></p>
+            </li>
+        {% empty %}
+            <div class="form-title" style="margin: 0;">თქვენ გაქვთ 0 შეტყობინება</div>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript">
+
+        $('.show-message-body').click(function (e) {
+            e.preventDefault();
+            let that = $(this);
+            let body = that.parents('li').find('.message-body');
+
+            if (!that.hasClass('done')) {
+                body.text('მოიცადეთ...');
+                $.ajax({
+                    method: "GET",
+                    url: '/contact/message/' + that.data('id'),
+                    success: function (e) {
+                        body.text(e.message);
+                        that.addClass('done');
+                    },
+                    error: function () {
+                        alert('მოხდა შეცდომა! თავიდან სცადეთ! თუ იგივე მოხდა, გთხოვთ მიწეროთ ადმინისტრაციას.');
+                    }
+                });
+            }
+
+            if (!body.hasClass('show')) {
+                console.log('ar aqvs');
+                body.toggleClass('show');
+                that.text('დამალვა')
+            } else {
+                console.log('aqvs');
+                body.toggleClass('show');
+                that.text('ნახვა')
+            }
+        });
+    </script>
+{% endblock %}

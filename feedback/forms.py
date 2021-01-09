@@ -1,5 +1,6 @@
 from django import forms
-from .models import Feedback
+
+from .models import Feedback, Message
 
 
 class FeedbackForm(forms.ModelForm):
@@ -33,3 +34,20 @@ class FeedbackForm(forms.ModelForm):
     class Meta:
         model = Feedback
         fields = ('customer_name', 'email', 'details',)
+
+
+def FeedbackReplyForm(obj):
+    class Form(forms.ModelForm):
+        def __init__(self, *args, **kwargs):
+            if 'initial' not in kwargs:
+                kwargs['initial'] = {}
+            kwargs['initial'].update({'to_user': obj.registered_user, 'subject': 'კონტაქტი #{}'.format(obj.id)})
+            super(Form, self).__init__(*args, **kwargs)
+
+            self.fields['to_user'].widget.attrs['disabled'] = True
+
+        class Meta:
+            model = Message
+            fields = ('to_user', 'subject', 'body')
+
+    return Form

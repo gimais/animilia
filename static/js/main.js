@@ -171,7 +171,7 @@ function makeCommentBoxHTML(data) {
         html += `<div class="user-actions">`;
 
         if (data['user_id'] === request_user_id) {
-            if (data['dislikes'] === 0 && data['likes'] === 0) {
+            if (data['editable'] && data['dislikes'] === 0 && data['likes'] === 0) {
                 html += `<div class="comment-right-buttons" id='edit-comment' style="margin-right: 3px;"><i class="fas fa-edit"></i></div>`;
             }
             html += `<div class="comment-right-buttons" id='remove-comment'><i class="fas fa-trash"></i></div>`;
@@ -185,9 +185,9 @@ function makeCommentBoxHTML(data) {
 
     html += `</div></div>`;
 
-    if (data['active_childs_count'] > 0) {
+    if (data['active_children_count'] > 0) {
         html += `<div class="comment-replies-check closed" data-id="${data['comment_id']}">
-                    პასუხების ჩვენება (${data['childs_count']})
+                    პასუხების ჩვენება (${data['children_count']})
                 </div>
                 <div class="comment-replies-box"></div>`;
     }
@@ -229,7 +229,7 @@ function makeReplyCommentBoxHTML(data) {
         html += `<div class="user-actions">`;
 
         if (data['user_id'] === request_user_id) {
-            if (data['dislikes'] === 0 && data['likes'] === 0) {
+            if (data['editable'] && data['dislikes'] === 0 && data['likes'] === 0) {
                 html += `<div class="comment-right-buttons" id='edit-comment' style="margin-right: 3px"><i class="fas fa-edit"></i></div>`;
             }
             html += `<div class="comment-right-buttons" id='remove-comment'><i class="fas fa-trash"></i></div>`;
@@ -249,7 +249,7 @@ function makeReplyCommentBoxHTML(data) {
 
 function makeDeletedCommentBoxHTML(data) {
     let html = '';
-    html += `<div class="comment ${data['active_childs_count'] ? 'clearfix' : ''}">
+    html += `<div class="comment ${data['active_children_count'] ? 'clearfix' : ''}">
                     <a class="comment-user-img" href="/profile/${data['user_id']}/">
                         <img src=${'/media/' + data.avatar} alt="avatar" loading="lazy">
                     </a>
@@ -260,9 +260,9 @@ function makeDeletedCommentBoxHTML(data) {
                         </div>
                             <p class="deleted-comment">ეს კომენტარი წაშლილია</p>
                     </div>`;
-    if (typeof data['active_childs_count'] !== "undefined" && data['active_childs_count'] > 0) {
+    if (typeof data['active_children_count'] !== "undefined" && data['active_children_count'] > 0) {
         html += `<div class="comment-replies-check closed" data-id="${data['comment_id']}">
-                    პასუხების ჩვენება (${data['childs_count']})
+                    პასუხების ჩვენება (${data['children_count']})
                 </div>
                 <div class="comment-replies-box"></div>`;
     }

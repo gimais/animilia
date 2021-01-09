@@ -4,6 +4,8 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django.core.mail import send_mail
 from django.core.validators import MinLengthValidator
 from django.db import models
@@ -19,7 +21,7 @@ class CustomUserManager(BaseUserManager):
 
     def get_queryset(self):
         return super(CustomUserManager, self).get_queryset().annotate(
-            notif=Count('notification', filter=Q(notification__visited=False)))
+            notif=Count('notifications', filter=Q(notifications__seen=False)))
 
     def create_user(self, username, email, password, is_staff=False, is_superuser=False, **extra_fields):
         if not username:
@@ -44,15 +46,15 @@ class CustomUserManager(BaseUserManager):
 
 
 class CommentManager(models.Manager):
-    def related_objects_annotates(self, user_obj):
+    def annotates_related_objects(self, user_obj):
         profiles = Profile.objects.filter(user_id=OuterRef('user_id'))
         user = get_user_model().objects.filter(pk=OuterRef('user_id'))
         params = {'avatar': Subquery(profiles.values('avatar')[:1]),
                   'username': Subquery(user.values('username')[:1]),
                   'like_count': Count('like', distinct=True),
                   'dislike_count': Count('dislike', distinct=True),
-                  'replies_count': Count('replies', distinct=True),
-                  'active_replies_count': Count('replies', filter=Q(replies__active=True), distinct=True)}
+                  'children_count': Count('children', distinct=True),
+                  'active_children_count': Count('children', filter=Q(children__active=True), distinct=True)}
 
         if user_obj.is_authenticated:
             has_like = user_obj.likes.filter(id=OuterRef('id'))
@@ -119,7 +121,7 @@ class Comment(models.Model):
     created = models.DateTimeField(auto_now_add=True, verbose_name='თარიღი')
     active = models.BooleanField(default=True, verbose_name='აქტიურია')
     priority = models.PositiveSmallIntegerField(null=True, verbose_name='პრიორიტეტი')
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
 
     objects = CommentManager()
 
@@ -130,13 +132,7 @@ class Comment(models.Model):
         db_table = "comment"
 
     def get_more_comment_info(self, request_user):
-        vote = None
-        if self.like.filter(pk=request_user).exists():
-            vote = 0
-        elif self.dislike.filter(pk=request_user).exists():
-            vote = 1
-
-        return {
+        response = {
             'comment_id': self.pk,
             'user_id': self.user.pk,
             'username': self.user.username,
@@ -145,10 +141,18 @@ class Comment(models.Model):
             'body': self.body,
             'likes': self.like.count(),
             'dislikes': self.dislike.count(),
-            'childs_count': self.replies.count(),
-            'active_childs_count': self.replies.filter(active=True).count(),
-            'voted': vote,
+            'children_count': self.children.count(),
+            'active_children_count': self.children.filter(active=True).count(),
         }
+
+        if request_user.is_authenticated:
+            if self.like.filter(pk=request_user.id).exists():
+                response['voted'] = 0
+            elif self.dislike.filter(pk=request_user.id).exists():
+                response['voted'] = 1
+            else:
+                response['voted'] = None
+        return response
 
     def get_deleted_comment_info(self):
         return {
@@ -158,19 +162,13 @@ class Comment(models.Model):
             'username': self.user.username,
             'avatar': self.user.profile.avatar.name,
             'time': datetime.timestamp(self.created),
-            'childs_count': self.replies.count(),
-            'active_childs_count': self.replies.filter(active=True).count(),
+            'children_count': self.children.count(),
+            'active_children_count': self.children.filter(active=True).count(),
         }
 
-    def get_reply_comment_info(self, request_user=None):
+    def get_reply_comment_info(self, request_user):
         if self.active:
-            vote = None
-            if self.like.filter(pk=request_user).exists():
-                vote = 0
-            elif self.dislike.filter(pk=request_user).exists():
-                vote = 1
-
-            return {
+            response = {
                 'comment_id': self.pk,
                 'parent_id': self.parent.pk,
                 'user_id': self.user.pk,
@@ -180,8 +178,18 @@ class Comment(models.Model):
                 'body': self.body,
                 'likes': self.like.count(),
                 'dislikes': self.dislike.count(),
-                'voted': vote,
             }
+
+            if self.user == request_user:
+                response['editable'] = self.replies.exclude(reply_comment__user=request_user).count() == 0
+            elif request_user.is_authenticated:
+                if self.like.filter(pk=request_user.id).exists():
+                    response['voted'] = 0
+                elif self.dislike.filter(pk=request_user.id).exists():
+                    response['voted'] = 1
+                else:
+                    response['voted'] = None
+            return response
         else:
             return {
                 'deleted': True,
@@ -240,15 +248,27 @@ class Settings(models.Model):
         return "{}-ის პარამეტრები".format(self.user.username)
 
 
-class Notification(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='notifications')
+class Reply(models.Model):
+    to_comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='replies')
     reply_comment = models.ForeignKey(Comment, blank=True, on_delete=models.CASCADE)
-    visited = models.BooleanField(default=False)
+    notification = GenericRelation('Notification', related_query_name='reply')
+
+    class Meta:
+        db_table = 'comment_reply'
+
+    def __str__(self):
+        return str(self.id)
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+    seen = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'user_notification'
 
     def __str__(self):
-        return "comment_id: {}, reply_id: {}, user_id : {}".format(self.comment.id, self.reply_comment.id,
-                                                                   self.user.username)
+        return "user: {}, id: {}".format(self.user.username, self.id)

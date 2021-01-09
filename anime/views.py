@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 
 from account.forms import CommentForm
-from account.models import Comment, Notification
+from account.models import Comment
 from anime.models import Anime, Schedule
 
 ERROR = {'error': 'moxda shecdoma!'}
@@ -27,26 +27,20 @@ def page_view(request, slug):
         'comment_form': CommentForm
     }
 
-    # todo change account_comment to relative table
+    # todo change rawsql with django methods
     if 'parent' in request.GET.keys():
-        comments = anime.comments.related_objects_annotates(request.user).filter(
-            Q(active=True) | Q(active_replies_count__gte=1),
+        comments = anime.comments.annotates_related_objects(request.user).filter(
+            Q(active=True) | Q(active_children_count__gte=1),
             parent__isnull=True).order_by(
             RawSQL('CASE WHEN "comment"."id" = %s THEN 1 ELSE 2 END', (request.GET['parent'],)), '-priority',
             '-id')
 
-        if 'notif' in request.GET.keys():
-            try:
-                notification = request.user.notification_set.get(id=int(request.GET['notif']), visited=False)
-            except (Notification.DoesNotExist, ValueError):
-                notification = None
-
-            if notification is not None:
-                notification.visited = True
-                notification.save()
+        notification = request.GET.get('notif', False)
+        if notification.isdecimal():
+            request.user.notifications.filter(id=notification, seen=False).update(seen=True)
     else:
-        comments = anime.comments.related_objects_annotates(request.user).filter(
-            Q(active=True) | Q(active_replies_count__gte=1),
+        comments = anime.comments.annotates_related_objects(request.user).filter(
+            Q(active=True) | Q(active_children_count__gte=1),
             parent__isnull=True)
 
     paginator = Paginator(comments, 6)
@@ -72,14 +66,14 @@ def more_comments(request):
             parent_id = None
 
         if parent_id:
-            comments = Comment.objects.related_objects_annotates(request.user).filter(
-                Q(active=True) | Q(active_replies_count__gte=1), parent__isnull=True, anime=anime_id).order_by(
+            comments = Comment.objects.annotates_related_objects(request.user).filter(
+                Q(active=True) | Q(active_children_count__gte=1), parent__isnull=True, anime=anime_id).order_by(
                 RawSQL('CASE WHEN "comment"."id" = %s THEN 1 ELSE 2 END', (request.GET['parent'],)),
                 '-priority',
                 '-id')
         else:
-            comments = Comment.objects.related_objects_annotates(request.user).filter(
-                Q(active=True) | Q(active_replies_count__gte=1),
+            comments = Comment.objects.annotates_related_objects(request.user).filter(
+                Q(active=True) | Q(active_children_count__gte=1),
                 parent__isnull=True, anime_id=anime_id)
 
         paginator = Paginator(comments, 6)
@@ -99,7 +93,7 @@ def more_comments(request):
 
 
 def schedule(request):
-    objs = Schedule.objects.select_related('anime').values('date', 'from_time', 'text', 'to_time', 'anime__name',
-                                                           'anime__poster', 'anime__slug',
-                                                           max=Count('anime__videos__row') + 1).all().order_by('-date')
+    objs = Schedule.objects.select_related('anime'). \
+        values('date', 'from_time', 'text', 'to_time', 'anime__name', 'anime__poster',
+               'anime__slug', max=Count('anime__videos__row') + 1).all().order_by('-date')
     return render(request, 'schedule.html', {'schedule': objs})

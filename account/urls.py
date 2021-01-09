@@ -19,8 +19,10 @@ urlpatterns = [
     path('login/', local_view.login_view, name='login'),
     path('logout/', views.LogoutView.as_view(), name='logout'),
 
-    path('notifications/', local_view.check_notification, name='notification'),
-    path('notifications/delete/<int:id>', local_view.delete_notification, name='notification'),
+    path('notifications/', local_view.check_notification, name='notifications'),
+    path('notifications/reply/', local_view.check_notification, name='notification_reply'),
+    path('notifications/message/', local_view.check_notification_message, name='notification_message'),
+    path('notifications/delete/<int:id>/', local_view.delete_notification, name='delete_notification'),
 
     path('profile/', local_view.profile_view, name='profile'),
     path('avatar_update/', local_view.avatar_update, name='avatar_update'),

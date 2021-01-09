@@ -59,7 +59,7 @@
                             {% if user.is_authenticated %}
                                 <div class="user-actions">
                                     {% if comment.user_id == user.pk %}
-                                        {% if comment.like_count == 0 and comment.dislike_count == 0 and comment.active_replies_count == 0 %}
+                                        {% if comment.like_count == 0 and comment.dislike_count == 0 and comment.active_children_count == 0 %}
                                             <div class="comment-right-buttons" id='edit-comment'><i
                                                     class="fas fa-edit"></i></div>
                                         {% endif %}
@@ -79,9 +79,9 @@
                         <p class="deleted-comment">ეს კომენტარი წაშლილია</p>
                     {% endif %}
         </div>
-        {% if comment.active_replies_count %}
+        {% if comment.active_children_count %}
             <div class="comment-replies-check closed" data-id="{{ comment.id }}">
-                პასუხების ჩვენება ({{ comment.replies_count }})
+                პასუხების ჩვენება ({{ comment.children_count }})
             </div>
             <div class="comment-replies-box"></div>
         {% endif %}

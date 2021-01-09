@@ -4,6 +4,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
+from feedback.models import Message
 from .models import Comment, Profile, Settings
 
 # Register your models here.
@@ -15,10 +16,11 @@ class CommentAdmin(admin.ModelAdmin):
     list_per_page = 20
     list_display = ('id', 'user', 'anime', 'created', 'active')
     list_filter = ('active', 'created')
-    search_fields = ['user__username', 'body']
+    search_fields = ('user__username', 'body')
     actions = ('active_comments', 'inactive_comments')
     readonly_fields = ('created', 'user', 'anime', 'parent_link', 'body')
     exclude = ('parent',)
+    ordering = ('-id',)
 
     def get_exclude(self, request, obj=None):
         excluded = super().get_exclude(request, obj)

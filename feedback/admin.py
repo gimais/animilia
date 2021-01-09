@@ -1,18 +1,49 @@
 from django.contrib import admin
+from django.db import models
+from django.forms import HiddenInput
 from django.utils.html import format_html
 
-from .models import Feedback
+from .forms import FeedbackReplyForm
+from .models import Feedback, Message
 
 
 # Register your models here.
+
+def ReplyToFeedbackInline(obj):
+    class Inline(admin.StackedInline):
+        model = Message
+        extra = 1
+        max_num = 1
+        form = FeedbackReplyForm(obj)
+        verbose_name = 'პასუხი'
+        formfield_overrides = {
+            models.ForeignKey: {'widget': HiddenInput},
+        }
+
+    return Inline
+
 
 class FeedbackAdmin(admin.ModelAdmin):
     list_per_page = 10
     list_display = ('id', 'ip', 'customer_name', 'date', 'closed', 'registered_user_link')
     list_filter = ('date', 'closed')
     search_fields = ('ip', 'details',)
-    readonly_fields = ('id', 'date', 'ip', 'customer_name', 'email', 'details')
-    exclude = ['registered_user']
+    readonly_fields = ('id', 'date', 'ip', 'customer_name', 'email', 'registered_user', 'details')
+    inlines = ()
+
+    def get_fields(self, request, obj=None):
+        if obj.registered_user is not None:
+            return 'closed', 'id', 'date', 'ip', 'registered_user', 'details',
+        return 'closed', 'id', 'date', 'ip', 'customer_name', 'email', 'details',
+
+    def get_inline_instances(self, request, obj=None):
+        if obj.registered_user is not None:
+            return [inline(self.model, self.admin_site) for inline in self.inlines]
+        return []
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        self.inlines = (ReplyToFeedbackInline(Feedback.objects.get(id=object_id)),)
+        return super(FeedbackAdmin, self).change_view(request, object_id)
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -30,4 +61,15 @@ class FeedbackAdmin(admin.ModelAdmin):
     registered_user_link.short_description = "მომხმარებელი"
 
 
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ('id', 'subject', 'created')
+    fields = ('to_everyone','subject', 'body')
+    search_fields = ('subject',)
+
+    def get_queryset(self, request):
+        queryset = super(MessageAdmin, self).get_queryset(request)
+        return queryset.filter(to_everyone=True)
+
+
 admin.site.register(Feedback, FeedbackAdmin)
+admin.site.register(Message, MessageAdmin)

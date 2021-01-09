@@ -21,6 +21,13 @@ class AnimeAdmin(admin.ModelAdmin):
     list_display = ("name", 'dubbed', "type", 'slug', 'updated', 'finished')
     inlines = [ChoiceInline]
 
+    fieldsets = (
+        ('სახელები', {'fields': ('name', 'namege', 'nameen', 'namejp', 'nameru')}),
+        ('დეტალები', {'fields': ('director', 'studio', 'year', 'age', 'categories',
+                                 'type', 'episodes', 'rating', 'poster', 'description')}),
+        ('ანიმილია', {'fields': ('dubbers', 'slug', 'finished', 'soon')}),
+    )
+
     class Media:
         js = ('admin/js/extrasett.js',)
 

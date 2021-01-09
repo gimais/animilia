@@ -1,9 +1,11 @@
 from django.contrib import messages
-from django.shortcuts import render
+from django.http import JsonResponse
+from django.shortcuts import render, get_object_or_404
 from .forms import FeedbackForm
 
-
 # Create your views here.
+from .models import Message
+
 
 def feedback(request):
     if request.method == 'POST':
@@ -31,3 +33,16 @@ def feedback(request):
         else:
             form = FeedbackForm()
     return render(request, 'feedback.html', {'form': form})
+
+
+def get_message(request, id):
+    message = get_object_or_404(Message, id=id)
+
+    if message.to_everyone or message.to_user == request.user:
+        message.notification.filter(seen=False, user_id=request.user).update(seen=True)
+
+        return JsonResponse({
+            'message': message.body
+        }, status=200)
+
+    return JsonResponse({'error': 'araavtorizebuli motxovna'}, status=401)
