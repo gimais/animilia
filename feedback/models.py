@@ -37,6 +37,8 @@ class Message(models.Model):
 
     class Meta:
         db_table = 'message'
+        verbose_name = 'წერილი'
+        verbose_name_plural = 'წერილი'
 
     def __str__(self):
         return str(self.id)
