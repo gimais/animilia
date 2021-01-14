@@ -11,7 +11,7 @@
                             <a href = "/anime/{{ anime.slug }}">
                                 <div style="position: relative;overflow: hidden">
                                     <div class="home-item-image">
-                                        <img src={% if anime.poster %}"/media/{{ anime.poster }}?r=1" {% else %} {% static 'img/no-poster-available.jpg' %} {% endif %} alt="{{ anime.name }}">
+                                        <img src={% if anime.poster %}"/media/{{ anime.poster }}?v=2" {% else %} {% static 'img/no-poster-available.jpg' %} {% endif %} alt="{{ anime.name }}">
                                     </div>
                                     {% if anime.soon %}
                                         <img class='soon' src="{% static 'img/soon_poster.svg' %}" alt="{{ anime.name }}">

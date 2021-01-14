@@ -207,20 +207,20 @@ nav{
     position: absolute;
     top:175px;
     border-radius: 50%;
-    background: url('/static/img/logo.png');
+    background: url('/static/img/logo.png?v=1');
 }
 
 .logo:hover{
-    background: url('/static/img/logo_focus.png');
+    background: url('/static/img/logo_focus.png?v=1');
 }
 
 .logo:hover + .web-name {
-    background: url('/static/img/name_focus.png') no-repeat;
+    background: url('/static/img/name_focus.png?v=1') no-repeat;
 }
 
 
 .web-name{
-    background: url('/static/img/name.png') no-repeat;
+    background: url('/static/img/name.png?v=1') no-repeat;
     height: 43px;
     width: 139px;
     display: inline-block;
