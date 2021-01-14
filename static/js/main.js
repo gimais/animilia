@@ -149,7 +149,11 @@ function makeCommentBoxHTML(data) {
                         <div class="comment-info">
                             <a class='comment-user${data['user_id'] === request_user_id ? " mine" : ""}' href="/profile/${data['user_id']}/">${data.username}</a>`;
 
-    if (typeof request_user_id !== "undefined")
+    if (!data['user_active']) {
+        html += `<span style="color: #dc1515;font-weight: 600;font-size: 10px"> BANNED</span>`;
+    }
+
+    if (typeof request_user_id !== "undefined" && data['user_active'])
         html += `<p class="reply-button" data-id="${data['comment_id']}" data-username="${data.username}">
                             <i class="fas fa-reply"></i> პასუხი
                         </p>`;
@@ -176,11 +180,12 @@ function makeCommentBoxHTML(data) {
             }
             html += `<div class="comment-right-buttons" id='remove-comment'><i class="fas fa-trash"></i></div>`;
         }
-
-        html += `<p class="reply-button touch" data-id="${data['comment_id']}" data-username="${data.username}">
+        if(data['user_active']){
+                    html += `<p class="reply-button touch" data-id="${data['comment_id']}" data-username="${data.username}">
                         <i class="fas fa-reply"></i>  პასუხი
-                </p>
-                </div>`;
+                </p>`;
+        }
+        html += `</div>`;
     }
 
     html += `</div></div>`;
@@ -205,9 +210,13 @@ function makeReplyCommentBoxHTML(data) {
                     </a>
                     <div class="comment-body">
                         <div class="comment-info">
-                            <a class='comment-user${data['user_id'] === request_user_id ? " mine" : ""}' href="/profile/${data['user_id']}/">${data.username}</a>`;
+                            <a class='comment-user${data['user_id'] === request_user_id ? " mine" : ""}' href="/profile/${data['user_id']}/">${data.username} </a>`;
 
-    if (typeof request_user_id !== "undefined")
+    if (!data['user_active']) {
+        html += `<span style="color: #dc1515;font-weight: 600;font-size: 10px"> BANNED</span>`;
+    }
+
+    if (typeof request_user_id !== "undefined" && data['user_active'])
         html += `<p class="reply-button" data-it="${data.parent_id}" data-id="${data['comment_id']}" data-username="${data.username}">
                             <i class="fas fa-reply"></i> პასუხი
                 </p>`;
@@ -234,11 +243,11 @@ function makeReplyCommentBoxHTML(data) {
             }
             html += `<div class="comment-right-buttons" id='remove-comment'><i class="fas fa-trash"></i></div>`;
         }
-
-        html += `<p class="reply-button touch" data-it="${data.parent_id}" data-id="${data['comment_id']}" data-username="${data.username}">
+        if (data['user_active']) {
+            html += `<p class="reply-button touch" data-it="${data.parent_id}" data-id="${data['comment_id']}" data-username="${data.username}">
                         <i class="fas fa-reply"></i>  პასუხი
-                </p>
-                </div>`;
+                </p>`;
+        }
     }
 
     html += `</div></div></div>`;
@@ -255,11 +264,15 @@ function makeDeletedCommentBoxHTML(data) {
                     </a>
                     <div class="comment-body">
                         <div class="comment-info">
-                            <a class='comment-user' href="/profile/${data['user_id']}/">${data.username}</a>
-                            <p class='comment-time'>${convertTimeGeo(data.time)}</p>
+                            <a class='comment-user' href="/profile/${data['user_id']}/">${data.username}</a>`;
+    if (!data['user_active']) {
+        html += `<span style="color: #dc1515;font-weight: 600;font-size: 10px"> BANNED</span>`;
+    }
+    html += `<p class='comment-time'>${convertTimeGeo(data.time)}</p>
                         </div>
                             <p class="deleted-comment">ეს კომენტარი წაშლილია</p>
                     </div>`;
+
     if (typeof data['active_childs_count'] !== "undefined" && data['active_childs_count'] > 0) {
         html += `<div class="comment-replies-check closed" data-id="${data['comment_id']}">
                     პასუხების ჩვენება (${data['childs_count']})

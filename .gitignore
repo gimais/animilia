@@ -213,12 +213,10 @@ fabric.properties
 !.elasticbeanstalk/*.global.yml
 .ebextensions/
 
-animilia-env/
-animilia/settings.py
-animilia/urls.py
+env/
 **/migrations/
 
 db.sqlite3
 media/posters/
 media/avatars/
-/animilia/staff.py
+/animilia/

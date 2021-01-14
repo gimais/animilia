@@ -31,15 +31,20 @@
             <div class="comment-body">
                 <div class="comment-info">
                     <a class='comment-user {% if comment.user_id == user.pk %}mine{% endif %}'
-                       href="/profile/{{ comment.user_id }}">{{ comment.username }}</a>
+                       href="/profile/{{ comment.user_id }}">{{ comment.username }}
+                    </a>
+                    {% if not comment.user_active %}
+                        <span style="color: #dc1515;font-weight: 600;font-size: 10px">BANNED</span>
+                    {% endif %}
                     {% if comment.active %}
-                        {% if user.is_authenticated %}
+                        {% if user.is_authenticated and comment.user_active %}
                             <p class="reply-button" data-id="{{ comment.id }}" data-username="{{ comment.username }}">
                                 <i class="fas fa-reply"></i> პასუხი
                             </p>
                         {% endif %}
                         {% if comment.priority != None %}
-                            <i class="fas fa-thumbtack" style="transform: scale(1.5,1.2) rotate(90deg);margin-left: 3px"></i>
+                            <i class="fas fa-thumbtack"
+                               style="transform: scale(1.5,1.2) rotate(90deg);margin-left: 3px"></i>
                         {% endif %}
                         <p class='comment-time'>{{ comment.created|date:"d/m/Y | H:i" }}</p>
                         </div>
@@ -65,10 +70,12 @@
                                         <div class="comment-right-buttons" id='remove-comment'><i
                                                 class="fas fa-trash"></i></div>
                                     {% endif %}
+                                {% if comment.user_active %}
                                     <p class="reply-button touch" data-id="{{ comment.id }}"
                                        data-username="{{ comment.username }}">
                                         <i class="fas fa-reply"></i> პასუხი
                                     </p>
+                                {% endif %}
                                 </div>
                             {% endif %}
                         </div>

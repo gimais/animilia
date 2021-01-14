@@ -13,11 +13,13 @@
             </div>
             <div class="profile-display">
                 <p id="profile-username">{{ profileuser.username }}</p>
-{#                <p id="profile-group">{{ profileuser.groups.all.0 }}</p>#}
+                {% if not profileuser.is_active %}
+                    <span style="color: #dc1515;font-weight: 600;">BANNED</span>
+                {% endif %}
                 <div class="profile-row">
                     <dl>
                         <dt>რეგისტრაციის თარიღი:</dt>
-                            <dd>{{ profileuser.date_joined|date:"d.m.Y" }}</dd>
+                        <dd>{{ profileuser.date_joined|date:"d.m.Y" }}</dd>
                         <dt>ჯგუფი:</dt>
                         {% if profileuser.is_superuser %}
                             <dd>ადმინისტრატორი</dd>

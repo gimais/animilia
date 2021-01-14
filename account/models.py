@@ -12,7 +12,8 @@ class CommentManager(models.Manager):
     def related_objects_annotates(self, user_obj):
         profiles = Profile.objects.filter(user_id=OuterRef('user_id'))
         user = User.objects.filter(pk=OuterRef('user_id'))
-        params = {'avatar': Subquery(profiles.values('avatar')[:1]),
+        params = {'user_active': Subquery(user.values('is_active')[:1]),
+                  'avatar': Subquery(profiles.values('avatar')[:1]),
                   'username': Subquery(user.values('username')[:1]),
                   'like_count': Count('like', distinct=True),
                   'dislike_count': Count('dislike', distinct=True),
@@ -57,6 +58,7 @@ class Comment(models.Model):
         return {
             'comment_id': self.pk,
             'user_id': self.user.pk,
+            'user_active': self.user.is_active,
             'username': self.user.username,
             'avatar': self.user.profile.avatar.name,
             'time': datetime.timestamp(self.created),
@@ -73,6 +75,7 @@ class Comment(models.Model):
             'deleted': True,
             'comment_id': self.id,
             'user_id': self.user.id,
+            'user_active': self.user.is_active,
             'username': self.user.username,
             'avatar': self.user.profile.avatar.name,
             'time': datetime.timestamp(self.created),
@@ -92,6 +95,7 @@ class Comment(models.Model):
                 'comment_id': self.pk,
                 'parent_id': self.parent.pk,
                 'user_id': self.user.pk,
+                'user_active': self.user.is_active,
                 'username': self.user.username,
                 'avatar': self.user.profile.avatar.name,
                 'time': datetime.timestamp(self.created),
@@ -106,7 +110,8 @@ class Comment(models.Model):
                 'username': self.user.username,
                 'avatar': self.user.profile.avatar.name,
                 'time': datetime.timestamp(self.created),
-                'user_id': self.user.pk
+                'user_id': self.user.pk,
+                'user_active': self.user.is_active
             }
 
     def __str__(self):
