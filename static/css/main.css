@@ -172,16 +172,14 @@ textarea {
 .clearfix:before,
 .clearfix:after {
   content: " ";
-  /* 1 */
   display: table;
-  /* 2 */
 }
 
 .clearfix:after {
   clear: both;
 }
 
-/*FROM HERE*/
+
 nav{
     border-bottom: 2px solid #973116;
     border-top: 2px solid #973116;
@@ -190,7 +188,7 @@ nav{
 }
 
 .top-background{
-   background: url('/static/img/background.webp') bottom 74% center;
+    background: url('/static/img/background.webp?v=1') bottom 74% center;
     height: 190px;
     position: relative;
     background-size: cover;
@@ -936,7 +934,7 @@ dd.not-finished{
     border-radius: 5px;
 }
 
-.comment-edit-form button,.comment-form button{
+.comment-edit-form button,.comment-form input,.comment-form button{
     background: #333;
     padding: 10px 15px;
     border: none;
@@ -1318,7 +1316,7 @@ a.change-pass-button {
     margin-bottom: 9px;
 }
 
-.profile-page button[type='submit']{
+.profile-page input[type='submit']{
     clear: both;
     margin-top: 25px;
 }

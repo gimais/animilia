@@ -2,7 +2,7 @@
     <form class='comment-form' method='POST'>
         {{ comment_form.as_p|safe }}
         <button class="spoiler-button">სპოილერი</button>
-        <button type='submit'>გაგზავნა</button>
+        <input type="submit" value="გაგზავნა">
     </form>
 {% else %}
     {% block extra %}
@@ -24,12 +24,11 @@
 <div class="comments-box clearfix">
     {% for comment in comments %}
         <div class="comment clearfix">
-            {#            <div class="admin"></div>#}
             <a class="comment-user-img" href="/profile/{{ comment.user_id }}">
                 <img src="/media/{{ comment.avatar }}?r=1" alt="{{ comment.username }}" loading="lazy">
             </a>
             <div class="comment-body">
-                <div class="comment-info">
+                <div class="comment-info" data-id="{{ comment.id }}">
                     <a class='comment-user {% if comment.user_id == user.pk %}mine{% endif %}'
                        href="/profile/{{ comment.user_id }}">{{ comment.username }}
                     </a>

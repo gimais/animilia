@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
+from django.db.models import F
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -116,28 +117,26 @@ def username_update(request):
 def avatar_update(request):
     if request.user.is_authenticated and request.is_ajax():
         if request.method == 'POST':
-            is_type = request.POST.get('type', None)
-            if is_type is not None:
-                profile = Profile.objects.get(pk=request.user.pk)
-                profile.avatar = 'no-avatar.jpg'
-                profile.save()
-                return JsonResponse({'success': True, 'info': 'ავატარი წაიშალა!'}, status=200)
             avatar = request.FILES.get('data', None)
             if avatar:
                 from PIL import Image
                 check_avatar = Image.open(avatar)
                 if check_avatar.format != "JPEG" or check_avatar.size[0] > 200 or check_avatar.size[1] > 200:
-                    return JsonResponse({'success': 'false', 'info': 'არ აკმაყოფილებს პირობებს!'}, status=406)
+                    return JsonResponse({'info': 'არ აკმაყოფილებს პირობებს!'}, status=406)
 
                 profile = request.user.profile
                 settings = request.user.settings
+                changed_avatar = settings.changed_avatar
 
                 # settings update
-                settings.avatar_updated = timezone.now()
+                if changed_avatar != 0:
+                    settings.avatar_updated = timezone.now()
+                settings.changed_avatar = F('changed_avatar') + 1
                 settings.save()
 
                 # uploading and saving
-                avatar.name = str(request.user.pk) + '_{}'.format(settings.avatar_updated.date()) + '.jpg'
+                avatar.name = str(request.user.pk) + '_{}_{}'.format(changed_avatar + 1,
+                                                                     settings.avatar_updated.date()) + '.jpg'
                 profile.avatar = avatar
                 profile.save()
 
@@ -146,12 +145,21 @@ def avatar_update(request):
                                          settings.avatar_updated + datetime.timedelta(days=3)),
                                      'new_avatar': 'avatars/{}'.format(avatar.name),
                                      }, status=200)
-            else:
-                return JsonResponse({'success': False, 'info': 'moxda shecdoma!'}, status=400)
-
-        return render(request, 'account/profile.html')
+            return JsonResponse(ERROR, status=400)
+        return JsonResponse(ERROR, status=405)
     else:
         return redirect('home')
+
+
+def avatar_delete(request):
+    if request.user.is_authenticated and request.is_ajax():
+        if request.method == 'DELETE':
+            profile = Profile.objects.get(pk=request.user.pk)
+            profile.avatar = 'no-avatar.jpg'
+            profile.save()
+            return JsonResponse({'success': True, 'info': 'ავატარი წაიშალა!'}, status=200)
+        return JsonResponse(ERROR, status=405)
+    return JsonResponse(ERROR, status=406)
 
 
 def change_email_request_view(request):
@@ -402,23 +410,23 @@ def edit_comment(request):
 def like_comment(request):
     if request.user.is_authenticated:
         try:
-            comment_id = Comment.objects.prefetch_related('like', 'dislike').get(id=request.POST.get('id', False))
+            comment = Comment.objects.prefetch_related('like', 'dislike').get(id=request.POST.get('id', False))
         except (TypeError, ValueError, OverflowError, Comment.DoesNotExist):
-            comment_id = None
+            comment = None
 
-        if comment_id and comment_id.user != request.user:
+        if comment and comment.user != request.user:
 
-            if comment_id.dislike.filter(
+            if comment.dislike.filter(
                     id=request.user.id).exists():  # თუ დისლაიქი აქვს კომს წაშალე დისლაქი და დაამატე ლაიქი
-                comment_id.dislike.remove(request.user)
-                comment_id.like.add(request.user)
+                comment.dislike.remove(request.user)
+                comment.like.add(request.user)
                 return JsonResponse({'type': 2}, status=200)
-            elif comment_id.like.filter(
+            elif comment.like.filter(
                     id=request.user.id).exists():  # თუ ლაიქი აქვს უკვე,ესეიგი ანლაიქი უნდა და წაშალე ლაიქი
-                comment_id.like.remove(request.user)
+                comment.like.remove(request.user)
                 return JsonResponse({'type': 0}, status=200)
             else:  # არაფერი ეწინააღმდეგება ,უბრალოდ დაამატე ლაიქი
-                comment_id.like.add(request.user)
+                comment.like.add(request.user)
                 return JsonResponse({'type': 1}, status=200)
 
         else:
@@ -457,7 +465,7 @@ def check_notification(request):
         notifications = Notification.objects.select_related('user', 'reply_comment', 'comment'). \
             filter(user_id=request.user).values_list(
             'reply_comment_id', 'reply_comment__body', 'comment__created',
-            'comment__anime__slug', 'reply_comment__parent', 'id','visited').order_by('-comment__created')
+            'comment__anime__slug', 'reply_comment__parent', 'id', 'visited').order_by('-comment__created')
 
         return render(request, 'account/notifications.html', {'notifications': notifications})
     else:

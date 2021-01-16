@@ -21,12 +21,11 @@ $(document).ready(function () {
     $("select[name='birth-month']").append(getMonthsSelectOptionsHTML());
     $("select[name='birth-year']").append(getYearsSelectOptionsHTML(1940,2019));
 
-    var pickedDate = [{{ user.profile.birth.day }},{{ user.profile.birth.month }},{{ user.profile.birth.year }}];
+    let pickedDate = [{{ user.profile.birth.day }},{{ user.profile.birth.month }},{{ user.profile.birth.year }}];
 
     $(`select[name='birth-day'] option[value=${pickedDate[0]}]`).attr('selected','');
     $(`select[name='birth-month'] option[value=${pickedDate[1]}]`).attr('selected','');
     $(`select[name='birth-year'] option[value=${pickedDate[2]}]`).attr('selected','');
-
 });
 
 let $avatar_updated = {{ user.settings.avatar_updated|date_to_timestamp:3 }};
@@ -78,17 +77,14 @@ $('#clear-image').on('click',function () {
     if(confirm('ნამდვილად გსურთ ავატარის წაშლა?\nთუ თქვენ ბოლო 3 დღეში ავატარი ატვირთული გქონდათ, ' +
         'ვერ ატვირთავთ ახალ ავატარს!')) {
         $.ajax({
-            url: "/account/avatar_update/",
-            type: "POST",
-            data: {
-                'type':0
-            },
+            url: "/account/avatar_update/delete",
+            type: "DELETE",
             success: function () {
                 $('#active-avatar').attr('src','/media/no-avatar.jpg');
                 $(this).hide();
             },
             error: function () {
-                alert('მოხდა შეცდომა!გთხოვთ,მოგვიანებით სცადეთ!')
+                alert('მოხდა შეცდომა! გთხოვთ,მოგვიანებით სცადეთ!')
             }
         });
         $(this).hide();
@@ -96,11 +92,11 @@ $('#clear-image').on('click',function () {
 });
 
 $('.change-profile-img').on('click',function () {
-    var now = new Date();
-    if(!(now.getTime()/1000 >= $avatar_updated))
+    if(!(cT()/1000 >= $avatar_updated)){
         alert(`ავატარის გამოცვლა შეგიძლიათ ყოველ 3 დღეში ერთხელ.\nშეცვლას შეძლებთ ${convertTimeGeo($avatar_updated)}-ზე`);
-    else
-    $('input[name=avatar]').click();
+    } else {
+        $('input[name=avatar]').click();
+    }
 });
 
 let $uploadCrop;
@@ -137,6 +133,7 @@ $('input[name=avatar]').on('change', function () {
 
 $('.close').on('click',function () {
     $('#avatarCroppieModal').css('display','none');
+    $('input[type=file]').val(null)
 });
 
 $('.upload-result').on('click', function (e) {
@@ -160,7 +157,6 @@ $('.upload-result').on('click', function (e) {
             processData: false,
             contentType: false,
             success: function (data) {
-                console.log(data);
                 $('#avatarCroppieModal').css('display','none');
                 $('#active-avatar').attr('src', "/media/"+data['new_avatar']);
                 $avatar_updated = data.time;
@@ -170,6 +166,8 @@ $('.upload-result').on('click', function (e) {
             },
             complete:function () {
                 that.attr('disabled',false);
+                $('input[type=file]').val(null);
+                that.text('დადასტურება');
             }
         });
     });
@@ -208,7 +206,7 @@ $(window).on('click',function (e) {
                                         </div>
                                     </div>
                                 </div>
-                                  <button class="upload-result">დადასტურება</button>
+                                  <input type="submit" class="upload-result" value="დადასტურება">
                               </div>
                             </div>
                         </div>
@@ -217,7 +215,6 @@ $(window).on('click',function (e) {
                     </div>
                 <div class="profile-display">
                     <p id="profile-username">{{ user.username }}</p>
-{#                    <p id="profile-group">{{ user.groups.all.0 }}</p>#}
                     <div class="profile-row">
                         <dl>
                             <dt>რეგისტრაციის თარიღი:</dt>
@@ -293,7 +290,7 @@ $(window).on('click',function (e) {
                         <label for="id_show_birth" style="display: inline-block"> პროფილზე გამოჩენა</label>
                         <input type="hidden" id="id_birth" name="birth" value="{{ user.profile.birth|date:"Y-m-d" }}">
                     </div>
-                    <button type="submit" class="form-submit">შენახვა</button>
+                    <input type="submit" class="form-submit" value="შენახვა">
                 </form>
             </div>
         </div>

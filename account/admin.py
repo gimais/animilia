@@ -14,7 +14,7 @@ class CommentAdmin(admin.ModelAdmin):
     actions = ('active_comments', 'inactive_comments')
     readonly_fields = ('created', 'user', 'anime', 'parent_link', 'body')
     exclude = ('parent',)
-
+    ordering = ('-id',)
 
     def get_exclude(self, request, obj=None):
         excluded = super().get_exclude(request, obj)
@@ -66,7 +66,7 @@ class SettingsAdmin(admin.ModelAdmin):
     list_per_page = 20
     list_display = ('user', 'ip', 'comment_count', 'like_count', 'dislike_count')
     search_fields = ['user__username', 'ip']
-    readonly_fields = ('id', 'user', 'ip', 'show_birth', 'show_gender', 'avatar_updated', 'username_updated')
+    readonly_fields = ('id', 'user', 'ip', 'show_birth', 'show_gender', 'changed_avatar', 'changed_username')
 
     def has_add_permission(self, request, obj=None):
         return False

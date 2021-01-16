@@ -152,6 +152,8 @@ class Settings(models.Model):
     avatar_updated = models.DateTimeField(default=sub_three_days)
     show_birth = models.BooleanField(default=False)
     show_gender = models.BooleanField(default=False)
+    changed_avatar = models.PositiveSmallIntegerField(default=0)
+    changed_username = models.PositiveSmallIntegerField(default=0)
 
     class Meta:
         verbose_name = 'პარამეტრი'
