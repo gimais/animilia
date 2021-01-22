@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Comment, Profile, Settings
+from .models import Comment, Profile, Settings, Notification
 
 
 # Register your models here.
@@ -12,7 +12,7 @@ class CommentAdmin(admin.ModelAdmin):
     list_filter = ('active', 'created')
     search_fields = ['user__username', 'body']
     actions = ('active_comments', 'inactive_comments')
-    readonly_fields = ('created', 'user', 'anime', 'parent_link', 'body')
+    readonly_fields = ('created', 'user', 'anime', 'parent_link')
     exclude = ('parent',)
     ordering = ('-id',)
 
@@ -86,6 +86,25 @@ class SettingsAdmin(admin.ModelAdmin):
         return queryset
 
 
+class NotificationAdmin(admin.ModelAdmin):
+    list_per_page = 20
+    list_display = ('id', 'user', 'comment', 'reply_comment', 'comment_preview', 'reply_preview', 'visited')
+    readonly_fields = ('id', 'user', 'comment', 'reply_comment')
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def comment_preview(self, obj):
+        return format_html("<a href='/admin/account/comment/{}/change/'>ლინკი</a>".format(obj.comment))
+
+    def reply_preview(self, obj):
+        return format_html("<a href='/admin/account/comment/{}/change/'>ლინკი</a>".format(obj.reply_comment))
+
+    comment_preview.allow_tags = True
+    reply_preview.allow_tags = True
+
+
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(Settings, SettingsAdmin)
+admin.site.register(Notification, NotificationAdmin)

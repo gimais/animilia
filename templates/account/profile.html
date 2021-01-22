@@ -74,7 +74,9 @@ $('.profile-details-input').on('click','#submit-username-button',function (e) {
 });
 
 $('#clear-image').on('click',function () {
-    if(confirm('ნამდვილად გსურთ ავატარის წაშლა?\nთუ თქვენ ბოლო 3 დღეში ავატარი ატვირთული გქონდათ, ' +
+    let forConfirm = {{ user.settings.changed_avatar }};
+
+    if(forConfirm < 2 || confirm('ნამდვილად გსურთ ავატარის წაშლა?\nთუ თქვენ ბოლო 3 დღეში ავატარი ატვირთული გქონდათ, ' +
         'ვერ ატვირთავთ ახალ ავატარს!')) {
         $.ajax({
             url: "/account/avatar_update/delete",
@@ -290,7 +292,7 @@ $(window).on('click',function (e) {
                         <label for="id_show_birth" style="display: inline-block"> პროფილზე გამოჩენა</label>
                         <input type="hidden" id="id_birth" name="birth" value="{{ user.profile.birth|date:"Y-m-d" }}">
                     </div>
-                    <input type="submit" class="form-submit" value="შენახვა">
+                    <button type="submit" class="form-submit">შენახვა</button>
                 </form>
             </div>
         </div>

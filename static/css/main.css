@@ -612,6 +612,26 @@ section{
     flex-wrap: wrap;
 }
 
+.pagination {
+    margin: 24px auto 10px;
+}
+
+.pagination a {
+    color: black;
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: background-color .3s;
+    border: 1px solid #ddd;
+    margin: 0 4px;
+}
+
+.pagination a.active {
+    background-color: #4CAF50;
+    color: white;
+    border: 1px solid #4CAF50;
+}
+
 .categories-list li:after {
     content: ',';
 }
@@ -1316,7 +1336,7 @@ a.change-pass-button {
     margin-bottom: 9px;
 }
 
-.profile-page input[type='submit']{
+.profile-page button[type='submit'] {
     clear: both;
     margin-top: 25px;
 }
