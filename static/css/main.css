@@ -517,6 +517,11 @@ section{
     font-weight: 600;
 }
 
+.schedule a{
+    text-decoration: none;
+    color: black;
+}
+
 .item {
     cursor: pointer;
     position: relative;
@@ -618,6 +623,7 @@ section{
 
 .pagination a {
     color: black;
+    font-size: 18px;
     float: left;
     padding: 8px 16px;
     text-decoration: none;
@@ -627,9 +633,15 @@ section{
 }
 
 .pagination a.active {
-    background-color: #4CAF50;
+    background-color: #973116;
     color: white;
-    border: 1px solid #4CAF50;
+    border: 1px solid #973116;
+    cursor: default;
+}
+
+.disabled{
+    background-color: #e2e2e2;
+    cursor: default;
 }
 
 .categories-list li:after {

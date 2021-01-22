@@ -1,4 +1,4 @@
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q, Count
 from django.db.models.expressions import RawSQL
 from django.http import JsonResponse
@@ -13,12 +13,23 @@ ERROR = {'error': 'moxda shecdoma!'}
 
 
 def index_view(request):
-    animes_list = Anime.objects.values('name', 'slug', 'age', 'rating', 'views', 'poster', 'soon').all().order_by(
+    animes = Anime.objects.values('name', 'slug', 'age', 'rating', 'views', 'poster', 'soon').all().order_by(
         '-updated')
-    return render(request, 'home.html', {'animes_list': animes_list})
+
+    paginator = Paginator(animes, 9)
+    page = request.GET.get('page', 1)
+
+    try:
+        animes = paginator.get_page(page)
+    except PageNotAnInteger:
+        animes = paginator.page(1)
+    except EmptyPage:
+        animes = paginator.page(paginator.num_pages)
+
+    return render(request, 'home.html', {'animes_list': animes})
 
 
-def page_view(request, slug):
+def anime_page_view(request, slug):
     template_name = 'anime/page.html'
     anime = get_object_or_404(Anime.objects, slug__iexact=slug)
     anime.increase_view_count(request.COOKIES)
@@ -100,5 +111,6 @@ def more_comments(request):
 def schedule(request):
     objs = Schedule.objects.select_related('anime').values('date', 'from_time', 'text', 'to_time', 'anime__name',
                                                            'anime__poster', 'anime__slug',
-                                                           max=Count('anime__series__row') + 1).all().order_by('date', 'from_time')
+                                                           max=Count('anime__series__row') + 1).all().order_by('date',
+                                                                                                               'from_time')
     return render(request, 'schedule.html', {'schedule': objs})

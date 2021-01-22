@@ -14,9 +14,12 @@
                                         <img src={% if anime.poster %}"/media/{{ anime.poster }}?v=2" {% else %} {% static 'img/no-poster-available.jpg' %} {% endif %} alt="{{ anime.name }}">
                                     </div>
                                     {% if anime.soon %}
-                                        <img class='soon' src="{% static 'img/soon_poster.svg' %}" alt="{{ anime.name }}">
+                                        <img class='soon' src="{% static 'img/soon_poster.svg' %}"
+                                             alt="{{ anime.name }}">
                                     {% else %}
-                                        <div class='age' style="padding: {% if anime.age >= 10 %}10px {% endif %} 5px">{{ anime.age }}+</div>
+                                        <div class='age'
+                                             style="padding: {% if anime.age >= 10 %}10px {% endif %} 5px">{{ anime.age }}+
+                                        </div>
                                     {% endif %}
                                     <div class="info">
                                         <div class='name'>{{ anime.name }}</div>
@@ -29,8 +32,31 @@
                             </a>
                         </div>
                     {% endfor %}
+                    {% if animes_list.has_other_pages %}
+                        <div class="pagination">
+{#                            <a>⇤</a>#}
+                            {% if animes_list.has_previous %}
+                                <a href="?page={{ animes_list.previous_page_number }}">←</a>
+                            {% else %}
+                                <a class="disabled">←</a>
+                            {% endif %}
+                            {% for page in animes_list.paginator.page_range %}
+                                {% if animes_list.number == page %}
+                                    <a class="active">{{ page }}</a>
+                                {% else %}
+                                    <a href="?page={{ page }}">{{ page }}</a>
+                                {% endif %}
+                            {% endfor %}
+                            {% if animes_list.has_next %}
+                                <a href="?page={{ animes_list.next_page_number }}">→</a>
+                            {% else %}
+                                <a class="disabled">→</a>
+                            {% endif %}
+{#                            <a>⇥</a>#}
+                        </div>
+                    {% endif %}
                 </div>
             {% endif %}
-        </div>
+    </div>
 
 {% endblock %}

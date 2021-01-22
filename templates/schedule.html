@@ -8,10 +8,10 @@
                 {% for row in schedule %}
                     <div class="info-page schedule clearfix">
                         <div class="schedule-poster">
-                            <img src="/media/{{ row.anime__poster }}?r=1" alt="poster">
+                            <a href="{% url 'page' row.anime__slug %}"><img src="/media/{{ row.anime__poster }}?r=1" alt="poster"></a>
                         </div>
                         <div class="schedule-right">
-                            <p class="schedule-name">{{ row.anime__name}}</p>
+                            <a href="{% url 'page' row.anime__slug %}"><p class="schedule-name">{{ row.anime__name}}</p></a>
                             <hr class="schedule-hr">
                             <div class="schedule-info">
                             {% if row.text == "" %}
