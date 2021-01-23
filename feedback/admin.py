@@ -27,14 +27,14 @@ class FeedbackAdmin(admin.ModelAdmin):
     list_per_page = 10
     list_display = ('id', 'ip', 'customer_name', 'date', 'closed', 'registered_user_link')
     list_filter = ('date', 'closed')
-    search_fields = ('ip', 'details',)
-    readonly_fields = ('id', 'date', 'ip', 'customer_name', 'email', 'registered_user', 'details')
+    search_fields = ('ip', 'body',)
+    readonly_fields = ('id', 'date', 'ip', 'customer_name', 'email', 'registered_user', 'body')
     inlines = ()
 
     def get_fields(self, request, obj=None):
         if obj.registered_user is not None:
-            return 'closed', 'id', 'date', 'ip', 'registered_user', 'details',
-        return 'closed', 'id', 'date', 'ip', 'customer_name', 'email', 'details',
+            return 'closed', 'id', 'date', 'ip', 'registered_user', 'email', 'body',
+        return 'closed', 'id', 'date', 'ip', 'customer_name', 'email', 'body',
 
     def get_inline_instances(self, request, obj=None):
         if obj.registered_user is not None:
@@ -63,12 +63,11 @@ class FeedbackAdmin(admin.ModelAdmin):
 
 class MessageAdmin(admin.ModelAdmin):
     list_display = ('id', 'subject', 'created')
-    fields = ('to_everyone','subject', 'body')
+    fields = ('subject', 'body')
     search_fields = ('subject',)
 
-    def get_queryset(self, request):
-        queryset = super(MessageAdmin, self).get_queryset(request)
-        return queryset.filter(to_everyone=True)
+    def has_add_permission(self, request, obj=None):
+        return False
 
 
 admin.site.register(Feedback, FeedbackAdmin)

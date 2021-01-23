@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
-from .forms import FeedbackForm
+from .forms import FeedbackForm, AuthFeedbackForm
 
 # Create your views here.
 from .models import Message
@@ -9,7 +9,7 @@ from .models import Message
 
 def feedback(request):
     if request.method == 'POST':
-        form = FeedbackForm(request.POST)
+        form = AuthFeedbackForm(request.POST) if request.user.is_authenticated else FeedbackForm(request.POST)
         if form.is_valid():
             form = form.save(commit=False)
             x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -22,23 +22,22 @@ def feedback(request):
             form.ip = ip_address
 
             if request.user.is_authenticated:
+                form.customer_name = request.user.username
+                form.email = request.user.email
                 form.registered_user = request.user
 
             form.save()
             messages.success(request, 'თქვენი წერილი წარმატებით გაიგზავნა.', extra_tags='welcome')
             return render(request, 'feedback.html', {'form': FeedbackForm()})
-    else:
-        if request.user.is_authenticated:
-            form = FeedbackForm(user_username=request.user.get_username(), user_email=request.user.email)
-        else:
-            form = FeedbackForm()
-    return render(request, 'feedback.html', {'form': form})
+    return render(request, 'feedback.html', {
+        'form': AuthFeedbackForm() if request.user.is_authenticated else FeedbackForm()
+    })
 
 
 def get_message(request, id):
     message = get_object_or_404(Message, id=id)
 
-    if message.to_everyone or message.to_user == request.user:
+    if message.to_user == request.user:
         message.notification.filter(seen=False, user_id=request.user).update(seen=True)
 
         return JsonResponse({

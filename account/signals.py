@@ -31,10 +31,4 @@ def send_reply_notification(sender, instance, **kwargs):
 @receiver(post_save, sender=Message)
 def send_message_notification(sender, instance, created,**kwargs):
     if created:
-        if not instance.to_everyone:
-            Notification.objects.create(user=instance.to_user, content_object=instance)
-        else:
-            notiications_for_everyone = []
-            for user in User.objects.all():
-                notiications_for_everyone.append(Notification(user=user,content_object=instance))
-            Notification.objects.bulk_create(notiications_for_everyone)
+        Notification.objects.create(user=instance.to_user, content_object=instance)
