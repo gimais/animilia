@@ -19,8 +19,17 @@ def index_view(request):
     paginator = Paginator(animes, 9)
     page = request.GET.get('page', 1)
 
+    try:
+        animes = paginator.get_page(page)
+    except PageNotAnInteger:
+        animes = paginator.page(1)
+    except EmptyPage:
+        animes = paginator.page(paginator.num_pages)
 
-def page_view(request, slug):
+    return render(request, 'home.html', {'animes_list': animes})
+
+
+def anime_page_view(request, slug):
     template_name = 'anime/page.html'
     anime = get_object_or_404(Anime.objects, slug__iexact=slug)
     anime.increase_view_count(request.COOKIES)
@@ -34,7 +43,7 @@ def page_view(request, slug):
         comments = anime.comments.annotates_related_objects(request.user).filter(
             Q(active=True) | Q(active_children_count__gte=1),
             parent__isnull=True).order_by(
-            RawSQL('CASE WHEN "account_comment"."id" = %s THEN 1 ELSE 2 END', (request.GET['parent'],)), '-priority',
+            RawSQL('CASE WHEN "comment"."id" = %s THEN 1 ELSE 2 END', (request.GET['parent'],)), '-priority',
             '-id')
 
         notification = request.GET.get('notif', False)
@@ -68,9 +77,9 @@ def more_comments(request):
             parent_id = None
 
         if parent_id:
-            comments = Comment.objects.related_objects_annotates(request.user).filter(
-                Q(active=True) | Q(active_replies_count__gte=1), parent__isnull=True, anime=anime_id).order_by(
-                RawSQL('CASE WHEN "account_comment"."id" = %s THEN 1 ELSE 2 END', (request.GET['parent'],)),
+            comments = Comment.objects.annotates_related_objects(request.user).filter(
+                Q(active=True) | Q(active_children_count__gte=1), parent__isnull=True, anime=anime_id).order_by(
+                RawSQL('CASE WHEN "comment"."id" = %s THEN 1 ELSE 2 END', (request.GET['parent'],)),
                 '-priority',
                 '-id')
         else:
@@ -84,7 +93,7 @@ def more_comments(request):
             result = list()
             for comment in paginator.get_page(page).object_list:
                 if comment.active:
-                    result.append(comment.get_more_comment_info(request.user.pk))
+                    result.append(comment.get_more_comment_info(request.user))
                 else:
                     result.append(comment.get_deleted_comment_info())
             return JsonResponse(result, status=200, safe=False)

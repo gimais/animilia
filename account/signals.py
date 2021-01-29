@@ -29,6 +29,6 @@ def send_reply_notification(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Message)
-def send_message_notification(sender, instance, created,**kwargs):
+def send_message_notification(sender, instance, created, **kwargs):
     if created:
         Notification.objects.create(user=instance.to_user, content_object=instance)

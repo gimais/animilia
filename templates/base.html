@@ -24,7 +24,7 @@
     <script src="https://kit.fontawesome.com/98d783368d.js" crossorigin="anonymous"></script>
     <meta name="theme-color" content="#973116">
 </head>
-
+<body>
   <!--[if IE]>
     <p class="browserupgrade">თქვენ იყენებთ <strong>ძველ</strong> ბრაუზერს.
         გთხოვთ, რომ <a href="https://browsehappy.com/">გაანახლოთ ბრაუზერი</a> .</p>
@@ -39,8 +39,9 @@
                 <a class="web-name"></a>
             </div>
             <ul class="top-nav">
-                <li {% if user.is_anonymous %} style="width: 100%" {% else %} style="width: 50%"{% endif %}><a
-                        id="mob-home" href="/">მთავარი</a></li>
+                <li {% if user.is_anonymous %} style="width: 100%" {% else %} style="width: 50%"{% endif %}>
+                    <a id="mob-home" href="/">მთავარი</a>
+                </li>
                 <li><a href="{% url 'schedule' %}">განრიგი</a></li>
                 <li><a href="{% url 'feedback' %}">კონტაქტი</a></li>
                 {% if user.is_anonymous %}
@@ -61,16 +62,13 @@
                     {% if user.is_staff %}
                         <li><a href="/admin/" target="_blank">პანელი</a></li>
                     {% endif %}
-                    {% load account_tags %}
-                    {% with notification_count=user|notif_count %}
                         <li>
-                            <a class="menu-icon fas fa-bell" href="{% url 'notification' %}">
-                            {% if notification_count %}
-                                <span class="notif-count">{{ notification_count }}</span>
+                            <a class="menu-icon fas fa-bell" href="{% url 'notifications' %}">
+                            {% if user.notif %}
+                                <span class="notif-count">{{ user.notif }}</span>
                             {% endif %}
                             </a>
                         </li>
-                       {% endwith %}
                         <li><a class='active' href="{% url 'profile' %}" data-id="{{ user.id }}">პროფილი</a></li>
                         <li><a class="menu-icon fas fa-sign-out-alt" href="{% url 'logout' %}?next={% block logout_redirect %}{% endblock %}">
                             <span>გასვლა</span>
@@ -92,12 +90,6 @@
             {% if 'welcome' in msg.extra_tags %}
                 <div class='flash-message' style="background: #973116">{{ msg }}</div>
             {% elif 'failedAuth' in msg.extra_tags %}
-                <div class='flash-message' style="background: red">{{ msg }}</div>
-            {% elif 'registered' in msg.extra_tags %}
-                <div class='flash-message' style="background: tomato">{{ msg }}</div>
-            {% elif 'error' in msg.extra_tags %}
-                <div class='flash-message' style="background: red">{{ msg }}</div>
-            {% elif 'nonAuth' in msg.extra_tags %}
                 <div class='flash-message' style="background: red">{{ msg }}</div>
             {% endif %}
         {% endfor %}

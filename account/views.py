@@ -1,11 +1,11 @@
 import datetime
 
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
+from django.db.models import F
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -20,6 +20,8 @@ from .models import Comment, Profile, Notification, Settings, Reply
 from .tokens import email_change_token
 
 ERROR = {'error': 'moxda shecdoma!'}
+
+User = get_user_model()
 
 
 def login_view(request):
@@ -116,28 +118,26 @@ def username_update(request):
 def avatar_update(request):
     if request.user.is_authenticated and request.is_ajax():
         if request.method == 'POST':
-            is_type = request.POST.get('type', None)
-            if is_type is not None:
-                profile = Profile.objects.get(pk=request.user.pk)
-                profile.avatar = 'no-avatar.jpg'
-                profile.save()
-                return JsonResponse({'success': True, 'info': 'ავატარი წაიშალა!'}, status=200)
             avatar = request.FILES.get('data', None)
             if avatar:
                 from PIL import Image
                 check_avatar = Image.open(avatar)
                 if check_avatar.format != "JPEG" or check_avatar.size[0] > 200 or check_avatar.size[1] > 200:
-                    return JsonResponse({'success': 'false', 'info': 'არ აკმაყოფილებს პირობებს!'}, status=406)
+                    return JsonResponse({'info': 'არ აკმაყოფილებს პირობებს!'}, status=406)
 
                 profile = request.user.profile
                 settings = request.user.settings
+                changed_avatar = settings.changed_avatar
 
                 # settings update
-                settings.avatar_updated = timezone.now()
+                if changed_avatar != 0:
+                    settings.avatar_updated = timezone.now()
+                settings.changed_avatar = F('changed_avatar') + 1
                 settings.save()
 
                 # uploading and saving
-                avatar.name = str(request.user.pk) + '_{}'.format(settings.avatar_updated.date()) + '.jpg'
+                avatar.name = str(request.user.pk) + '_{}_{}'.format(changed_avatar + 1,
+                                                                     settings.avatar_updated.date()) + '.jpg'
                 profile.avatar = avatar
                 profile.save()
 
@@ -150,6 +150,17 @@ def avatar_update(request):
         return JsonResponse(ERROR, status=405)
     else:
         return redirect('home')
+
+
+def avatar_delete(request):
+    if request.user.is_authenticated and request.is_ajax():
+        if request.method == 'DELETE':
+            profile = Profile.objects.get(pk=request.user.pk)
+            profile.avatar = 'no-avatar.jpg'
+            profile.save()
+            return JsonResponse({'success': True, 'info': 'ავატარი წაიშალა!'}, status=200)
+        return JsonResponse(ERROR, status=405)
+    return JsonResponse(ERROR, status=406)
 
 
 def change_email_request_view(request):
@@ -304,7 +315,7 @@ def check_replies(request, id):
             if paginator.num_pages >= page > 0:
                 result = {'replies': [], 'availablePages': paginator.num_pages}
                 for reply in paginator.get_page(page).object_list:
-                    result['replies'].append(reply.get_reply_comment_info(request.user.pk))
+                    result['replies'].append(reply.get_reply_comment_info(request.user))
                 return JsonResponse(result, status=200)
         return JsonResponse(ERROR, status=404)
     return JsonResponse(ERROR, status=405)

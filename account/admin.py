@@ -1,10 +1,41 @@
 from django.contrib import admin
+from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
 
-from .models import Comment, Profile, Settings
-
+from .models import Comment, Profile, Settings, Notification, Reply
 
 # Register your models here.
+
+User = get_user_model()
+
+
+class CustomUserAdmin(UserAdmin):
+    add_form_template = 'admin/auth/user/add_form.html'
+    change_user_password_template = None
+    fieldsets = (
+        (None, {'fields': ('username', 'password', 'email')}),
+        (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',
+                                       'groups', 'user_permissions')}),
+        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'password1', 'password2'),
+        }),
+    )
+
+    list_display = ('username', 'email', 'is_staff')
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
+    search_fields = ('username', 'email')
+    ordering = ('id',)
+    filter_horizontal = ('groups', 'user_permissions',)
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
 
 class CommentAdmin(admin.ModelAdmin):
     list_per_page = 20
@@ -66,7 +97,7 @@ class SettingsAdmin(admin.ModelAdmin):
     list_per_page = 20
     list_display = ('user', 'ip', 'comment_count', 'like_count', 'dislike_count')
     search_fields = ['user__username', 'ip']
-    readonly_fields = ('id', 'user', 'ip', 'show_birth', 'show_gender', 'avatar_updated', 'username_updated')
+    readonly_fields = ('id', 'user', 'ip', 'show_birth', 'show_gender', 'changed_avatar', 'changed_username')
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -86,6 +117,33 @@ class SettingsAdmin(admin.ModelAdmin):
         return queryset
 
 
+class NotificationAdmin(admin.ModelAdmin):
+    list_per_page = 20
+    list_display = ('id', 'user', 'content_type', 'object_id', 'seen')
+    readonly_fields = ('id', 'user', 'content_type', 'object_id', 'seen')
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
+class ReplyAdmin(admin.ModelAdmin):
+    list_per_page = 20
+    list_display = ('id', 'comment_preview', 'reply_preview')
+    readonly_fields = ('to_comment', 'reply_comment')
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def comment_preview(self, obj):
+        return format_html("<a href='/admin/account/comment/{id}/change/'>{id}</a>".format(id=obj.to_comment))
+
+    def reply_preview(self, obj):
+        return format_html("<a href='/admin/account/comment/{id}/change/'>{id}</a>".format(id=obj.reply_comment))
+
+
+admin.site.register(User, CustomUserAdmin)
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(Settings, SettingsAdmin)
+admin.site.register(Reply, ReplyAdmin)
+admin.site.register(Notification, NotificationAdmin)

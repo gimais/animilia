@@ -49,7 +49,8 @@ class CommentManager(models.Manager):
     def annotates_related_objects(self, user_obj):
         profiles = Profile.objects.filter(user_id=OuterRef('user_id'))
         user = get_user_model().objects.filter(pk=OuterRef('user_id'))
-        params = {'avatar': Subquery(profiles.values('avatar')[:1]),
+        params = {'user_active': Subquery(user.values('is_active')[:1]),
+                  'avatar': Subquery(profiles.values('avatar')[:1]),
                   'username': Subquery(user.values('username')[:1]),
                   'like_count': Count('like', distinct=True),
                   'dislike_count': Count('dislike', distinct=True),
@@ -110,7 +111,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
 
-# TODO check like dislike blank
 class Comment(models.Model):
     anime = models.ForeignKey(Anime, on_delete=models.CASCADE, related_name='comments', verbose_name='გვერდი')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='comment',
@@ -135,6 +135,7 @@ class Comment(models.Model):
         response = {
             'comment_id': self.pk,
             'user_id': self.user.pk,
+            'user_active': self.user.is_active,
             'username': self.user.username,
             'avatar': self.user.profile.avatar.name,
             'time': datetime.timestamp(self.created),
@@ -159,6 +160,7 @@ class Comment(models.Model):
             'deleted': True,
             'comment_id': self.id,
             'user_id': self.user.id,
+            'user_active': self.user.is_active,
             'username': self.user.username,
             'avatar': self.user.profile.avatar.name,
             'time': datetime.timestamp(self.created),
@@ -172,6 +174,7 @@ class Comment(models.Model):
                 'comment_id': self.pk,
                 'parent_id': self.parent.pk,
                 'user_id': self.user.pk,
+                'user_active': self.user.is_active,
                 'username': self.user.username,
                 'avatar': self.user.profile.avatar.name,
                 'time': datetime.timestamp(self.created),
@@ -196,7 +199,8 @@ class Comment(models.Model):
                 'username': self.user.username,
                 'avatar': self.user.profile.avatar.name,
                 'time': datetime.timestamp(self.created),
-                'user_id': self.user.pk
+                'user_id': self.user.pk,
+                'user_active': self.user.is_active
             }
 
     def __str__(self):
@@ -238,6 +242,8 @@ class Settings(models.Model):
     avatar_updated = models.DateTimeField(default=sub_three_days)
     show_birth = models.BooleanField(default=False)
     show_gender = models.BooleanField(default=False)
+    changed_avatar = models.PositiveSmallIntegerField(default=0)
+    changed_username = models.PositiveSmallIntegerField(default=0)
 
     class Meta:
         verbose_name = 'პარამეტრი'
@@ -254,6 +260,8 @@ class Reply(models.Model):
     notification = GenericRelation('Notification', related_query_name='reply')
 
     class Meta:
+        verbose_name = 'კომენტარზე პასუხი'
+        verbose_name_plural = "კომენტარზე პასუხები"
         db_table = 'comment_reply'
 
     def __str__(self):
@@ -268,6 +276,8 @@ class Notification(models.Model):
     seen = models.BooleanField(default=False)
 
     class Meta:
+        verbose_name = 'შეტყობინება'
+        verbose_name_plural = "შეტყობინებები"
         db_table = 'user_notification'
 
     def __str__(self):
