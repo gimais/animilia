@@ -169,6 +169,10 @@ class Notification(models.Model):
     reply_comment = models.ForeignKey(Comment, blank=True, on_delete=models.CASCADE)
     visited = models.BooleanField(default=False)
 
+    class Meta:
+        verbose_name = 'შეტყობინებები'
+        verbose_name_plural = "შეტყობინებები"
+
     def __str__(self):
         return "comment_id: {}, reply_id: {}, user_id : {}".format(self.comment.id, self.reply_comment.id,
                                                                    self.user.username)
