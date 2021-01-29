@@ -14,8 +14,7 @@
         </style>
     {% endblock %}
     <div class="no-auth">
-        <p>
-            კომენტარის გასაკეთებლად საჭიროა
+        <p>კომენტარის გასაკეთებლად საჭიროა
             <a href="#login-focus" onclick="document.getElementsByClassName('login-form')[0].className += ' show'">ავტორიზაცია</a>,
             თუ არ ხართ ავტორიზებული შეგიძლიათ გაიაროთ <a href="{% url 'signup' %}">რეგისტრაცია</a>
         <p>
@@ -30,17 +29,21 @@
                 <img src="/media/{{ comment.avatar }}?r=1" alt="{{ comment.username }}" loading="lazy">
             </a>
             <div class="comment-body">
-                <div class="comment-info">
-                    <a class='comment-user {% if comment.user_id == user.pk %}mine{% endif %}'
+                <div class="comment-info" data-id="{{ comment.id }}">
+                                        <a class='comment-user {% if comment.user_id == user.pk %}mine{% endif %}'
                        href="{% url 'profile_preview' comment.user_id %}">{{ comment.username }}</a>
+                    {% if not comment.user_active %}
+                        <span style="color: #dc1515;font-weight: 600;font-size: 10px">BANNED</span>
+                    {% endif %}
                     {% if comment.active %}
-                        {% if user.is_authenticated %}
+                        {% if user.is_authenticated and comment.user_active %}
                             <p class="reply-button" data-id="{{ comment.id }}" data-username="{{ comment.username }}">
                                 <i class="fas fa-reply"></i> პასუხი
                             </p>
                         {% endif %}
                         {% if comment.priority != None %}
-                            <i class="fas fa-thumbtack" style="transform: scale(1.5,1.2) rotate(90deg);margin-left: 3px"></i>
+                            <i class="fas fa-thumbtack"
+                               style="transform: scale(1.5,1.2) rotate(90deg);margin-left: 3px"></i>
                         {% endif %}
                         <p class='comment-time'>{{ comment.created|date:"d/m/Y | H:i" }}</p>
                         </div>

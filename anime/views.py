@@ -1,4 +1,4 @@
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q, Count
 from django.db.models.expressions import RawSQL
 from django.http import JsonResponse
@@ -13,9 +13,11 @@ ERROR = {'error': 'moxda shecdoma!'}
 
 
 def index_view(request):
-    animes_list = Anime.objects.values('name', 'slug', 'age', 'rating', 'views', 'poster', 'soon').all().order_by(
+    animes = Anime.objects.values('name', 'slug', 'age', 'rating', 'views', 'poster', 'soon').all().order_by(
         '-updated')
-    return render(request, 'home.html', {'animes_list': animes_list})
+
+    paginator = Paginator(animes, 9)
+    page = request.GET.get('page', 1)
 
 
 def page_view(request, slug):
@@ -32,7 +34,7 @@ def page_view(request, slug):
         comments = anime.comments.annotates_related_objects(request.user).filter(
             Q(active=True) | Q(active_children_count__gte=1),
             parent__isnull=True).order_by(
-            RawSQL('CASE WHEN "comment"."id" = %s THEN 1 ELSE 2 END', (request.GET['parent'],)), '-priority',
+            RawSQL('CASE WHEN "account_comment"."id" = %s THEN 1 ELSE 2 END', (request.GET['parent'],)), '-priority',
             '-id')
 
         notification = request.GET.get('notif', False)
@@ -66,9 +68,9 @@ def more_comments(request):
             parent_id = None
 
         if parent_id:
-            comments = Comment.objects.annotates_related_objects(request.user).filter(
-                Q(active=True) | Q(active_children_count__gte=1), parent__isnull=True, anime=anime_id).order_by(
-                RawSQL('CASE WHEN "comment"."id" = %s THEN 1 ELSE 2 END', (request.GET['parent'],)),
+            comments = Comment.objects.related_objects_annotates(request.user).filter(
+                Q(active=True) | Q(active_replies_count__gte=1), parent__isnull=True, anime=anime_id).order_by(
+                RawSQL('CASE WHEN "account_comment"."id" = %s THEN 1 ELSE 2 END', (request.GET['parent'],)),
                 '-priority',
                 '-id')
         else:

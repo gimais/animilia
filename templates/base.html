@@ -16,10 +16,10 @@
     <link rel="icon" sizes="144x144" href="{% static "icon-144.png" %}">
 
     {% block extra %}{% endblock %}
-    <link rel="stylesheet" href="//cdn.web-fonts.ge/fonts/dejavu-sans-condensed/css/dejavu-sans-condensed.min.css?display=swap">
+    <link rel="stylesheet" href="//cdn.web-fonts.ge/fonts/dejavu-sans-condensed/css/dejavu-sans-condensed.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap">
     <link rel="stylesheet" href="{% static "css/normalize.css" %}">
-    <link rel="stylesheet" href="{% static "css/main.css" %}?v=5">
+    <link rel="stylesheet" href="{% static "css/main.css" %}?v=7">
 
     <script src="https://kit.fontawesome.com/98d783368d.js" crossorigin="anonymous"></script>
     <meta name="theme-color" content="#973116">
@@ -39,9 +39,8 @@
                 <a class="web-name"></a>
             </div>
             <ul class="top-nav">
-                <li {% if user.is_anonymous %} style="width: 100%" {% else %} style="width: 50%"{% endif %}>
-                    <a id="mob-home" href="/">მთავარი</a>
-                </li>
+                <li {% if user.is_anonymous %} style="width: 100%" {% else %} style="width: 50%"{% endif %}><a
+                        id="mob-home" href="/">მთავარი</a></li>
                 <li><a href="{% url 'schedule' %}">განრიგი</a></li>
                 <li><a href="{% url 'feedback' %}">კონტაქტი</a></li>
                 {% if user.is_anonymous %}
@@ -62,13 +61,16 @@
                     {% if user.is_staff %}
                         <li><a href="/admin/" target="_blank">პანელი</a></li>
                     {% endif %}
+                    {% load account_tags %}
+                    {% with notification_count=user|notif_count %}
                         <li>
-                            <a class="menu-icon fas fa-bell" href="{% url 'notifications' %}">
-                            {% if user.notif %}
-                                <span class="notif-count">{{ user.notif }}</span>
+                            <a class="menu-icon fas fa-bell" href="{% url 'notification' %}">
+                            {% if notification_count %}
+                                <span class="notif-count">{{ notification_count }}</span>
                             {% endif %}
                             </a>
                         </li>
+                       {% endwith %}
                         <li><a class='active' href="{% url 'profile' %}" data-id="{{ user.id }}">პროფილი</a></li>
                         <li><a class="menu-icon fas fa-sign-out-alt" href="{% url 'logout' %}?next={% block logout_redirect %}{% endblock %}">
                             <span>გასვლა</span>
@@ -81,7 +83,7 @@
     <noscript>
         <div class="flash-message" style="background-color:#973116;">
             თქვენს ბრაუზერს არ აქვს JavaScript-ის მხარდაჭერა, საიტის სრულად გამოყენებისთვის საჭიროა მისი
-            <a href="https://www.enable-javascript.com/" target="_blank">ჩართვა!</a>
+            <a href="https://www.enable-javascript.com/" style="color: white" target="_blank">ჩართვა!</a>
         </div>
     </noscript>
     {% if messages %}
@@ -90,6 +92,12 @@
             {% if 'welcome' in msg.extra_tags %}
                 <div class='flash-message' style="background: #973116">{{ msg }}</div>
             {% elif 'failedAuth' in msg.extra_tags %}
+                <div class='flash-message' style="background: red">{{ msg }}</div>
+            {% elif 'registered' in msg.extra_tags %}
+                <div class='flash-message' style="background: tomato">{{ msg }}</div>
+            {% elif 'error' in msg.extra_tags %}
+                <div class='flash-message' style="background: red">{{ msg }}</div>
+            {% elif 'nonAuth' in msg.extra_tags %}
                 <div class='flash-message' style="background: red">{{ msg }}</div>
             {% endif %}
         {% endfor %}
@@ -113,7 +121,7 @@
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <script>window.jQuery || document.write('<script src="/static/js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
     <script src="{% static "js/plugins.js" %}"></script>
-    <script src="{% static "js/main.js" %}?v=5"></script>
+    <script src="{% static "js/main.js" %}?v=7"></script>
 
     {% block script %}{% endblock %}
 

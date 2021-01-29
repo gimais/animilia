@@ -1,11 +1,11 @@
 import datetime
 
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, get_user_model
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
-from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -20,8 +20,6 @@ from .models import Comment, Profile, Notification, Settings, Reply
 from .tokens import email_change_token
 
 ERROR = {'error': 'moxda shecdoma!'}
-
-User = get_user_model()
 
 
 def login_view(request):
@@ -148,10 +146,8 @@ def avatar_update(request):
                                          settings.avatar_updated + datetime.timedelta(days=3)),
                                      'new_avatar': 'avatars/{}'.format(avatar.name),
                                      }, status=200)
-            else:
-                return JsonResponse({'success': False, 'info': 'moxda shecdoma!'}, status=400)
-
-        return render(request, 'account/profile.html')
+            return JsonResponse(ERROR, status=400)
+        return JsonResponse(ERROR, status=405)
     else:
         return redirect('home')
 
@@ -212,9 +208,7 @@ def add_comment(request):
                 try:
                     anime = Anime.objects.get(id=request.POST.get('id', False))
                 except (TypeError, ValueError, OverflowError, Anime.DoesNotExist):
-                    return JsonResponse({
-                        'error': 'ასეთი ანიმე არ არსებობს!',
-                    }, status=404)
+                    anime = None
 
                 if anime:
                     comment = form.save(commit=False)
@@ -223,16 +217,25 @@ def add_comment(request):
 
                     comment.save()
 
-                return JsonResponse({
-                    'username': request.user.username,
-                    'avatar': request.user.profile.avatar.name,
-                    'user_id': request.user.id,
-                    'comment_id': comment.id,
-                    'editable': True,
-                    'time': datetime.datetime.timestamp(comment.created),
-                    'likes': 0,
-                    'dislikes': 0
-                }, status=200)
+                    response_data = {
+                        'username': request.user.username,
+                        'avatar': request.user.profile.avatar.name,
+                        'user_id': request.user.id,
+                        'user_active': request.user.is_active,
+                        'comment_id': comment.id,
+                        'editable': True,
+                        'time': datetime.datetime.timestamp(comment.created),
+                        'likes': 0,
+                        'dislikes': 0
+                    }
+
+                    status = 200
+                else:
+                    response_data = {
+                        'error': 'aseti anime bazashi ar aris!',
+                    }
+                    status = 404
+                return JsonResponse(response_data, status=status)
             else:
                 return JsonResponse(form.errors.get_json_data(), status=400)
         else:
@@ -273,6 +276,7 @@ def reply_comment(request):
                     'avatar': request.user.profile.avatar.name,
                     'user_id': request.user.id,
                     'editable': True,
+                    'user_active': request.user.is_active,
                     'comment_id': reply_comment.id,
                     'parent_id': reply_comment.parent.id,
                     'time': datetime.datetime.timestamp(reply_comment.created),
@@ -300,7 +304,7 @@ def check_replies(request, id):
             if paginator.num_pages >= page > 0:
                 result = {'replies': [], 'availablePages': paginator.num_pages}
                 for reply in paginator.get_page(page).object_list:
-                    result['replies'].append(reply.get_reply_comment_info(request.user))
+                    result['replies'].append(reply.get_reply_comment_info(request.user.pk))
                 return JsonResponse(result, status=200)
         return JsonResponse(ERROR, status=404)
     return JsonResponse(ERROR, status=405)
@@ -466,7 +470,7 @@ def delete_notification(request, id):
             if notification is not None and notification.user_id == request.user.id:
                 notification.delete()
 
-            return JsonResponse({'success': True}, status=200)
+            return JsonResponse({'info': "waishala"}, status=200)
         else:
             return JsonResponse({'error': "araavtorizebuli motxovna!"}, status=401)
     else:

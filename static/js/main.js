@@ -146,10 +146,14 @@ function makeCommentBoxHTML(data) {
                         <img src=${'/media/' + data.avatar} alt="avatar" loading="lazy">
                     </a>
                     <div class="comment-body">
-                        <div class="comment-info">
+                        <div class="comment-info" data-id="${data['comment_id']}">
                             <a class='comment-user${data['user_id'] === request_user_id ? " mine" : ""}' href="/profile/${data['user_id']}/">${data.username}</a>`;
 
-    if (typeof request_user_id !== "undefined")
+    if (!data['user_active']) {
+        html += `<span style="color: #dc1515;font-weight: 600;font-size: 10px"> BANNED</span>`;
+    }
+
+    if (typeof request_user_id !== "undefined" && data['user_active'])
         html += `<p class="reply-button" data-id="${data['comment_id']}" data-username="${data.username}">
                             <i class="fas fa-reply"></i> პასუხი
                         </p>`;
@@ -171,23 +175,24 @@ function makeCommentBoxHTML(data) {
         html += `<div class="user-actions">`;
 
         if (data['user_id'] === request_user_id) {
-            if (data['editable'] && data['dislikes'] === 0 && data['likes'] === 0) {
+            if (data['dislikes'] === 0 && data['likes'] === 0) {
                 html += `<div class="comment-right-buttons" id='edit-comment' style="margin-right: 3px;"><i class="fas fa-edit"></i></div>`;
             }
             html += `<div class="comment-right-buttons" id='remove-comment'><i class="fas fa-trash"></i></div>`;
         }
-
-        html += `<p class="reply-button touch" data-id="${data['comment_id']}" data-username="${data.username}">
+        if(data['user_active']){
+                    html += `<p class="reply-button touch" data-id="${data['comment_id']}" data-username="${data.username}">
                         <i class="fas fa-reply"></i>  პასუხი
-                </p>
-                </div>`;
+                </p>`;
+        }
+        html += `</div>`;
     }
 
     html += `</div></div>`;
 
-    if (data['active_children_count'] > 0) {
+    if (data['active_childs_count'] > 0) {
         html += `<div class="comment-replies-check closed" data-id="${data['comment_id']}">
-                    პასუხების ჩვენება (${data['children_count']})
+                    პასუხების ჩვენება (${data['childs_count']})
                 </div>
                 <div class="comment-replies-box"></div>`;
     }
@@ -204,10 +209,14 @@ function makeReplyCommentBoxHTML(data) {
                         <img src=${'/media/' + data.avatar} alt="avatar" loading="lazy">
                     </a>
                     <div class="comment-body">
-                        <div class="comment-info">
-                            <a class='comment-user${data['user_id'] === request_user_id ? " mine" : ""}' href="/profile/${data['user_id']}/">${data.username}</a>`;
+                        <div class="comment-info" data-id="${data['comment_id']}">
+                            <a class='comment-user${data['user_id'] === request_user_id ? " mine" : ""}' href="/profile/${data['user_id']}/">${data.username} </a>`;
 
-    if (typeof request_user_id !== "undefined")
+    if (!data['user_active']) {
+        html += `<span style="color: #dc1515;font-weight: 600;font-size: 10px"> BANNED</span>`;
+    }
+
+    if (typeof request_user_id !== "undefined" && data['user_active'])
         html += `<p class="reply-button" data-it="${data.parent_id}" data-id="${data['comment_id']}" data-username="${data.username}">
                             <i class="fas fa-reply"></i> პასუხი
                 </p>`;
@@ -229,16 +238,16 @@ function makeReplyCommentBoxHTML(data) {
         html += `<div class="user-actions">`;
 
         if (data['user_id'] === request_user_id) {
-            if (data['editable'] && data['dislikes'] === 0 && data['likes'] === 0) {
+            if (data['dislikes'] === 0 && data['likes'] === 0) {
                 html += `<div class="comment-right-buttons" id='edit-comment' style="margin-right: 3px"><i class="fas fa-edit"></i></div>`;
             }
             html += `<div class="comment-right-buttons" id='remove-comment'><i class="fas fa-trash"></i></div>`;
         }
-
-        html += `<p class="reply-button touch" data-it="${data.parent_id}" data-id="${data['comment_id']}" data-username="${data.username}">
+        if (data['user_active']) {
+            html += `<p class="reply-button touch" data-it="${data.parent_id}" data-id="${data['comment_id']}" data-username="${data.username}">
                         <i class="fas fa-reply"></i>  პასუხი
-                </p>
-                </div>`;
+                </p>`;
+        }
     }
 
     html += `</div></div></div>`;
@@ -249,20 +258,24 @@ function makeReplyCommentBoxHTML(data) {
 
 function makeDeletedCommentBoxHTML(data) {
     let html = '';
-    html += `<div class="comment ${data['active_children_count'] ? 'clearfix' : ''}">
+    html += `<div class="comment ${data['active_childs_count'] ? 'clearfix' : ''}">
                     <a class="comment-user-img" href="/profile/${data['user_id']}/">
                         <img src=${'/media/' + data.avatar} alt="avatar" loading="lazy">
                     </a>
                     <div class="comment-body">
-                        <div class="comment-info">
-                            <a class='comment-user' href="/profile/${data['user_id']}/">${data.username}</a>
-                            <p class='comment-time'>${convertTimeGeo(data.time)}</p>
+                        <div class="comment-info" data-id="${data['comment_id']}">
+                            <a class='comment-user' href="/profile/${data['user_id']}/">${data.username}</a>`;
+    if (!data['user_active']) {
+        html += `<span style="color: #dc1515;font-weight: 600;font-size: 10px"> BANNED</span>`;
+    }
+    html += `<p class='comment-time'>${convertTimeGeo(data.time)}</p>
                         </div>
                             <p class="deleted-comment">ეს კომენტარი წაშლილია</p>
                     </div>`;
-    if (typeof data['active_children_count'] !== "undefined" && data['active_children_count'] > 0) {
+
+    if (typeof data['active_childs_count'] !== "undefined" && data['active_childs_count'] > 0) {
         html += `<div class="comment-replies-check closed" data-id="${data['comment_id']}">
-                    პასუხების ჩვენება (${data['children_count']})
+                    პასუხების ჩვენება (${data['childs_count']})
                 </div>
                 <div class="comment-replies-box"></div>`;
     }
@@ -365,7 +378,21 @@ function getChildComments(that, parent_id, replying = false) {
 }
 
 $('form').submit(function () {
-    $(':submit', this).attr('disabled', true);
+    let that = $(this);
+
+    that.find('input[type=submit]').each(function () {
+        let submitButton = $(this);
+
+        if(submitButton.attr('disabled'))
+            return;
+
+        setTimeout(function () {
+            submitButton.attr('disabled',true);
+            setTimeout(function () {
+                submitButton.removeAttr('disabled')
+            },1500)
+        },0)
+    })
 });
 
 $('#login-focus').on('click', function () {
@@ -420,16 +447,14 @@ $('.comment-form').submit(function (e) {
                     alert("მოხდა ტექნიკური შეცდომა, გთხოვთ მიწეროთ ადმინისტრაციას.");
             },
             complete: function () {
-                that.find('.spoiler-button').attr('disabled', false);
+                that.find('button').removeAttr('disabled');
             }
         })
     } else {
         if (text.match(/\[spoiler\](.*?)\[\/spoiler\]/ig) == null)
-            that.find('.spoiler-button').attr('disabled', false);
+            that.find('.spoiler-button').removeAttr('disabled');
         alert(validation);
     }
-    that.find('button[type="submit"]').attr('disabled', false);
-
 });
 
 $('.comments-box, .comment-form').on('click', '.reply-button', function () {
@@ -484,6 +509,8 @@ $('.comments-box, .comment-form').on('click', '.reply-button', function () {
     let $formDataSerialized = that.serialize();
     let validation = validateComment($(this).find('textarea').val());
 
+    that.off('submit');
+
     if (validation == null) {
         if (typeof that.data('it') !== "undefined") {
             $formDataSerialized += `&parent_id=${that.data('id')}` + `&replying_to_id=${that.data('it')}`;
@@ -529,7 +556,7 @@ $('.comments-box, .comment-form').on('click', '.reply-button', function () {
 
         $.ajax({
             method: "DELETE",
-            url: '/account/comment/delete/' + parent.find('.reply-button').data('id'),
+            url: '/account/comment/delete/' + parent.find('.comment-info').data('id'),
             success: function (data) {
                 parent.fadeOut(200, function () {
                     parent.replaceWith(makeDeletedCommentBoxHTML(data));
@@ -543,7 +570,7 @@ $('.comments-box, .comment-form').on('click', '.reply-button', function () {
 }).on('click', '.comment #edit-comment', function () {
     let that = $(this);
     let commentBox = that.closest('.comment');
-    let id = commentBox.find('.reply-button').data('id');
+    let id = commentBox.find('.comment-info').data('id');
     let commentText = commentBox.find('.comment-text');
     let hasSpoiler = commentText.find('.spoiler').length > 0;
     let textareaValue = HTMLToBB(commentText.html());
@@ -595,7 +622,7 @@ $('.comments-box, .comment-form').on('click', '.reply-button', function () {
 
 
     if (!parent.find('.comment-user').hasClass('mine')) {
-        let id = parent.find('.reply-button').data('id');
+        let id = parent.find('.comment-info').data('id');
 
         $.ajax({
             method: "POST",
@@ -633,7 +660,7 @@ $('.comments-box, .comment-form').on('click', '.reply-button', function () {
 
     if (!parent.find('.comment-user').hasClass('mine')) {
 
-        let id = parent.find('.reply-button').data('id');
+        let id = parent.find('.comment-info').data('id');
         $.ajax({
             method: "POST",
             url: '/account/comment/dislike/',
