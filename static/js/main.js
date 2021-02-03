@@ -898,7 +898,7 @@ $('.notification-page').on('click', '#delete-all', function (e) {
         url: '/account/notifications/delete/' + that.data('id'),
         success: function () {
             let newNotifCountElement = $('a.notif-model.active').find('.count');
-            let newNotifCount = parseInt(newNotifCountElement.text().match(/\d+/g)[0]);
+            let newNotifCount = newNotifCountElement.text().match(/\d+/g);
 
             let notificationsBox = $('.notifications');
             let allNotifCount = notificationsBox.find('li').length;
@@ -911,7 +911,7 @@ $('.notification-page').on('click', '#delete-all', function (e) {
             if (!that.parent().hasClass('visited')) {
                 let notifCount = $('.notif-count');
                 notifCount.text(notifCount.text() - 1);
-                newNotifCountElement.text(`(${newNotifCount - 1})`)
+                newNotifCountElement.text(`(${newNotifCount[0] - 1})`)
             }
 
             that.parents('li').hide(200).remove();
