@@ -1,7 +1,7 @@
 {% extends "account/notifications.html" %}
 
 {% block notif_content %}
-    {% if total.admin_message %}
+    {% if msgs %}
         <button id="delete-all" data-content="message">შეტყობინებების წაშლა</button>
     {% endif %}
     <ul class="notifications">
