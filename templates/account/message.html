@@ -1,12 +1,15 @@
 {% extends "account/notifications.html" %}
 
 {% block notif_content %}
+    {% if total.admin_message %}
+        <button id="delete-all" data-content="message">შეტყობინებების წაშლა</button>
+    {% endif %}
     <ul class="notifications">
         {% for msg in msgs %}
             <li {% if msg.seen %}class="visited"{% endif %}>
                 <span class="notif-info">
                         {{ msg.message__subject }}
-                        <a data-id="{{ msg.message__id }}" class="show-message-body">ნახვა</a>
+                        <a data-id="{{ msg.message__id }}" data-notif="{{ msg.id }}" class="show-message-body">ნახვა</a>
                     </span>
                 <span class="remove-notif" data-id="{{ msg.id }}" title="წაშლა">
                         <i class="fas fa-trash" aria-hidden="true"></i>
@@ -15,7 +18,7 @@
                 <p class="message-body"></p>
             </li>
         {% empty %}
-            <div class="form-title" style="margin: 0;">თქვენ გაქვთ 0 შეტყობინება</div>
+            <div class="form-title">თქვენ გაქვთ 0 შეტყობინება</div>
         {% endfor %}
     </ul>
 {% endblock %}
@@ -26,16 +29,25 @@
         $('.show-message-body').click(function (e) {
             e.preventDefault();
             let that = $(this);
-            let body = that.parents('li').find('.message-body');
+            let liParent = that.parents('li');
+            let body = liParent.find('.message-body');
 
             if (!that.hasClass('done')) {
                 body.text('მოიცადეთ...');
                 $.ajax({
                     method: "GET",
                     url: '/contact/message/' + that.data('id'),
+                    data: {
+                        visited : liParent.hasClass('visited') ? 1 : 0,
+                    },
                     success: function (e) {
                         body.text(e.message);
                         that.addClass('done');
+
+                        if(!liParent.hasClass('visited')){
+                            let notifCount = $('.notif-count');
+                            notifCount.text(notifCount.text() -1);
+                        }
                     },
                     error: function () {
                         alert('მოხდა შეცდომა! თავიდან სცადეთ! თუ იგივე მოხდა, გთხოვთ მიწეროთ ადმინისტრაციას.');
@@ -45,10 +57,14 @@
 
             if (!body.hasClass('show')) {
                 body.toggleClass('show');
-                that.text('დამალვა')
+                that.text('დამალვა');
             } else {
                 body.toggleClass('show');
-                that.text('ნახვა')
+                that.text('ნახვა');
+
+                if(!liParent.hasClass('visited')){
+                    liParent.addClass('visited');
+                }
             }
         });
     </script>

@@ -1244,7 +1244,6 @@ div.comment-right-buttons {
     padding: 2px 8px;
     display: inline-block;
     font-size: 1.3rem;
-    text-transform: uppercase;
     word-break: break-word;
 }
 
@@ -1446,57 +1445,115 @@ a.change-pass-button {
     visibility: visible;
 }
 
-.notif-list{
-    float: left;
-    width: 15%;
-    padding: 20px 10px;
-    background-color: #90878421;
-    margin-left: 8px;
+.notification-page {
+    background-color: #ffffff;
+    padding-bottom: 20px;
 }
 
-.notif-model{
+.notification-page h2 {
+    margin: 20px 0 15px 20px;
+    font-size: 23px;
+    font-weight: lighter;
+}
+
+#delete-all {
+    border: 1px solid #cec3c3;
+    background-color: white;
+    width: fit-content;
+    padding: 7px;
+    font-size: 14px;
+    cursor: pointer;
+    position: absolute;
+    right: 25px;
+    top: 20px;
+}
+
+.notif-list {
+    float: left;
+    width: 20%;
+    margin-left: 25px;
+}
+
+.notif-model {
     text-align: center;
     padding: 10px;
-    margin: 6px 0;
-    border: 1px solid black;
-    background-color: #efefef;
     color: black;
     text-decoration: none;
     display: block;
 }
 
-.notif-model:hover{
-    cursor: pointer;
-    background-color: #973116;
-    color: #ffffff;
+.nav-icon {
+    color: #000000;
+    display: none;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 20px;
+    padding: 7px 12px;
+    border-radius: 4px;
+    background-color: #e2e1e1;
 }
 
-.notif-content{
+.nav-icon .notif-count-page {
+    border-radius: 50%;
+    background: #ff2b01;
+    top: -12px;
+    right: -15px;
+    width: 12px;
+    position: absolute;
+    height: 12px;
+}
+
+.notif-model.active {
+    background-color: #e2e1e1;
+}
+
+.notif-model:not(:last-child) {
+    border-bottom: 1px solid #cecccc;
+}
+
+.notif-model:hover {
+    cursor: pointer;
+    background-color: #e2e1e1;
+}
+
+.notif-content {
+    width: 75%;
     float: right;
-    width: 80%;
-    background-color: #90878421;
 }
 
 /*replies*/
-.notifications, .messages{
-    width: 90%;
-    margin: 0 auto;
+.notifications, .messages {
+    margin-right: 20px;
 }
 
-.notifications li{
-    padding: 9px 0;
+.notifications li {
     background-color: #322219;
     color: #ffffff;
-    margin: 6px auto;
+    margin: 0 0 6px;
+    padding: 10px;
+    position: relative;
 }
 
-.notifications li.visited{
-    background-color: #7b7a7a80;
+.notifications .form-title {
+    padding-left: 25%;
+    text-align: left;
+    margin: 0;
+    font-weight: lighter
+}
+
+#delete-all:hover {
+    background-color: #e2e1e1;
+}
+
+.notifications li.visited {
+    background-color: #e2e2e2;
     color: #000000;
 }
 
-.notif-info{
+.notif-info {
     margin-left: 15px;
+    display: inline-block;
 }
 
 .notif-info a{
@@ -1543,10 +1600,13 @@ a.change-pass-button {
     margin: 14px 16px 5px;
     padding-top: 14px;
     border-top: 1px solid black;
+    line-height: 135%;
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
-.visited > .message-body{
-    color: #ffffff;
+.visited > .message-body {
+    color: #000000;
 }
 
 .hide-this {
@@ -1628,12 +1688,6 @@ a.change-pass-button {
         width: 95%;
     }
 
-    .notif-time {
-        margin-left: 15px;
-        float: none;
-        display: block;
-    }
-
     .schedule {
         width: 85%;
     }
@@ -1641,6 +1695,7 @@ a.change-pass-button {
 }
 
 @media (max-width: 768px) {
+
     .top-background{
         height: 0;
     }
@@ -1738,21 +1793,51 @@ a.change-pass-button {
 
     .notifications {
         padding: 10px 5px;
-        width: 100%;
+        width: 95%;
+        margin: 0 auto;
     }
 
-    .notif-list{
-        width: 20%;
-        padding: 0;
-    }
-
-    .notif-content{
+    .notif-content {
         width: 75%;
     }
 
-    .remove-notif {
-        font-size: 20px;
-        margin-top: 4px;
+    .notification-page h2 {
+        margin-top: 23px;
+    }
+
+    .nav-icon {
+        display: block;
+    }
+
+    .notif-list{
+        width: 96%;
+        padding: 0;
+        margin: 16px auto;
+        float: none;
+    }
+
+    .notif-model{
+        display: none ;
+        width: 100%;
+    }
+
+    .notif-content{
+        width: 100%;
+    }
+
+    .notif-info {
+         margin-left: 0;
+    }
+
+    .notifications .form-title {
+         padding: 0;
+         text-align: center;
+    }
+
+    #delete-all {
+        position: unset;
+        display: block;
+        margin: 0 auto;
     }
 
     #submit-username-button, .profile-details-input .cancel {
@@ -1796,13 +1881,9 @@ a.change-pass-button {
 
     .notif-info a {
         display: block;
-        margin: 5px 0 5px 15px;
+        margin-top: 10px;
     }
 
-    .remove-notif {
-        font-size: 25px;
-        margin: -22px 10px;
-    }
 
     .item-page {
         padding: 5px;
@@ -1858,16 +1939,11 @@ a.change-pass-button {
         margin-top: 7px;
     }
 
-    .notif-list{
-        width: 80%;
-        margin: 0 auto;
-        float: none;
-    }
-
-    .notif-content{
-        width: 90%;
-        margin: 15px auto;
-        float: none;
+    .notif-time {
+        float: unset;
+        position: absolute;
+        bottom: 10px;
+        right: 6px;
     }
 
     .item-page-right {
@@ -1900,11 +1976,6 @@ a.change-pass-button {
     .item img {
         width: 100%;
         height: auto;
-    }
-
-    .remove-notif {
-        font-size: 20px;
-        margin-top: -8px;
     }
 
     .top-nav li a span.notif-count {

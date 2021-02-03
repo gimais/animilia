@@ -24,6 +24,9 @@ def show_info(request, id):
             profile = Profile.objects.select_related('user__settings').get(pk=id)
 
             user_info = {
+                "email": profile.user.email,
+                "last_login": profile.user.last_login,
+                "registration": profile.user.date_joined,
                 "gender": profile.gender,
                 "birth": profile.birth,
                 "show_birth": profile.user.settings.show_birth,

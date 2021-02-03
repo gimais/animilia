@@ -19,10 +19,6 @@ from anime.models import Anime
 
 class CustomUserManager(BaseUserManager):
 
-    def get_queryset(self):
-        return super(CustomUserManager, self).get_queryset().annotate(
-            notif=Count('notifications', filter=Q(notifications__seen=False)))
-
     def create_user(self, username, email, password, is_staff=False, is_superuser=False, **extra_fields):
         if not username:
             raise ValueError(_('The given username must be set'))
@@ -109,6 +105,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def email_user(self, subject, message, from_email=None, **kwargs):
         send_mail(subject, message, from_email, [self.email], **kwargs)
+
+    @property
+    def get_notification_count(self):
+        return self.notifications.filter(seen=False).count()
 
 
 class Comment(models.Model):

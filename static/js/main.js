@@ -859,7 +859,37 @@ $('.profile-details-input').on('click', '#change-username-button', function (e) 
     });
 });
 
-$('.remove-notif').click(function (e) {
+$('.notification-page').on('click', '#delete-all', function (e) {
+    e.preventDefault();
+    let that = $(this);
+
+    $.ajax({
+        method: "DELETE",
+        url: '/account/notifications/delete/all/' + that.data('content'),
+        success: function () {
+            let navNotifCountElement = $('.notif-count');
+            let navNotifCount = navNotifCountElement.text();
+            let notificationsBox = $('.notifications');
+
+            if (navNotifCount > 0) {
+                notificationsBox.find('li').each((index, item) => {
+                    if (!$(item).hasClass('visited')) {
+                        navNotifCount -= 1;
+                    }
+                });
+                navNotifCountElement.text(navNotifCount)
+            }
+
+            notificationsBox.html(`<div class="form-title">თქვენ გაქვთ 0 შეტყობინება</div>`);
+
+            $('a.notif-model.active').find('.count').text('(0)');
+            that.hide(200).remove();
+        },
+        error: function () {
+            alert('მოხდა შეცდომა! თავიდან სცადეთ!');
+        }
+    });
+}).on('click', '.remove-notif', function (e) {
     let that = $(this);
 
     e.preventDefault();
@@ -867,14 +897,29 @@ $('.remove-notif').click(function (e) {
         method: "DELETE",
         url: '/account/notifications/delete/' + that.data('id'),
         success: function () {
+            let newNotifCountElement = $('a.notif-model.active').find('.count');
+            let newNotifCount = parseInt(newNotifCountElement.text().match(/\d+/g)[0]);
+
+            let notificationsBox = $('.notifications');
+            let allNotifCount = notificationsBox.find('li').length;
+
+            if (allNotifCount - 1 === 0) {
+                $('#delete-all').hide(200).remove();
+                notificationsBox.html(`<div class="form-title">თქვენ გაქვთ 0 შეტყობინება</div>`);
+            }
+
             if (!that.parent().hasClass('visited')) {
                 let notifCount = $('.notif-count');
                 notifCount.text(notifCount.text() - 1);
+                newNotifCountElement.text(`(${newNotifCount - 1})`)
             }
+
             that.parents('li').hide(200).remove();
         },
         error: function () {
             alert('მოხდა შეცდომა! თავიდან სცადეთ!');
         }
     });
+}).on('click', '.nav-icon', function () {
+    $('.notif-model').toggleClass('show hide')
 });

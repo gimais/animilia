@@ -63,10 +63,12 @@
                         <li><a href="/admin/" target="_blank">პანელი</a></li>
                     {% endif %}
                         <li>
-                            <a class="menu-icon fas fa-bell" href="{% url 'notifications' %}">
-                            {% if user.notif %}
-                                <span class="notif-count">{{ user.notif }}</span>
-                            {% endif %}
+                            <a class="menu-icon fas fa-bell" href="{% url 'notification_reply' %}">
+                            {% with notif=user.get_notification_count %}
+                                {% if notif %}
+                                <span class="notif-count">{{ notif }}</span>
+                                {% endif %}
+                            {% endwith %}
                             </a>
                         </li>
                         <li><a class='active' href="{% url 'profile' %}" data-id="{{ user.id }}">პროფილი</a></li>

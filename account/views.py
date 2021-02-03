@@ -437,12 +437,12 @@ def dislike_comment(request):
     return JsonResponse({'error': "araavtorizebuli motxovna!"}, status=401)
 
 
-def check_notification(request):
+def check_notification_reply(request):
     if request.user.is_authenticated:
         notifications = request.user.notifications
-
-        reply = notifications.filter(content_type__model='reply').count()
-        admin_message = notifications.filter(content_type__model='message').count()
+        # TODO try raw sql
+        reply = notifications.filter(content_type__model='reply', seen=False).count()
+        admin_message = notifications.filter(content_type__model='message', seen=False).count()
 
         replies = notifications.filter(content_type__model='reply').prefetch_related(
             'content_object').values(
@@ -457,13 +457,14 @@ def check_notification(request):
 
 def check_notification_message(request):
     if request.user.is_authenticated:
-        notifications = Notification.objects.filter(user_id=request.user)
+        notifications = request.user.notifications
 
-        reply = notifications.filter(content_type__model='reply').count()
-        admin_message = notifications.filter(content_type__model='message').count()
+        reply = notifications.filter(content_type__model='reply', seen=False).count()
+        admin_message = notifications.filter(content_type__model='message', seen=False).count()
 
         message = notifications.filter(content_type__model='message').prefetch_related('content_object').values(
-            'id', 'message__subject', 'message__id', 'message__created', 'seen').order_by('-message__created')
+            'id', 'message__subject', 'message__id', 'message__created', 'seen') \
+            .order_by('-message__created')
 
         return render(request, 'account/message.html',
                       {'total': {'reply': reply, 'admin_message': admin_message}, 'msgs': message})
@@ -474,15 +475,23 @@ def delete_notification(request, id):
     if request.method == "DELETE":
         if request.user.is_authenticated:
             try:
-                notification = Notification.objects.get(id=id)
+                Notification.objects.get(user_id=request.user, id=id).delete()
             except Notification.DoesNotExist:
-                notification = None
-
-            if notification is not None and notification.user_id == request.user.id:
-                notification.delete()
+                return JsonResponse({'error': "ver moizebna!"}, status=404)
 
             return JsonResponse({'info': "waishala"}, status=200)
-        else:
-            return JsonResponse({'error': "araavtorizebuli motxovna!"}, status=401)
-    else:
-        return JsonResponse({'error': "araswori motxovna!"}, status=405)
+        return JsonResponse({'error': "araavtorizebuli motxovna!"}, status=401)
+    return JsonResponse({'error': "araswori motxovna!"}, status=405)
+
+
+def delete_all_notification_by_content(request, content):
+    if request.method == "DELETE":
+        if request.user.is_authenticated:
+            try:
+                Notification.objects.filter(user_id=request.user, content_type__model=content).delete()
+            except Notification.DoesNotExist:
+                return JsonResponse({'error': "ver moizebna!"}, status=404)
+
+            return JsonResponse({'info': "waishala"}, status=200)
+        return JsonResponse({'error': "araavtorizebuli motxovna!"}, status=401)
+    return JsonResponse({'error': "araswori motxovna!"}, status=405)

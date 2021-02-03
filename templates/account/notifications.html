@@ -1,46 +1,57 @@
 {% extends "base.html" %}
-{% block title %}შეყობინებები{% endblock %}
+{% block title %}შეტყობინებები{% endblock %}
 {% block logout_redirect %}/{% endblock %}
 {% load static %}
 {% load extra_tags %}
 
 {% block content %}
-    <div class="container clearfix">
-        <div class="notif-list">
-            <a class="notif-model" href="{% url 'notification_reply' %}">კომენტარები
-                {% if total.reply %}
-                    ({{ total.reply }})
+    <div class="container">
+        <div class="notification-page clearfix">
+            <h2>შეტყობინებები</h2>
+            <div class="notif-list">
+                <a class="notif-model{% if request.get_full_path == '/account/notifications/reply/' %} active{% endif %}" href="{% url 'notification_reply' %}">
+                    <span>კომენტარები</span>
+                    {% if total.reply %}<span class="count">({{ total.reply }})</span>{% endif %}
+                </a>
+                <a class="notif-model{% if request.get_full_path == '/account/notifications/message/' %} active{% endif %}" href="{% url 'notification_message' %}">
+                    <span>ადმინისტრაცია</span>
+                    {% if total.admin_message %}<span class="count">({{ total.admin_message }})</span>{% endif %}
+                </a>
+              <a href="javascript:void(0);" class="nav-icon">
+                <i class="fa fa-bars" style="position:relative;">
+                 {% if total.admin_message or total.reply %}
+                    <span class="notif-count-page"></span>
                 {% endif %}
-            </a>
-            <a class="notif-model" href="{% url 'notification_message' %}">ადმინისტრაცია
-                {% if total.admin_message %}
-                    ({{ total.admin_message }})
-                {% endif %}
-            </a>
-        </div>
-        <div class="notif-content">
-            {% block notif_content %}
-                <ul class="notifications">
-                    {% for reply in replies %}
-                        <li {% if reply.seen %}class="visited"{% endif %}>
-                            <span class="notif-info">
-                                თქვენს კომენტარზე ("{{ reply.reply__to_comment__body|truncatechars:17 }}")
-                                {% if reply.reply__to_comment__parent_id != None %}
-                                    <a href="/anime/{{ reply.reply__to_comment__anime__slug }}?parent={{ reply.reply__to_comment__parent_id }}&notif={{ reply.id }}">პასუხია</a>
-                                {% else %}
-                                    <a href="/anime/{{ reply.reply__to_comment__anime__slug }}?parent={{ reply.reply__to_comment }}&notif={{ reply.id }}">პასუხია</a>
-                                {% endif %}
-                            </span>
-                            <span class="remove-notif" data-id="{{ reply.id }}" title="წაშლა">
-                                <i class="fas fa-trash" aria-hidden="true"></i>
-                            </span>
-                            <span class="notif-time">{{ reply.reply__reply_comment__created|date:"d/m/Y | H:i" }}</span>
-                        </li>
-                    {% empty %}
-                        <div class="form-title" style="margin: 0;">თქვენ გაქვთ 0 შეტყობინება</div>
-                    {% endfor %}
-                </ul>
-            {% endblock %}
+                </i>
+              </a>
+            </div>
+            <div class="notif-content">
+                {% block notif_content %}
+                    {% if total.reply %}
+                        <button id="delete-all" data-content="reply">შეტყობინებების წაშლა</button>
+                    {% endif %}
+                    <ul class="notifications">
+                        {% for reply in replies %}
+                            <li {% if reply.seen %}class="visited"{% endif %}>
+                                <span class="notif-info">
+                                    თქვენს კომენტარზე ("{{ reply.reply__to_comment__body|truncatechars:17 }}")
+                                    {% if reply.reply__to_comment__parent_id != None %}
+                                        <a href="/anime/{{ reply.reply__to_comment__anime__slug }}?parent={{ reply.reply__to_comment__parent_id }}&notif={{ reply.id }}">პასუხია</a>
+                                    {% else %}
+                                        <a href="/anime/{{ reply.reply__to_comment__anime__slug }}?parent={{ reply.reply__to_comment }}&notif={{ reply.id }}">პასუხია</a>
+                                    {% endif %}
+                                </span>
+                                <span class="remove-notif" data-id="{{ reply.id }}" title="წაშლა">
+                                    <i class="fas fa-trash" aria-hidden="true"></i>
+                                </span>
+                                <span class="notif-time">{{ reply.reply__reply_comment__created|date:"d/m/Y | H:i" }}</span>
+                            </li>
+                        {% empty %}
+                            <div class="form-title">თქვენ გაქვთ 0 შეტყობინება</div>
+                        {% endfor %}
+                    </ul>
+                {% endblock %}
+            </div>
         </div>
     </div>
 {% endblock %}
