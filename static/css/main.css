@@ -1909,6 +1909,10 @@ a.change-pass-button {
         margin: 0;
     }
 
+    .profile-page{
+        padding: 0;
+    }
+
     p.username-info {
         text-align: center;
     }

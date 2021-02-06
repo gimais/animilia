@@ -190,9 +190,9 @@ function makeCommentBoxHTML(data) {
 
     html += `</div></div>`;
 
-    if (data['active_childs_count'] > 0) {
+    if (data['active_children_count'] > 0) {
         html += `<div class="comment-replies-check closed" data-id="${data['comment_id']}">
-                    პასუხების ჩვენება (${data['childs_count']})
+                    პასუხების ჩვენება (${data['children_count']})
                 </div>
                 <div class="comment-replies-box"></div>`;
     }
@@ -258,7 +258,7 @@ function makeReplyCommentBoxHTML(data) {
 
 function makeDeletedCommentBoxHTML(data) {
     let html = '';
-    html += `<div class="comment ${data['active_childs_count'] ? 'clearfix' : ''}">
+    html += `<div class="comment ${data['active_children_count'] ? 'clearfix' : ''}">
                     <a class="comment-user-img" href="/profile/${data['user_id']}/">
                         <img src=${'/media/' + data.avatar} alt="avatar" loading="lazy">
                     </a>
@@ -273,9 +273,9 @@ function makeDeletedCommentBoxHTML(data) {
                             <p class="deleted-comment">ეს კომენტარი წაშლილია</p>
                     </div>`;
 
-    if (typeof data['active_childs_count'] !== "undefined" && data['active_childs_count'] > 0) {
+    if (typeof data['active_children_count'] !== "undefined" && data['active_children_count'] > 0) {
         html += `<div class="comment-replies-check closed" data-id="${data['comment_id']}">
-                    პასუხების ჩვენება (${data['childs_count']})
+                    პასუხების ჩვენება (${data['children_count']})
                 </div>
                 <div class="comment-replies-box"></div>`;
     }
@@ -390,7 +390,7 @@ $('form').submit(function () {
             submitButton.attr('disabled',true);
             setTimeout(function () {
                 submitButton.removeAttr('disabled')
-            },1500)
+            },3000)
         },0)
     })
 });
