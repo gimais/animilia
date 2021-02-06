@@ -28,6 +28,7 @@ urlpatterns = [
 
     path('profile/', local_view.profile_view, name='profile'),
     path('avatar_update/', local_view.avatar_update, name='avatar_update'),
+    path('avatar_update/delete/', local_view.avatar_delete, name='avatar_update'),
     path('username_update/', local_view.username_update, name='username_update'),
 
     path('password_change/', views.PasswordChangeView.as_view(), name='password_change'),

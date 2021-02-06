@@ -62,9 +62,9 @@ class FeedbackAdmin(admin.ModelAdmin):
 
 
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ('id', 'subject', 'created')
+    list_display = ('id', 'to_user', 'subject', 'created')
     fields = ('subject', 'body')
-    search_fields = ('subject',)
+    search_fields = ('subject', 'to_user', )
 
     def has_add_permission(self, request, obj=None):
         return False

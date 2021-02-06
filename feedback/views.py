@@ -31,6 +31,8 @@ def feedback(request):
 
             form.save()
             messages.success(request, 'თქვენი წერილი წარმატებით გაიგზავნა.', extra_tags='welcome')
+            return render(request, 'feedback.html', {'form': form_class()})
+        return render(request, 'feedback.html', {'form': form})
     return render(request, 'feedback.html', {'form': form_class()})
 
 
