@@ -7,14 +7,16 @@
     <ul class="notifications">
         {% for msg in msgs %}
             <li {% if msg.seen %}class="visited"{% endif %}>
-                <span class="notif-info">
-                        {{ msg.message__subject }}
-                        <a data-id="{{ msg.message__id }}" data-notif="{{ msg.id }}" class="show-message-body">ნახვა</a>
-                    </span>
-                <span class="remove-notif" data-id="{{ msg.id }}" title="წაშლა">
+                <div style="position: relative">
+                    <span class="notif-info">
+                            {{ msg.message__subject }}
+                            <a data-id="{{ msg.message__id }}" data-notif="{{ msg.id }}" class="show-message-body">ნახვა</a>
+                        </span>
+                    <span class="remove-notif" data-id="{{ msg.id }}" title="წაშლა">
                         <i class="fas fa-trash" aria-hidden="true"></i>
                     </span>
-                <span class="notif-time">{{ msg.message__created|date:"d/m/Y | H:i" }}</span>
+                    <span class="notif-time">{{ msg.message__created|date:"d/m/Y | H:i" }}</span>
+                </div>
                 <p class="message-body"></p>
             </li>
         {% empty %}

@@ -55,3 +55,7 @@ th, td {
   padding: 5px;
   text-align: left;
 }
+
+.form-input {
+    border-color: #adadad;
+}
