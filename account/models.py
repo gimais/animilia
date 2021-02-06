@@ -263,6 +263,7 @@ class Reply(models.Model):
         verbose_name = 'კომენტარზე პასუხი'
         verbose_name_plural = "კომენტარზე პასუხები"
         db_table = 'comment_reply'
+        unique_together = ('to_comment', 'reply_comment')
 
     def __str__(self):
         return str(self.id)

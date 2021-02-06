@@ -39,7 +39,7 @@ class CustomUserAdmin(UserAdmin):
 
 class CommentAdmin(admin.ModelAdmin):
     list_per_page = 20
-    list_display = ('id', 'user', 'anime', 'created', 'active')
+    list_display = ('id', 'user', 'anime', 'created', 'active', 'parent')
     list_filter = ('active', 'created')
     search_fields = ['user__username', 'body']
     actions = ('active_comments', 'inactive_comments')
@@ -74,6 +74,11 @@ class CommentAdmin(admin.ModelAdmin):
 
     def inactive_comments(self, request, queryset):
         queryset.update(active=False)
+
+    def get_queryset(self, request):
+        queryset = super(CommentAdmin, self).get_queryset(request)
+        queryset = queryset.prefetch_related('parent')
+        return queryset
 
     parent_link.short_description = 'მთავარი კომენტარი'
 
@@ -129,10 +134,6 @@ class NotificationAdmin(admin.ModelAdmin):
 class ReplyAdmin(admin.ModelAdmin):
     list_per_page = 20
     list_display = ('id', 'comment_preview', 'reply_preview')
-    readonly_fields = ('to_comment', 'reply_comment')
-
-    def has_add_permission(self, request, obj=None):
-        return False
 
     def comment_preview(self, obj):
         return format_html("<a href='/admin/account/comment/{id}/change/'>{id}</a>".format(id=obj.to_comment))

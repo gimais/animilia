@@ -38,16 +38,18 @@ def anime_page_view(request, slug):
         'comment_form': CommentForm
     }
 
-    # todo change rawsql with django methods
-    if 'parent' in request.GET.keys():
+    parent = request.GET.get('parent', None)
+    if parent and parent.isdecimal():
+
+        # todo change rawsql with django methods
         comments = anime.comments.annotates_related_objects(request.user).filter(
             Q(active=True) | Q(active_children_count__gte=1),
             parent__isnull=True).order_by(
-            RawSQL('CASE WHEN "comment"."id" = %s THEN 1 ELSE 2 END', (request.GET['parent'],)), '-priority',
+            RawSQL('CASE WHEN "comment"."id" = %s THEN 1 ELSE 2 END', (parent,)), '-priority',
             '-id')
 
-        notification = request.GET.get('notif', False)
-        if notification.isdecimal():
+        notification = request.GET.get('notif', None)
+        if notification and notification.isdecimal():
             request.user.notifications.filter(id=notification, seen=False).update(seen=True)
     else:
         comments = anime.comments.annotates_related_objects(request.user).filter(

@@ -59,3 +59,9 @@ th, td {
 .form-input {
     border-color: #adadad;
 }
+
+@media screen and (max-width: 768px) {
+    .modal-content {
+        width: 80%;
+    }
+}
