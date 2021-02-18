@@ -399,6 +399,10 @@ $('#login-focus').on('click', function () {
     $('.login-form').toggleClass('show');
 });
 
+$(".show-ordering").on('click',function () {
+    $(".item-page-ordering").toggle();
+});
+
 $('.episode-select-button').on('click', function () {
     let clickedButton = $(this);
     let videoURL = clickedButton.data('url');
