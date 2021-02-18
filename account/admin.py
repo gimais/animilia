@@ -43,7 +43,7 @@ class CommentAdmin(admin.ModelAdmin):
     list_filter = ('active', 'created')
     search_fields = ['user__username', 'body']
     actions = ('active_comments', 'inactive_comments')
-    readonly_fields = ('created', 'user', 'anime', 'parent_link', 'body')
+    readonly_fields = ('created', 'user', 'anime', 'parent_link')
     exclude = ('parent',)
     ordering = ('-id',)
 
