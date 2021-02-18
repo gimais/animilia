@@ -2,14 +2,19 @@ from django.contrib import admin
 from django.db import models
 from django.forms import CheckboxSelectMultiple
 
-from .models import Category, Anime, Video, Dubber, Schedule
+from .models import Category, Anime, Video, Dubber, Schedule, WatchOrder, WatchingOrderingGroup
 
 
 # Register your models here.
 
 
-class ChoiceInline(admin.TabularInline):
+class VideoChoiceInline(admin.TabularInline):
     model = Video
+    extra = 1
+
+
+class OrderChoiceInline(admin.TabularInline):
+    model = WatchOrder
     extra = 1
 
 
@@ -19,7 +24,7 @@ class AnimeAdmin(admin.ModelAdmin):
     }
 
     list_display = ("name", 'dubbed', "type", 'slug', 'updated', 'finished')
-    inlines = [ChoiceInline]
+    inlines = [VideoChoiceInline]
 
     fieldsets = (
         ('სახელები', {'fields': ('name', 'namege', 'nameen', 'namejp', 'nameru')}),
@@ -39,7 +44,12 @@ class ScheduleAdmin(admin.ModelAdmin):
         return super(ScheduleAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
+class WatchingOrderingAdmin(admin.ModelAdmin):
+    inlines = [OrderChoiceInline]
+
+
 admin.site.register(Category)
 admin.site.register(Dubber)
 admin.site.register(Schedule, ScheduleAdmin)
+admin.site.register(WatchingOrderingGroup, WatchingOrderingAdmin)
 admin.site.register(Anime, AnimeAdmin)

@@ -673,6 +673,16 @@ section{
     margin: 15px auto 0;
 }
 
+.show-ordering{
+    background-color: #973116;
+    margin: 0;
+    border-radius: 4px 4px 0 0;
+    width: fit-content;
+    color: #ffffff;
+    padding: 10px;
+    text-align: center;
+}
+
 .nomore{
     background-color: #cac3c3;
     width: fit-content;
@@ -886,6 +896,26 @@ dd.not-finished{
 .item-page-desc p {
     line-height: 135%;
     white-space:pre-wrap;
+}
+
+.item-page-ordering{
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #e2e2e2;
+}
+
+.item-page-ordering .ordering-item{
+    padding: 2px 0;
+}
+
+.item-page-ordering .ordering-item a{
+    text-decoration: none;
+    color: #ff2e01;
+}
+
+.item-page-ordering .ordering-item .current-order{
+    font-size: 15px;
+    color: #1b1a1a;
 }
 
 .item-page-episodes {

@@ -7,7 +7,7 @@ from django.shortcuts import render
 
 from account.forms import CommentForm
 from account.models import Comment
-from anime.models import Anime, Schedule
+from anime.models import Anime, Schedule, WatchOrder
 
 ERROR = {'error': 'moxda shecdoma!'}
 
@@ -35,6 +35,10 @@ def anime_page_view(request, slug):
     anime.increase_view_count(request.COOKIES)
     context = {
         'anime': anime,
+        'ordering': WatchOrder.objects.select_related('anime').filter(
+            ordering_group__in=WatchOrder.objects.select_related('anime')
+                .filter(anime=anime).values('ordering_group_id')).order_by('id')
+            .values('anime__name', 'anime__slug', 'not_here'),
         'comment_form': CommentForm
     }
 

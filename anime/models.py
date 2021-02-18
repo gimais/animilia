@@ -28,6 +28,33 @@ class Dubber(models.Model):
         return self.name
 
 
+class WatchingOrderingGroup(models.Model):
+    name = models.CharField(max_length=100, unique=True, verbose_name='ჯგუფის სახელი')
+
+    class Meta:
+        verbose_name = "ყურების განრიგი"
+        verbose_name_plural = "ყურების განრიგი"
+        db_table = "anime_ordering"
+
+    def __str__(self):
+        return self.name
+
+
+class WatchOrder(models.Model):
+    anime = models.OneToOneField("Anime", null=True, blank=True,
+                                 related_name='animeorder', verbose_name='ანიმე', on_delete=models.CASCADE)
+    not_here = models.CharField(max_length=100, null=True, blank=True, verbose_name='სხვა',
+                                help_text="თუ ანიმეს სიაში არ არის ესეიგი ჩვენთან ბაზაში არაა და ხელით აქ ჩაწერე")
+    ordering_group = models.ForeignKey(WatchingOrderingGroup, default=None,
+                                       related_name='ordergroup', verbose_name='ჯგუფი', on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = "მიმდევრობა"
+
+    def __str__(self):
+        return self.anime.name if self.anime is not None else self.not_here
+
+
 class Anime(models.Model):
     TYPES = (
         (0, 'სერიალი'),
@@ -127,7 +154,7 @@ class Video(models.Model):
 
 class Schedule(models.Model):
     anime = models.OneToOneField(Anime, on_delete=models.CASCADE, related_name='schedule', verbose_name='ანიმე',
-                                 error_messages={'unique':'განრიგი ამ ანიმე-ზე უკვე არსებობს'})
+                                 error_messages={'unique': 'განრიგი ამ ანიმე-ზე უკვე არსებობს'})
     date = models.DateField(verbose_name='თარიღი')
     from_time = models.TimeField(verbose_name='დან')
     to_time = models.TimeField(verbose_name='მდე')

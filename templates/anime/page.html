@@ -84,7 +84,25 @@
             <div class="item-page-desc">
                 <p>{{anime.description}}</p>
             </div>
-            <hr>
+        {% if ordering %}
+            <div class="show-ordering">ყურების განრიგი</div>
+            <div class="item-page-ordering">
+                {% for item in ordering %}
+                    <div class="ordering-item">
+                        <span>{{ forloop.counter }}.</span>
+                    {% if item.anime__slug != None %}
+                        {% if item.anime__slug == anime.slug %}
+                            <span class="current-order">{{ item.anime__name }}</span>
+                        {% else %}
+                             <a href="{% url 'page' item.anime__slug %}">{{ item.anime__name }}</a>
+                        {% endif %}
+                    {% else %}
+                        <span>{{ item.not_here }} - საიტზე არ დევს</span>
+                    {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
         {% if not anime.soon %}
             {% if anime.type == 0 or anime.type == 2 %}
             <div class="item-page-episodes">
