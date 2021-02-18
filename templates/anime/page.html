@@ -92,12 +92,12 @@
                         <span>{{ forloop.counter }}.</span>
                     {% if item.anime__slug != None %}
                         {% if item.anime__slug == anime.slug %}
-                            <span class="current-order">{{ item.anime__name }}</span>
+                            <a href="{% url 'page' item.anime__slug %}" class="current-order">{{ item.anime__name }}</a>
                         {% else %}
                              <a href="{% url 'page' item.anime__slug %}">{{ item.anime__name }}</a>
                         {% endif %}
                     {% else %}
-                        <span>{{ item.not_here }} - საიტზე არ დევს</span>
+                        <span>{{ item.not_here }}</span>
                     {% endif %}
                     </div>
                 {% endfor %}

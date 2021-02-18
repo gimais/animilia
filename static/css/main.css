@@ -915,6 +915,7 @@ dd.not-finished{
 
 .item-page-ordering .ordering-item .current-order{
     font-size: 15px;
+    font-weight: 600;
     color: #1b1a1a;
 }
 
