@@ -915,7 +915,6 @@ dd.not-finished{
 }
 
 .item-page-ordering .ordering-item .current-order{
-    font-size: 15px;
     font-weight: 600;
     color: #1b1a1a;
 }
@@ -942,6 +941,7 @@ dd.not-finished{
 }
 
 .item-player {
+    margin-top: 11px;
     position: relative;
     padding-bottom: 56.25%; /* 16:9 */
     padding-top: 25px;
@@ -967,6 +967,7 @@ dd.not-finished{
     border-radius: 4px;
     background: #000000ed url('/static/img/soon_transparent.svg') no-repeat center;
     background-size: 50%;
+    margin-top: 11px;
 }
 
 .no-auth{

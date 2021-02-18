@@ -38,7 +38,8 @@ def anime_page_view(request, slug):
         'ordering': WatchOrder.objects.select_related('anime').filter(
             ordering_group__in=WatchOrder.objects.select_related('anime')
                 .filter(anime=anime).values('ordering_group_id')).order_by('id')
-            .values('anime__name', 'anime__slug', 'not_here'),
+            .values('anime__name', 'anime__slug', 'not_here', 'anime__type', 'anime__episodes'),
+        'types': Anime.TYPES,
         'comment_form': CommentForm
     }
 

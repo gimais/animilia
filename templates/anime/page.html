@@ -4,6 +4,7 @@
 {% block description %}{{ anime.name }} - ქართულად გახმოვანებული{% endblock %}
 {% block ogtitle %}<meta property="og:title" content="{{ anime.name }}"/>{% endblock %}
 {% block ogdescription %}<meta property="og:description" content="Animilia.ge - ქართულად გახმოვანებული ფილმები და ანიმეები">{% endblock %}
+{% load extra_tags %}
 
 {% block content %}
     <div class="container">
@@ -38,13 +39,7 @@
                 <div class="item-page-row">
                     <dl>
                         <dt>ტიპი:</dt>
-                        {% if anime.type == 0 %}
-                            <dd>სერიალი</dd>
-                        {% elif anime.type == 1 %}
-                            <dd>ფილმი</dd>
-                        {% elif anime.type == 2 %}
-                            <dd>OVA</dd>
-                        {% endif %}
+                            <dd>{{ types|access_collection_element:anime.type|access_collection_element:1}}</dd>
                         <dt>სტატუსი:</dt>
                         {% if anime.finished %}
                             <dd class="anime-status finished">გახმოვანებული</dd>
@@ -91,20 +86,20 @@
                     <div class="ordering-item">
                         <span>{{ forloop.counter }}.</span>
                     {% if item.anime__slug != None %}
-                        {% if item.anime__slug == anime.slug %}
-                            <a href="{% url 'page' item.anime__slug %}" class="current-order">{{ item.anime__name }}</a>
+                        {% if item.anime__type == 0 or item.anime__type == 2 or item.anime__type == 3 %}
+                             <span><a href="{% url 'page' item.anime__slug %}" {% if item.anime__slug == anime.slug %}class="current-order"{% endif %}>{{ item.anime__name }}</a> - {{ types|access_collection_element:item.anime__type|access_collection_element:1}} ({{item.anime__episodes}} ეპ.)</span>
                         {% else %}
-                             <a href="{% url 'page' item.anime__slug %}">{{ item.anime__name }}</a>
+                            <span><a href="{% url 'page' item.anime__slug %}" {% if item.anime__slug == anime.slug %}class="current-order"{% endif %}>{{ item.anime__name }} </a>- {{ types|access_collection_element:item.anime__type|access_collection_element:1}}</span>
                         {% endif %}
                     {% else %}
-                        <span>{{ item.not_here }}</span>
+                        <span>{{ item.not_here }} - ?</span>
                     {% endif %}
                     </div>
                 {% endfor %}
             </div>
         {% endif %}
         {% if not anime.soon %}
-            {% if anime.type == 0 or anime.type == 2 %}
+            {% if anime.type == 0 or anime.type == 2 or anime.type == 3 %}
             <div class="item-page-episodes">
                 {% for episode in anime.videos.all|dictsort:"row" %}
                 <div class="episode-select-button" data-id="{{episode.row}}" data-url="{{episode.url}}">{{ episode.row }}</div>

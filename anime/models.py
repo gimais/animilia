@@ -58,10 +58,10 @@ class WatchOrder(models.Model):
 class Anime(models.Model):
     TYPES = (
         (0, 'სერიალი'),
-        (1, 'კინო'),
+        (1, 'ფილმი'),
         (2, 'OVA'),
         (3, 'ONA'),
-        (4, 'ანიმაციური ფილმი')
+        (4, 'ანიმაციური ფილმი'),
     )
 
     name = models.CharField(max_length=100, unique=True, verbose_name='სახელი')
