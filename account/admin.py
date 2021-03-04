@@ -5,6 +5,7 @@ from django.contrib.auth.models import Group
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
+from anime.models import Dubber
 from staff.admin import staff_site, admin_site
 from .models import Comment, Profile, Settings, Notification, Reply
 
@@ -107,7 +108,10 @@ class CommentStaff(admin.ModelAdmin):
         if request.user.has_perm('account.view_all_comment'):
             return queryset
 
-        return queryset.filter(anime__in=request.user.dubber.get_dubbed_animes)
+        try:
+            return queryset.filter(anime__in=request.user.dubber.get_dubbed_animes)
+        except Dubber.DoesNotExist:
+            return Comment.objects.none()
 
     parent_link.short_description = 'მთავარი კომენტარი'
 
