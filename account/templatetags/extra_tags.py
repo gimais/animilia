@@ -1,5 +1,6 @@
-from django import template
 from datetime import datetime, timedelta
+
+from django import template
 
 
 def date_to_timestamp(date, val=0):
@@ -19,8 +20,13 @@ def geo_number(number):
         return '{}-ე'.format(number)
 
 
+def is_member_of(user, group_name):
+    return user.groups.filter(name=group_name).exists()
+
+
 register = template.Library()
 
 register.filter(date_to_timestamp)
+register.filter(is_member_of)
 register.filter(access_collection_element)
 register.filter(geo_number, is_safe=True)

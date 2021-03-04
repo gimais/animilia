@@ -60,7 +60,7 @@
                     <li><a href="{% url 'signup' %}">რეგისტრაცია</a></li>
                 {% else %}
                     {% if user.is_staff %}
-                        <li><a href="/admin/" target="_blank">პანელი</a></li>
+                        <li><a href="/staff" target="_blank">პანელი</a></li>
                     {% endif %}
                         <li>
                             <a class="menu-icon fas fa-bell" href="{% url 'notification_reply' %}">

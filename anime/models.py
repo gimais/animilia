@@ -1,7 +1,9 @@
 from datetime import datetime
 
+from django.conf import settings
 from django.db import models
 from django.db.models import F
+from django.utils.functional import cached_property
 
 
 class Category(models.Model):
@@ -18,6 +20,7 @@ class Category(models.Model):
 
 class Dubber(models.Model):
     name = models.CharField(max_length=16, unique=True, verbose_name='სახელი')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'dubber'
@@ -26,6 +29,10 @@ class Dubber(models.Model):
 
     def __str__(self):
         return self.name
+
+    @cached_property
+    def get_dubbed_animes(self):
+        return self.dubbed.all()
 
 
 class WatchingOrderingGroup(models.Model):
@@ -50,6 +57,7 @@ class WatchOrder(models.Model):
 
     class Meta:
         verbose_name = "მიმდევრობა"
+        verbose_name_plural = "მიმდევრობა"
 
     def __str__(self):
         return self.anime.name if self.anime is not None else self.not_here
@@ -64,12 +72,12 @@ class Anime(models.Model):
         (4, 'ანიმაციური ფილმი'),
     )
 
-    name = models.CharField(max_length=100, unique=True, verbose_name='სახელი')
+    name = models.CharField(max_length=100, verbose_name='სახელი', unique=True)
     namege = models.CharField(max_length=100, verbose_name='ქართულად', blank=True)
     nameen = models.CharField(max_length=100, verbose_name='ინგლისურად', blank=True)
     namejp = models.CharField(max_length=100, verbose_name='იაპონურად', blank=True)
     nameru = models.CharField(max_length=100, verbose_name='რუსულად', blank=True)
-    dubbers = models.ManyToManyField(Dubber, related_name='dubbers', verbose_name='გამხმოვანებელი')
+    dubbers = models.ManyToManyField(Dubber, related_name='dubbed', verbose_name='გამხმოვანებელი')
     poster = models.ImageField(upload_to='posters/', max_length=50, blank=True, verbose_name='სურათი')
     year = models.PositiveSmallIntegerField(verbose_name='გამოშვების წელი')
     director = models.CharField(max_length=45, verbose_name='რეჟისორი')
@@ -88,6 +96,10 @@ class Anime(models.Model):
     soon = models.BooleanField(default=False, verbose_name="მალე")
 
     class Meta:
+        permissions = [
+            ("view_all_anime", "ყველა ანიმეს ნახვის უფლება"),
+        ]
+
         db_table = 'anime'
         verbose_name = 'ანიმე'
         verbose_name_plural = 'ანიმე'
@@ -154,13 +166,19 @@ class Video(models.Model):
 
 class Schedule(models.Model):
     anime = models.OneToOneField(Anime, on_delete=models.CASCADE, related_name='schedule', verbose_name='ანიმე',
-                                 error_messages={'unique': 'განრიგი ამ ანიმე-ზე უკვე არსებობს'})
+                                 error_messages={'unique': 'განრიგი ამ ანიმეზე უკვე არსებობს'})
     date = models.DateField(verbose_name='თარიღი')
     from_time = models.TimeField(verbose_name='დან')
     to_time = models.TimeField(verbose_name='მდე')
-    text = models.TextField(max_length=400, blank=True, verbose_name='ტექსტი')
+    text = models.TextField(max_length=400, blank=True, verbose_name='ტექსტი',
+                            help_text="თუ ეს ტექსტი ცარიელი იქნება, მაშინ საიტზე მხოლოდ თარიღი გამოჩნდება,"
+                                      " წინააღმდეგ შემთხვევაში მხოლოდ ტექსტი გამოჩდნება")
 
     class Meta:
+        permissions = [
+            ("view_all_schedule", "ყველა განრიგის ნახვის უფლება"),
+        ]
+
         db_table = 'schedule'
         verbose_name = 'განრიგი'
         verbose_name_plural = 'განრიგი'

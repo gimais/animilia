@@ -1,19 +1,22 @@
 {% extends "base.html" %}
 {% block title %}{{ anime.name }} - Animilia{% endblock %}
 {% block logout_redirect %}{{ request.path }}{% endblock %}
-{% block description %}{{ anime.name }} - ქართულად გახმოვანებული{% endblock %}
-{% block ogtitle %}<meta property="og:title" content="{{ anime.name }}"/>{% endblock %}
-{% block ogdescription %}<meta property="og:description" content="Animilia.ge - ქართულად გახმოვანებული ფილმები და ანიმეები">{% endblock %}
+{% block description %}{{ anime.name }}, {{ anime.nameen }}, {{ anime.namejp }} ქართულად გახმოვანებული, qartulad
+    gaxmovanebuli{% endblock %}
+{% block ogtitle %}
+    <meta property="og:title" content="{{ anime.name }}"/>{% endblock %}
+{% block ogdescription %}
+    <meta property="og:description" content="Animilia.ge - ქართულად გახმოვანებული ანიმეები">{% endblock %}
 {% load extra_tags %}
 
 {% block content %}
     <div class="container">
         <div class="item-page clearfix" data-id="{{ anime.id }}">
-        {% if anime.poster %}
-                <img class="item-page-img" src="/media/{{ anime.poster }}?r=1"  alt="{{ anime.name }}">
-        {% else %}
-                <img class="item-page-img" src="/static/img/no-poster-available.jpg"  alt="{{ anime.name }}">
-        {% endif %}
+            {% if anime.poster %}
+                <img class="item-page-img" src="/media/{{ anime.poster }}?r=1" alt="{{ anime.name }}">
+            {% else %}
+                <img class="item-page-img" src="/static/img/no-poster-available.jpg" alt="{{ anime.name }}">
+            {% endif %}
             <div class="item-page-info">
                 <div class="item-page-head clearfix">
                     <div class="item-page-left">
@@ -77,7 +80,7 @@
                 </div>
             </div>
             <div class="item-page-desc">
-                <p>{{anime.description}}</p>
+                <p>{{ anime.description }}</p>
             </div>
         {% if ordering %}
             <div class="show-ordering">ყურების განრიგი</div>

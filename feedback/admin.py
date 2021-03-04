@@ -3,6 +3,7 @@ from django.db import models
 from django.forms import HiddenInput
 from django.utils.html import format_html
 
+from staff.admin import staff_site, admin_site
 from .forms import FeedbackReplyForm
 from .models import Feedback, Message
 
@@ -50,7 +51,7 @@ class FeedbackAdmin(admin.ModelAdmin):
 
     def registered_user_link(self, obj):
         if obj.registered_user:
-            return format_html('<a href="/admin/account/profile/{}/change/">{}</a>', obj.registered_user.pk,
+            return format_html('<a href="/staff/account/profile/{}/change/">{}</a>', obj.registered_user.pk,
                                obj.registered_user)
         return 'ანონიმურია'
 
@@ -64,11 +65,13 @@ class FeedbackAdmin(admin.ModelAdmin):
 class MessageAdmin(admin.ModelAdmin):
     list_display = ('id', 'to_user', 'subject', 'created')
     fields = ('subject', 'body')
-    search_fields = ('subject', 'to_user', )
+    search_fields = ('subject', 'to_user',)
 
     def has_add_permission(self, request, obj=None):
         return False
 
 
-admin.site.register(Feedback, FeedbackAdmin)
-admin.site.register(Message, MessageAdmin)
+staff_site.register(Feedback, FeedbackAdmin)
+
+admin_site.register(Feedback, FeedbackAdmin)
+admin_site.register(Message, MessageAdmin)

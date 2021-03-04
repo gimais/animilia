@@ -96,7 +96,7 @@ def profile_view(request):
 
 def profile_preview(request, id):
     user = get_object_or_404(User.objects.select_related('profile', 'settings'), pk=id)
-    return render(request, 'account/profile_preview.html', {'profileuser': user})
+    return render(request, 'account/profile_preview.html', {'user_profile': user})
 
 
 def username_update(request):
@@ -122,27 +122,26 @@ def avatar_update(request):
             if avatar:
                 from PIL import Image
                 check_avatar = Image.open(avatar)
-                if check_avatar.format != "JPEG" or check_avatar.size[0] > 200 or check_avatar.size[1] > 200:
+                if check_avatar.format != "JPEG" or check_avatar.size[0] > 560 or check_avatar.size[1] > 560:
                     return JsonResponse({'info': 'არ აკმაყოფილებს პირობებს!'}, status=406)
 
                 profile = request.user.profile
                 settings = request.user.settings
                 changed_avatar = settings.changed_avatar
+                now = timezone.now()
 
                 # settings update
                 if changed_avatar != 0:
-                    settings.avatar_updated = timezone.now()
+                    settings.avatar_updated = now
                 settings.changed_avatar = F('changed_avatar') + 1
                 settings.save()
 
                 # uploading and saving
-                avatar.name = str(request.user.pk) + '_{}_{}'.format(changed_avatar + 1,
-                                                                     settings.avatar_updated.date()) + '.jpg'
+                avatar.name = str(request.user.pk) + '_{}_{}'.format(changed_avatar + 1, now.date()) + '.jpg'
                 profile.avatar = avatar
-                profile.save()
+                profile.save() 
 
-                return JsonResponse({'success': True,
-                                     'time': datetime.datetime.timestamp(
+                return JsonResponse({'time': datetime.datetime.timestamp(
                                          settings.avatar_updated + datetime.timedelta(days=3)),
                                      'new_avatar': 'avatars/{}'.format(avatar.name),
                                      }, status=200)

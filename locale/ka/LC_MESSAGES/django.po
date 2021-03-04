@@ -23,7 +23,30 @@ msgstr ""
 msgid "username"
 msgstr "ნიკი"
 
-#, python-format
+msgid "Recent actions"
+msgstr "ბოლო ქმედებები"
+
+msgid "Select %s to view"
+msgstr "აირჩიე %s"
+
+msgid "View %s"
+msgstr "%s"
+
+msgid "View"
+msgstr "ნახვა"
+
+msgid "Close"
+msgstr "უკან"
+
+msgid "My actions"
+msgstr "ჩემი ქმედებები"
+
+msgid "Django site admin"
+msgstr "სამართავი პანელი"
+
+msgid "Django administration"
+msgstr "Admin Panel"
+
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
@@ -31,15 +54,18 @@ msgstr ""
 "%(username)s ან პაროლი არასწორია. "
 "თავიდან სცადეთ."
 
-#, python-format სტაფი
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr "თქვენ ავტორიზებული ხართ, როგორც %(username)s და ამ გვერდზე წვდომა არ გაქვთ!"
+
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
-"გთხოვთ, შეიყვანოთ სწორი %(username)s და პაროლი. "
-"იქონიეთ მხედველობაში, რომ ორივე ველი ითვალისწინებს პატარა და დიდ ასოებს."
+"გთხოვთ, შეიყვანოთ სწორი %(username)s და პაროლი."
 
-#, python-format
+
 msgid ""
 "Ensure this value has at most %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -50,7 +76,6 @@ msgstr[0] ""
 "სიგრძე მაქსიმუმ %(limit_value)d სიმბოლოსგან უნდა შედგებოდეს."
 " (შეყვანილია %(show_value)d სიმბოლო)."
 
-#, python-format
 msgid ""
 "This password is too short. It must contain at least %(min_length)d character."
 msgid_plural ""
@@ -67,14 +92,5 @@ msgstr "შეყვანილი პაროლები ერთმან�
 msgid "This account is inactive."
 msgstr "თქვენი ექაუნთი დაბლოკილია."
 
-msgid "Recent actions"
-msgstr "ბოლო ქმედებები"
-
-msgid "My actions"
-msgstr "ჩემი ქმედებები"
-
-msgid "Django site admin"
-msgstr "სამართავი პანელი"
-
-msgid "Django administration"
-msgstr "Admin Panel"
+msgid "Enter a valid username. This value may contain only English letters, numbers, and @/./+/-/_ characters."
+msgstr "ნიკი შეიძლება შეიცავდეს მხოლოდ ლათინურ ასოებს, ციფრებსა და /-/_ სიმბოლოებს."

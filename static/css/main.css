@@ -867,7 +867,7 @@ form.login-form a{
     font-size: 15px;
 }
 
-.item-page-row dd > li, .profile-row dd > li, .upload-demo.ready .upload-result {
+.item-page-row dd > li, .profile-row dd > li, .profile-row dd > li, .upload-demo.ready .upload-result {
     display: inline-block;
 }
 
@@ -879,7 +879,7 @@ form.login-form a{
     content: '';
 }
 
-dd.anime-status {
+.anime-status {
     display: inline-block;
     color: #ffffff;
     padding: 2px 7px;
@@ -887,11 +887,11 @@ dd.anime-status {
     font-size: 13px;
 }
 
-dd.finished{
+.finished{
     background-color: #0ac40a;
 }
 
-dd.not-finished{
+.not-finished{
     background-color: #ff2d01;
 }
 

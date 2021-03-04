@@ -113,5 +113,5 @@ def more_comments(request):
 def schedule(request):
     objs = Schedule.objects.select_related('anime'). \
         values('date', 'from_time', 'text', 'to_time', 'anime__name', 'anime__poster',
-               'anime__slug', max=Count('anime__videos__row') + 1).all().order_by('-date')
+               'anime__slug', max=Count('anime__videos__row') + 1).all().order_by('date')
     return render(request, 'schedule.html', {'schedule': objs})

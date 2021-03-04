@@ -1,10 +1,9 @@
-from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.contrib.auth.validators import ASCIIUsernameValidator
 from django.utils.translation import gettext_lazy as _
 
 
-class MyUnicodeUsernameValidator(UnicodeUsernameValidator):
+class MyASCIIUsernameValidator(ASCIIUsernameValidator):
     regex = r'^[\w-]+$'
-    message = 'ნიკი შეიძლება შეიცავდეს მხოლოდ ასოებს, ციფრებსა და /-/_ სიმბოლოებს.'
 
 
 ERRORS = {

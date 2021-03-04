@@ -124,7 +124,7 @@ $uploadCrop = $('#upload-demo').croppie({
     viewport: {
         width: 200,
         height: 200,
-        type: 'square'
+        type: 'square',
     },
 });
 
@@ -146,12 +146,16 @@ $('.upload-result').on('click', function (e) {
     that.text('მოიცადეთ...');
     $uploadCrop.croppie('result', {
         type: 'blob',
-        size: 'viewport',
+        size: {
+            width: 560,
+            height: 560
+        },
         format: 'jpeg',
-        quality: 0.95,
     }).then(function (img) {
         let formData = new FormData();
+
         formData.append('data', img);
+
         $.ajax({
             url: "/account/avatar_update/",
             type: "POST",
@@ -222,10 +226,12 @@ $(window).on('click',function (e) {
                             <dt>რეგისტრაციის თარიღი:</dt>
                                 <dd>{{ user.date_joined|date:"d.m.Y" }}</dd>
                             <dt>ჯგუფი:</dt>
-                            {% if user.is_superuser %}
-                                <dd>ადმინისტრატორი</dd>
-                            {% elif user.is_staff %}
-                                <dd>მოდერატორი</dd>
+                            {% if user.is_staff %}
+                                <dd>
+                                {% for group in user.groups.all %}
+                                    <li class="anime-status" style="background-color:{{ group.display_color }}">{{ group }}</li>
+                                {% endfor %}
+                                </dd>
                             {% else %}
                                 <dd>მაყურებელი</dd>
                             {% endif %}

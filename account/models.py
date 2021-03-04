@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-from django.contrib.auth.models import AbstractUser, PermissionsMixin
+from django.contrib.auth.models import AbstractUser, PermissionsMixin, Group
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.core.mail import send_mail
@@ -13,7 +13,7 @@ from django.db.models import Count, Exists, OuterRef, Subquery, Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from account.validators import MyUnicodeUsernameValidator
+from account.validators import MyASCIIUsernameValidator
 from anime.models import Anime
 
 
@@ -64,7 +64,7 @@ class CommentManager(models.Manager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    username_validator = MyUnicodeUsernameValidator()
+    username_validator = MyASCIIUsernameValidator()
     username_min_length = MinLengthValidator(3)
 
     username = models.CharField(
@@ -110,6 +110,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_notification_count(self):
         return self.notifications.filter(seen=False).count()
 
+    def is_member_of(self, group_name):
+        return self.groups.filter(name=group_name).exists()
+
 
 class Comment(models.Model):
     anime = models.ForeignKey(Anime, on_delete=models.CASCADE, related_name='comments', verbose_name='გვერდი')
@@ -126,6 +129,11 @@ class Comment(models.Model):
     objects = CommentManager()
 
     class Meta:
+        permissions = [
+            ("view_all_comment", "ყველა კომენტარის ნახვის უფლება"),
+            ("edit_comment_text", "ტექსტის შეცვლის უფლება"),
+        ]
+
         ordering = ['priority', '-id']
         verbose_name = 'კომენტარი'
         verbose_name_plural = 'კომენტარი'
@@ -213,7 +221,7 @@ class Profile(models.Model):
         (1, 'მდედრობითი')
     )
 
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, primary_key=True)
     avatar = models.ImageField(upload_to='avatars/', default='no-avatar.jpg', blank=True, verbose_name='ავატარი')
     gender = models.PositiveSmallIntegerField(choices=TYPES, blank=True, null=True, verbose_name='სქესი')
     birth = models.DateField(blank=True, null=True, verbose_name='დაბადების თარიღი')
@@ -236,7 +244,7 @@ def sub_seven_days():
 
 
 class Settings(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, primary_key=True)
     ip = models.GenericIPAddressField(verbose_name='IP', null=True)
     username_updated = models.DateTimeField(default=sub_seven_days)
     avatar_updated = models.DateTimeField(default=sub_three_days)
@@ -283,3 +291,6 @@ class Notification(models.Model):
 
     def __str__(self):
         return "user: {}, id: {}".format(self.user.username, self.id)
+
+
+Group.add_to_class('display_color', models.CharField(max_length=7, null=True))
