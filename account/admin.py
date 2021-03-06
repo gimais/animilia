@@ -75,6 +75,11 @@ class ReplyAdmin(admin.ModelAdmin):
     def reply_preview(self, obj):
         return format_html("<a href='/admin/account/comment/{id}/change/'>{id}</a>".format(id=obj.reply_comment))
 
+    def get_queryset(self, request):
+        queryset = super(ReplyAdmin, self).get_queryset(request)
+        queryset = queryset.select_related('to_comment', 'reply_comment')
+        return queryset
+
 
 class CommentStaff(admin.ModelAdmin):
     list_per_page = 20
@@ -156,7 +161,6 @@ staff_site.register(Profile, ProfileStaff)
 
 admin_site.register(Comment, CommentAdmin)
 admin_site.register(Profile, ProfileAdmin)
-
 admin_site.register(User, CustomUserAdmin)
 admin_site.register(Group, GroupAdmin)
 admin_site.register(Settings, SettingsAdmin)

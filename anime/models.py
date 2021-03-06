@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.conf import settings
+from django.core.cache import cache
 from django.db import models
 from django.db.models import F
 from django.utils.functional import cached_property
@@ -90,7 +91,6 @@ class Anime(models.Model):
     rating = models.DecimalField(max_digits=5, decimal_places=1, default=0, verbose_name='რეიტინგი')
     updated = models.DateTimeField(auto_now=True)
     views = models.IntegerField(default=0, editable=False)
-    dubbed = models.PositiveSmallIntegerField(default=0, verbose_name='გახმოვანებული', editable=False)
     slug = models.SlugField(unique=True, verbose_name='ლინკი')
     finished = models.BooleanField(default=False, verbose_name="დამთავრებულია")
     soon = models.BooleanField(default=False, verbose_name="მალე")
@@ -104,15 +104,22 @@ class Anime(models.Model):
         verbose_name = 'ანიმე'
         verbose_name_plural = 'ანიმე'
 
+    @cached_property
+    def dubbed(self):
+        return self.videos.count()
+
     def increase_view_count(self, cookies):
         if not cookies.get('_vEpAd', False):
-            Anime.objects.filter(pk=self.pk).update(views=F('views') + 1)
-
-    def save(self, *args, **kwargs):
-        if self.type == 1:
-            self.episodes = 1
-
-        super(Anime, self).save(*args, **kwargs)
+            cached_views = cache.get("anime_{}".format(self.pk))
+            if cached_views is not None:
+                if cached_views >= 50:
+                    self.views = F('views') + cached_views
+                    self.save()
+                    cache.delete("anime_{}".format(self.pk))
+                else:
+                    cache.set("anime_{}".format(self.pk), cached_views + 1)
+            else:
+                cache.set("anime_{}".format(self.pk), 1)
 
     def get_absolute_url(self):
         return f'/anime/{self.slug}'
@@ -124,44 +131,30 @@ class Anime(models.Model):
 class Video(models.Model):
     anime = models.ForeignKey(Anime, on_delete=models.CASCADE, limit_choices_to={'type': 0}, related_name='videos')
     url = models.CharField(max_length=100, verbose_name='ვიდეოს ლინკი')
-    row = models.PositiveSmallIntegerField(default=1, verbose_name='ეპიზოდი', editable=False)
+    episode = models.PositiveSmallIntegerField(default=1, verbose_name='ეპიზოდი', editable=False)
 
     class Meta:
         db_table = 'anime_video'
         verbose_name = 'ვიდეო'
         verbose_name_plural = 'ვიდეოები'
 
-    def delete(self, using=None, keep_parents=False):
-        super(Video, self).delete()
-
-        largest = Video.objects.filter(anime=self.anime).aggregate(largest=models.Max('row'))['largest']
-        Anime.objects.filter(pk=self.anime.pk).update(dubbed=largest)
-
     def save(self, *args, **kwargs):
-        # Todo Optimize
         if self._state.adding:
-            last_id = Video.objects.filter(anime=self.anime).aggregate(largest=models.Max('row'))['largest']
+            last_episode = self.anime.videos.aggregate(models.Max('episode')).get('episode__max')
 
-            if self.anime.type == 1 and last_id is not None:
+            if self.anime.type == 1 or self.anime.type == 4:
                 return
 
-            if last_id is not None:
-                self.row = last_id + 1
+            if last_episode is not None:
+                self.episode = last_episode + 1
 
         super(Video, self).save(*args, **kwargs)
 
-        Anime.objects.get(pk=self.anime.pk).updated = datetime.now()  # update after adding episodes
-
-        Anime.save(self.anime)
-
-        largest = Video.objects.filter(anime=self.anime).aggregate(largest=models.Max('row'))['largest']
-        Anime.objects.filter(pk=self.anime.pk).update(dubbed=largest)
+        self.anime.updated = datetime.now()
+        self.anime.save()
 
     def __str__(self):
-        if self.anime.type == 0:
-            return '{} - {}'.format(self.anime, self.row)
-        else:
-            return str(self.anime)
+        return '{} - {}'.format(self.anime, self.episode)
 
 
 class Schedule(models.Model):

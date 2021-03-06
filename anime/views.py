@@ -30,7 +30,6 @@ def index_view(request):
 
 
 def anime_page_view(request, slug):
-    template_name = 'anime/page.html'
     anime = get_object_or_404(Anime.objects, slug__iexact=slug)
     anime.increase_view_count(request.COOKIES)
     context = {
@@ -66,7 +65,7 @@ def anime_page_view(request, slug):
 
     context['comments'] = comments
     context['max_page'] = paginator.num_pages
-    return render(request, template_name, context)
+    return render(request, 'anime/page.html', context)
 
 
 def more_comments(request):
