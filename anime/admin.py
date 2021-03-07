@@ -6,9 +6,6 @@ from staff.admin import staff_site, admin_site
 from .models import Category, Anime, Video, Dubber, Schedule, WatchOrder, WatchingOrderingGroup
 
 
-# Register your models here.
-
-
 class VideoChoiceInline(admin.TabularInline):
     model = Video
     extra = 1
@@ -17,6 +14,10 @@ class VideoChoiceInline(admin.TabularInline):
         if obj is not None and (obj.type == 1 or obj.type == 4):
             return 1
         return self.max_num
+
+    def get_queryset(self, request):
+        queryset = super(VideoChoiceInline, self).get_queryset(request)
+        return queryset.select_related('anime')
 
 
 class OrderChoiceInline(admin.TabularInline):
@@ -47,11 +48,12 @@ class AnimeStaff(admin.ModelAdmin):
         ('სახელები', {'fields': ('name', 'namege', 'nameen', 'namejp', 'nameru')}),
         ('დეტალები', {'fields': ('director', 'studio', 'year', 'age', 'categories',
                                  'type', 'episodes', 'rating', 'poster', 'description')}),
-        ('ანიმილია', {'fields': ('dubbers', 'slug', 'finished', 'soon')}),
+        ('Animilia', {'fields': ('dubbers', 'slug', 'finished', 'soon')}),
     )
 
     def get_queryset(self, request):
         queryset = super(AnimeStaff, self).get_queryset(request)
+        queryset = queryset.prefetch_related('videos')
 
         if request.user.has_perm('anime.view_all_anime'):
             return queryset

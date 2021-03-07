@@ -89,8 +89,8 @@ class Anime(models.Model):
     type = models.PositiveSmallIntegerField(choices=TYPES, default=0, verbose_name='ტიპი')
     episodes = models.PositiveSmallIntegerField(verbose_name='ეპიზოდების რაოდენობა', default=1)
     rating = models.DecimalField(max_digits=5, decimal_places=1, default=0, verbose_name='რეიტინგი')
-    updated = models.DateTimeField(auto_now=True)
-    views = models.IntegerField(default=0, editable=False)
+    updated = models.DateTimeField(auto_now=True, verbose_name="განახლებული")
+    views = models.IntegerField(default=0, editable=False, verbose_name="ნახვა")
     slug = models.SlugField(unique=True, verbose_name='ლინკი')
     finished = models.BooleanField(default=False, verbose_name="დამთავრებულია")
     soon = models.BooleanField(default=False, verbose_name="მალე")
@@ -107,6 +107,8 @@ class Anime(models.Model):
     @cached_property
     def dubbed(self):
         return self.videos.count()
+
+    dubbed.short_description = "გახმოვანებული"
 
     def increase_view_count(self, cookies):
         if not cookies.get('_vEpAd', False):
@@ -142,10 +144,10 @@ class Video(models.Model):
         if self._state.adding:
             last_episode = self.anime.videos.aggregate(models.Max('episode')).get('episode__max')
 
-            if self.anime.type == 1 or self.anime.type == 4:
-                return
-
             if last_episode is not None:
+                if self.anime.type == 1 or self.anime.type == 4:
+                    return
+
                 self.episode = last_episode + 1
 
         super(Video, self).save(*args, **kwargs)
