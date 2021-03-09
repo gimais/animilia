@@ -1,9 +1,9 @@
 from django.urls import path
-from . import views
+from .views import *
 
 urlpatterns = [
-    path('', views.index_view, name='home'),
-    path('anime/more_comments/', views.more_comments, name='more_comments'), # TODO ratoa es aq?
-    path('anime/<slug:slug>', views.anime_page_view, name='page'),
-    path('schedule/', views.schedule, name='schedule'),
+    path('', index_view, name='home'),
+    path('anime/search', search_anime, name='search_anime'),
+    path('anime/<slug:slug>', anime_page_view, name='page'),
+    path('schedule/', schedule, name='schedule'),
 ]

@@ -37,7 +37,7 @@
                             <div>
     {#                            <a>⇤</a>#}
                                 {% if animes_list.has_previous %}
-                                    <a href="?page={{ animes_list.previous_page_number }}">←</a>
+                                    <a href="?page={{ animes_list.previous_page_number }}&{{ params }}">←</a>
                                 {% else %}
                                     <a class="disabled">←</a>
                                 {% endif %}
@@ -45,11 +45,11 @@
                                     {% if animes_list.number == page %}
                                         <a class="active">{{ page }}</a>
                                     {% else %}
-                                        <a href="?page={{ page }}">{{ page }}</a>
+                                        <a href="?page={{ page }}&{{ params }}">{{ page }}</a>
                                     {% endif %}
                                 {% endfor %}
                                 {% if animes_list.has_next %}
-                                    <a href="?page={{ animes_list.next_page_number }}">→</a>
+                                    <a href="?page={{ animes_list.next_page_number }}&{{ params }}">→</a>
                                 {% else %}
                                     <a class="disabled">→</a>
                                 {% endif %}

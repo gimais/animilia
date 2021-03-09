@@ -19,7 +19,6 @@ urlpatterns = [
     path('login/', local_view.login_view, name='login'),
     path('logout/', views.LogoutView.as_view(), name='logout'),
 
-    # path('notifications/', local_view.check_notification, name='notifications'),
     path('notifications/reply/', local_view.check_notification_reply, name='notification_reply'),
     path('notifications/message/', local_view.check_notification_message, name='notification_message'),
     path('notifications/delete/<int:id>/', local_view.delete_notification, name='delete_notification'),
@@ -43,7 +42,8 @@ urlpatterns = [
 
     path('comment/', local_view.add_comment, name='comment'),
     path('reply_comment/', local_view.reply_comment, name='reply_comment'),
-    path('check_replies/<int:id>', local_view.check_replies, name='replies_check'),
+    path('check_replies/<int:id>/', local_view.check_replies, name='replies_check'),
+    path('more_comments/<int:anime_id>/<int:page>/', local_view.more_comments, name='more_comments'),
 
     path('comment/delete/<int:id>', local_view.delete_comment, name='comment_delete'),
     path('comment/edit/', local_view.edit_comment, name='comment_edit'),

@@ -1,10 +1,13 @@
 from datetime import datetime
+from typing import Any, Callable
 
 from django.conf import settings
 from django.core.cache import cache
 from django.db import models
 from django.db.models import F
 from django.utils.functional import cached_property
+
+get_name: Callable[[Any], Any] = lambda x: x.field.name
 
 
 class Category(models.Model):
@@ -109,6 +112,10 @@ class Anime(models.Model):
         return self.videos.count()
 
     dubbed.short_description = "გახმოვანებული"
+
+    @classmethod
+    def searchable_fields(cls):
+        return [get_name(cls.categories), get_name(cls.dubbers)]
 
     def increase_view_count(self, cookies):
         if not cookies.get('_vEpAd', False):

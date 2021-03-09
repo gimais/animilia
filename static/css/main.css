@@ -879,6 +879,11 @@ form.login-form a{
     content: '';
 }
 
+.item-page-row dd > li a{
+    color: #000000;
+    text-decoration: none;
+}
+
 .anime-status {
     display: inline-block;
     color: #ffffff;

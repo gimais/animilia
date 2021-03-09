@@ -770,20 +770,20 @@ $('.comments-box, .comment-form').on('click', '.reply-button', function () {
 $('.showmore').on('click', function () {
     let that = $(this);
     let current_page = parseInt(that.attr('data-page'));
-    let hasParentQueryString = urlForQueryParams.has("parent");
-    let dataJson = {
-        'skip': current_page + 1,
-        'id': $('.item-page').data('id'),
+
+    let requestParams = {
+        method: "GET",
+        url: '/account/more_comments/' + $('.item-page').data('id') + "/" + (current_page + 1) + "/"
     };
 
-    if (hasParentQueryString) {
-        dataJson.parent = urlForQueryParams.get("parent");
+    if (urlForQueryParams.has("parent")) {
+        requestParams.data = {
+            parent: urlForQueryParams.get("parent"),
+        }
     }
 
     $.ajax({
-        method: "GET",
-        url: '/anime/more_comments/',
-        data: dataJson,
+        ...requestParams,
         success: function (data) {
             let html = '';
             let commentBox = $(".comments-box");

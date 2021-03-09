@@ -56,7 +56,7 @@
                         <dt>ჟანრები:</dt>
                         <dd>
                             {% for genre in anime.categories.all %}
-                                <li>{{ genre }}</li>
+                                <li><a href="{% url 'search_anime' %}?categories={{ genre }}">{{ genre }}</a></li>
                             {% endfor %}
                         </dd>
                         <dt>ასაკობრივი შეზღუდვა:</dt>
@@ -70,7 +70,7 @@
                         <dt>გამხმოვანებელი:</dt>
                         <dd>
                             {% for dubber in anime.dubbers.all %}
-                                <li>{{ dubber }}</li>
+                                <li><a href="{% url 'search_anime' %}?dubbers={{ dubber }}">{{ dubber }}</a></li>
                             {% endfor %}
                         </dd>
                     </dl>

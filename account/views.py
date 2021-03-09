@@ -5,7 +5,8 @@ from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
-from django.db.models import F
+from django.db.models import F, Q
+from django.db.models.expressions import Case, When
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -139,12 +140,12 @@ def avatar_update(request):
                 # uploading and saving
                 avatar.name = str(request.user.pk) + '_{}_{}'.format(changed_avatar + 1, now.date()) + '.jpg'
                 profile.avatar = avatar
-                profile.save() 
+                profile.save()
 
                 return JsonResponse({'time': datetime.datetime.timestamp(
-                                         settings.avatar_updated + datetime.timedelta(days=3)),
-                                     'new_avatar': 'avatars/{}'.format(avatar.name),
-                                     }, status=200)
+                    settings.avatar_updated + datetime.timedelta(days=3)),
+                    'new_avatar': 'avatars/{}'.format(avatar.name),
+                }, status=200)
             return JsonResponse(ERROR, status=400)
         return JsonResponse(ERROR, status=405)
     else:
@@ -318,6 +319,38 @@ def check_replies(request, id):
                 return JsonResponse(result, status=200)
         return JsonResponse(ERROR, status=404)
     return JsonResponse(ERROR, status=405)
+
+
+def more_comments(request, anime_id, page):
+
+    parent = request.GET.get('parent', None)
+
+    if parent and parent.isdecimal():
+        comments = Comment.objects.annotates_related_objects(request.user).filter(
+            Q(active=True) | Q(active_children_count__gte=1), parent__isnull=True, anime=anime_id).order_by(
+            Case(
+                When(id=parent, then=1),
+                default=2,
+            ),
+            '-priority',
+            '-id')
+    else:
+        comments = Comment.objects.annotates_related_objects(request.user).filter(
+            Q(active=True) | Q(active_children_count__gte=1),
+            parent__isnull=True, anime_id=anime_id)
+
+    paginator = Paginator(comments, 6)
+
+    if paginator.num_pages >= page:
+        result = list()
+        for comment in paginator.get_page(page).object_list:
+            if comment.active:
+                result.append(comment.get_more_comment_info(request.user))
+            else:
+                result.append(comment.get_deleted_comment_info())
+        return JsonResponse(result, status=200, safe=False)
+    else:
+        return JsonResponse(ERROR, status=404)
 
 
 def delete_comment(request, id):
