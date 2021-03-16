@@ -1,16 +1,3 @@
-/*! HTML5 Boilerplate v7.3.0 | MIT License | https://html5boilerplate.com/ */
-
-/* main.css 2.0.0 | MIT License | https://github.com/h5bp/main.css#readme */
-/*
- * What follows is the result of much research on cross-browser styling.
- * Credit left inline and big thanks to Nicolas Gallagher, Jonathan Neal,
- * Kroc Camen, and the H5BP dev community and team.
- */
-
-/* ==========================================================================
-   Base styles: opinionated defaults
-   ========================================================================== */
-
 * {
     margin: 0;
     padding: 0;
@@ -179,6 +166,10 @@ textarea {
   clear: both;
 }
 
+a {
+    color: #000000;
+    text-decoration: none;
+}
 
 nav{
     border-bottom: 2px solid #973116;
@@ -187,8 +178,8 @@ nav{
     background-color: #1c150f;
 }
 
-.top-background{
-    background: url('/static/img/background.webp?v=1') bottom 74% center;
+.top-background {
+    background: url('/static/img/background.webp') bottom 74% center;
     height: 190px;
     position: relative;
     background-size: cover;
@@ -199,26 +190,26 @@ nav{
     float: left;
 }
 
-.logo{
+.logo {
     width: 100px;
     height: 100px;
     position: absolute;
-    top:175px;
+    top: 175px;
     border-radius: 50%;
-    background: url('/static/img/logo.png?v=1');
+    background: url('/static/img/logo.png');
 }
 
-.logo:hover{
-    background: url('/static/img/logo_focus.png?v=1');
+.logo:hover {
+    background: url('/static/img/logo_focus.png');
 }
 
 .logo:hover + .web-name {
-    background: url('/static/img/name_focus.png?v=1') no-repeat;
+    background: url('/static/img/name_focus.png') no-repeat;
 }
 
 
-.web-name{
-    background: url('/static/img/name.png?v=1') no-repeat;
+.web-name {
+    background: url('/static/img/name.png') no-repeat;
     height: 43px;
     width: 139px;
     display: inline-block;
@@ -359,75 +350,66 @@ section{
   -moz-border-radius: 10px;
   -webkit-border-radius: 10px;
   -o-border-radius: 10px;
-  -ms-border-radius: 10px;
-  padding: 50px 85px;
+    -ms-border-radius: 10px;
+    padding: 50px 85px;
 }
 
 .form-group {
-  overflow: hidden;
-  margin-bottom: 20px;
+    overflow: hidden;
+    margin-bottom: 20px;
 }
 
 .form-input {
-  width: 100%;
-  border: 1px solid #ebebeb;
-  border-radius: 5px;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  -o-border-radius: 5px;
-  -ms-border-radius: 5px;
-  padding: 17px;
-  box-sizing: border-box;
-  font-size: 14px;
-  font-weight: 500;
-  color: #222; }
-  .form-input::-webkit-input-placeholder {
-    color: #999; }
-  .form-input::-moz-placeholder {
-    color: #999; }
-  .form-input:-ms-input-placeholder {
-    color: #999; }
-  .form-input:-moz-placeholder {
-    color: #999; }
-  .form-input::-webkit-input-placeholder {
-    font-weight: 500; }
-  .form-input::-moz-placeholder {
-    font-weight: 500; }
-  .form-input:-ms-input-placeholder {
-    font-weight: 500; }
-  .form-input:-moz-placeholder {
-    font-weight: 500; }
-  .form-input:focus {
-      outline: none;
-  }
-    .form-input:focus::-webkit-input-placeholder {
-      color: #ffffff; }
-    .form-input:focus::-moz-placeholder {
-      color: #222; }
-    .form-input:focus:-ms-input-placeholder {
-      color: #222; }
-    .form-input:focus:-moz-placeholder {
-      color: #222; }
+    width: 100%;
+    border: 1px solid #ebebeb;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -o-border-radius: 5px;
+    -ms-border-radius: 5px;
+    padding: 17px;
+    box-sizing: border-box;
+    font-size: 14px;
+    font-weight: 500;
+    color: #222;
+}
+
+.form-input::-webkit-input-placeholder, .form-input::-moz-placeholder, .form-input:-ms-input-placeholder, .form-input:-moz-placeholder {
+    color: #999;
+    font-weight: 500;
+}
+
+.form-input:focus {
+    outline: none;
+}
+
+.form-input:focus::-webkit-input-placeholder {
+    color: #ffffff;
+}
+
+.form-input:focus::-moz-placeholder,.form-input:focus:-ms-input-placeholder,.form-input:focus:-moz-placeholder {
+    color: #222;
+}
 
 .form-submit {
     cursor: pointer;
-      border-radius: 5px;
-      -moz-border-radius: 5px;
-      -webkit-border-radius: 5px;
-      -o-border-radius: 5px;
-      -ms-border-radius: 5px;
-      padding: 17px 20px;
-      box-sizing: border-box;
-      font-size: 14px;
-      font-weight: 700;
-      color: #fff;
-      text-transform: uppercase;
-      border: none;
-      background-image: -moz-linear-gradient(to left, #292018, #973116);
-      background-image: -ms-linear-gradient(to left, #292018, #973116);
-      background-image: -o-linear-gradient(to left, #292018, #973116);
-      background-image: -webkit-linear-gradient(to left, #292018, #973116);
-      background-image: linear-gradient(to left, #292018, #973116);
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -o-border-radius: 5px;
+    -ms-border-radius: 5px;
+    padding: 17px 20px;
+    box-sizing: border-box;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    border: none;
+    background-image: -moz-linear-gradient(to left, #292018, #973116);
+    background-image: -ms-linear-gradient(to left, #292018, #973116);
+    background-image: -o-linear-gradient(to left, #292018, #973116);
+    background-image: -webkit-linear-gradient(to left, #292018, #973116);
+    background-image: linear-gradient(to left, #292018, #973116);
     margin: 0 auto;
     display: block;
 }
@@ -440,33 +422,6 @@ section{
 
 .flash-message a{
     color: #ffffff;
-}
-
-/*profile tabs*/
-
-.tabs {
-    clear: both;
-    color: #fff;
-    padding: 15px;
-    text-transform: uppercase;
-    background-image: -moz-linear-gradient(90deg, #282626 30%, #973116);
-    background-image: -ms-linear-gradient(90deg, #282626 30%, #973116);
-    background-image: -o-linear-gradient(90deg, #282626 30%, #973116);
-    background-image: -webkit-linear-gradient(90deg, #282626 30%, #973116);
-    background-image: linear-gradient(90deg, #282626 30%, #973116);
-    border-bottom: 3px solid #973116;
-}
-
-.tabs li {
-    display: inline-block;
-    text-transform: uppercase;
-    cursor: pointer;
-    padding: 13px 25px;
-    font-size: 14px;
-    border: 0;
-    background-color: #973116;
-    margin-left: -40px;
-    border-top-left-radius: 10px;
 }
 
 .anime-content{
@@ -729,7 +684,7 @@ body footer{
     margin-left: 10px;
 }
 
-.fa-facebook {
+.fa-facebook, .fa-instagram {
     color: #ff2b01;
     border-radius: 50%;
 }
@@ -847,8 +802,12 @@ form.login-form a{
 }
 
 .profile-row dl{
-    width: 50%;
-    float: left;
+    width: 49%;
+    display: inline-table;
+}
+
+.profile-social {
+    margin-top: 6px;
 }
 
 .item-page-row dt,.profile-row dt {
@@ -877,11 +836,6 @@ form.login-form a{
 
 .item-page-row dd > li:last-child:after{
     content: '';
-}
-
-.item-page-row dd > li a{
-    color: #000000;
-    text-decoration: none;
 }
 
 .anime-status {
@@ -1305,20 +1259,21 @@ div.comment-right-buttons {
     margin-left: 20px;
 }
 
+.profile-inputs-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 16px;
+}
 
 .profile-edit {
     padding: 2px 28px;
     clear: both;
 }
 
-.profile-details{
-    margin-top:20px;
-    padding: 2px 28px;
-}
-
-.profile-details-input{
+.profile-details-input {
+    position: relative;
     width: 45%;
-    float: left;
     margin-bottom: 20px;
 }
 
@@ -1333,21 +1288,28 @@ div.comment-right-buttons {
     cursor: pointer;
 }
 
-.birthselector{
+.birthselector {
     margin-bottom: 10px;
 }
 
-#id_gender{
+#id_gender, #id_facebook, #id_instagram {
     width: 100%;
     margin-bottom: 10px;
 }
 
-.profile-details-input #id_email,.profile-details-input #id_username,.profile-details-input #id_password {
+#id_gender, #id_birthday, #id_facebook, #id_instagram {
+    margin-top: 4px;
+}
+
+ #id_facebook, #id_instagram {
+     cursor: text;
+ }
+
+.profile-details-input #id_email, .profile-details-input #id_username, .profile-details-input #id_password {
     width: 100%;
     cursor: auto;
     background-color: #aaaaaa;
     margin-top: 2px;
-    margin-left: 3px;
 }
 
 p.username-info {
@@ -1940,22 +1902,32 @@ a.change-pass-button {
         margin-top: 8px;
     }
 
-    .item-page-desc,.item-page-info {
+    .item-page-desc, .item-page-info {
         padding: 8px 12px;
     }
 
     .profile-avatar-container, .profile-display, .profile-row dl,
-    .profile-row, .item, .profile-details-input, .item-page-img {
+    .profile-row, .item, .item-page-img {
         float: none;
         width: 100%;
     }
 
-    .profile-display,.item-page-img,.item-page-info,.item img,.profile-page {
+    .profile-display, .item-page-img, .item-page-info, .item img, .profile-page {
         width: 100%;
         margin: 0;
     }
 
-    .profile-page{
+    .profile-inputs-row {
+        flex-direction: column;
+        padding: 0 4px;
+    }
+
+    .profile-details-input {
+        width: 100%;
+        margin: 0 0 12px 0;
+    }
+
+    .profile-page {
         padding: 0;
     }
 
@@ -1963,7 +1935,7 @@ a.change-pass-button {
         text-align: center;
     }
 
-    a.change-pass-button,select.birthselector {
+    a.change-pass-button, select.birthselector {
         width: 100%;
         margin-top: 8px;
     }
@@ -2101,21 +2073,6 @@ a.change-pass-button {
 
     .user-actions {
         float: none;
-    }
-}
-
-
-@media screen and (min-width: 4000px) {
-    .comment-body {
-        margin: 0;
-    }
-
-    .top-background {
-        height: 280px;
-    }
-
-    .logo {
-        top: 265px;
     }
 }
 

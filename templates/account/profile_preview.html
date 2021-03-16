@@ -25,42 +25,60 @@
                     <span style="color: #dc1515;font-weight: 600;">BANNED</span>
                 {% endif %}
                 <div class="profile-row">
-                    <dl>
-                        <dt>რეგისტრაციის თარიღი:</dt>
-                        <dd>{{ user_profile.date_joined|date:"d.m.Y" }}</dd>
-                        <dt>ჯგუფი:</dt>
-                        {% if user_profile.is_superuser %}
-                            <dd><li class="anime-status" style="background-color:#973116">ადმინისტრატორი</li></dd>
-                        {% elif user_profile.is_staff %}
-                            <dd>
-                            {% for group in user_profile.groups.all %}
-                                <li class="anime-status" style="background-color:{{ group.display_color }}">{{ group }}</li>
-                            {% endfor %}
-                            </dd>
-                        {% else %}
+                    <div>
+                        <dl>
+                            <dt>რეგისტრაციის თარიღი:</dt>
+                            <dd>{{ user_profile.date_joined|date:"d.m.Y" }}</dd>
+                            <dt>ჯგუფი:</dt>
+                            {% if user_profile.is_superuser %}
+                                <dd>
+                                    <li class="anime-status" style="background-color:#973116">ადმინისტრატორი</li>
+                                </dd>
+                            {% elif user_profile.is_staff %}
+                                <dd>
+                                    {% for group in user_profile.groups.all %}
+                                        <li class="anime-status"
+                                            style="background-color:{{ group.display_color }}">{{ group }}</li>
+                                    {% endfor %}
+                                </dd>
+                            {% else %}
                             <dd>მაყურებელი</dd>
                         {% endif %}
-                    </dl>
-                    <dl>
-                        {% if user_profile.settings.show_gender %}
-                            <dt>სქესი:</dt>
-                            {% if user_profile.profile.gender == 0 %}
-                                <dd>მამრობოთი</dd>
-                            {% elif user_profile.profile.gender == 1 %}
-                                <dd>მდედრობითი</dd>
-                            {% else %}
-                                <dd>მითითებული არ არის</dd>
+                        </dl>
+                        <dl>
+                            {% if user_profile.settings.show_gender %}
+                                <dt>სქესი:</dt>
+                                {% if user_profile.profile.gender == 0 %}
+                                    <dd>მამრობოთი</dd>
+                                {% elif user_profile.profile.gender == 1 %}
+                                    <dd>მდედრობითი</dd>
+                                {% else %}
+                                    <dd>მითითებული არ არის</dd>
+                                {% endif %}
                             {% endif %}
-                        {% endif %}
-                        {% if user_profile.settings.show_birth %}
-                            <dt>დაბადების თარიღი:</dt>
-                            {% if user_profile.profile.birth %}
-                                <dd>{{ user_profile.profile.birth }}</dd>
-                            {% else %}
-                                <dd>მითითებული არ არის</dd>
+                            {% if user_profile.settings.show_birth %}
+                                <dt>დაბადების თარიღი:</dt>
+                                {% if user_profile.profile.birth %}
+                                    <dd>{{ user_profile.profile.birth }}</dd>
+                                {% else %}
+                                    <dd>მითითებული არ არის</dd>
+                                {% endif %}
                             {% endif %}
-                        {% endif %}
-                    </dl>
+                        </dl>
+                    </div>
+                    <div class="profile-social">
+                        <dl>
+                            {% if user_profile.profile.facebook %}
+                                <dd><a href="{{ user_profile.profile.facebook }}" target="_blank"><i
+                                        class="fab fa-facebook"></i> Facebook</a></dd>
+                            {% endif %}
+                            {% if user_profile.profile.instagram %}
+                                <dd><a href="{{ user_profile.profile.instagram }}" target="_blank"><i
+                                        class="fab fa-instagram"></i> Instagram</a></dd>
+                            {% endif %}
+                        </dl>
+                    </div>
+
                 </div>
             </div>
         </div>

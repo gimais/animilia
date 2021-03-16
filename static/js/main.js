@@ -822,7 +822,7 @@ $('.profile-edit button[type=submit]').on('click', function (e) {
     else
         $('input[name=birth]').val(null);
 
-    $('.profile-details').submit();
+    $('#profile-details-form').submit();
 });
 
 

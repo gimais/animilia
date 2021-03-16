@@ -208,12 +208,16 @@ class UpdateUsernameForm(forms.ModelForm):
 
 
 class UpdateProfileForm(forms.ModelForm):
+    use_required_attribute = False
+
     gender = forms.Select()
     birth = None
+    facebook = forms.URLField(widget=forms.URLInput(attrs={'placeholder': 'ლინკი'}), required=False)
+    instagram = forms.URLField(widget=forms.URLInput(attrs={'placeholder': 'ლინკი'}), required=False)
 
     class Meta:
         model = Profile
-        fields = ('gender', 'birth')
+        fields = ('gender', 'birth', 'facebook', 'instagram')
 
 
 class ShowProfileForm(forms.ModelForm):

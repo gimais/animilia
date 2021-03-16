@@ -119,16 +119,7 @@ class Anime(models.Model):
 
     def increase_view_count(self, cookies):
         if not cookies.get('_vEpAd', False):
-            cached_views = cache.get("anime_{}".format(self.pk))
-            if cached_views is not None:
-                if cached_views >= 50:
-                    self.views = F('views') + cached_views
-                    self.save()
-                    cache.delete("anime_{}".format(self.pk))
-                else:
-                    cache.set("anime_{}".format(self.pk), cached_views + 1)
-            else:
-                cache.set("anime_{}".format(self.pk), 1)
+            Anime.objects.filter(pk=self.pk).update(views=F('views') + 1)
 
     def get_absolute_url(self):
         return f'/anime/{self.slug}'

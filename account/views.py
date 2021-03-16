@@ -76,17 +76,19 @@ def signup_view(request):
 
 def profile_view(request):
     if request.user.is_authenticated:
+        user = User.objects.with_user_details().get(pk=request.user.pk)
         if request.method == 'POST':
-            profile_form = UpdateProfileForm(request.POST, instance=request.user.profile)
-            settings_form = ShowProfileForm(request.POST, instance=request.user.settings)
+            profile_form = UpdateProfileForm(request.POST, instance=user.profile)
+            settings_form = ShowProfileForm(request.POST, instance=user.settings)
             if profile_form.is_valid() and settings_form.is_valid():
                 settings_form.save()
                 profile_form.save()
                 return redirect('profile')
         else:
-            profile_form = UpdateProfileForm(instance=request.user.profile)
-            settings_form = ShowProfileForm(instance=request.user.settings)
+            profile_form = UpdateProfileForm(instance=user.profile)
+            settings_form = ShowProfileForm(instance=user.settings)
         context = {
+            'user': user,
             'p_form': profile_form,
             's_form': settings_form,
         }
@@ -96,7 +98,7 @@ def profile_view(request):
 
 
 def profile_preview(request, id):
-    user = get_object_or_404(User.objects.select_related('profile', 'settings'), pk=id)
+    user = get_object_or_404(User.objects.with_user_details(), pk=id)
     return render(request, 'account/profile_preview.html', {'user_profile': user})
 
 
@@ -428,8 +430,7 @@ def like_comment(request):
 
         if comment and comment.user != request.user:
 
-            if comment.dislike.filter(
-                    id=request.user.id).exists():  # თუ დისლაიქი აქვს კომს წაშალე დისლაქი და დაამატე ლაიქი
+            if comment.dislike.filter(id=request.user.id).exists():  # თუ დისლაიქი აქვს კომს წაშალე დისლაქი და დაამატე ლაიქი
                 comment.dislike.remove(request.user)
                 comment.like.add(request.user)
                 return JsonResponse({'type': 2}, status=200)

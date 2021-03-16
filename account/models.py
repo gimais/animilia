@@ -7,7 +7,7 @@ from django.contrib.auth.models import AbstractUser, PermissionsMixin, Group
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.core.mail import send_mail
-from django.core.validators import MinLengthValidator
+from django.core.validators import MinLengthValidator, RegexValidator
 from django.db import models
 from django.db.models import Count, Exists, OuterRef, Subquery, Q
 from django.utils import timezone
@@ -18,6 +18,9 @@ from anime.models import Anime
 
 
 class CustomUserManager(BaseUserManager):
+
+    def with_user_details(self):
+        return self.get_queryset().select_related('profile', 'settings').prefetch_related('groups')
 
     def create_user(self, username, email, password, is_staff=False, is_superuser=False, **extra_fields):
         if not username:
@@ -225,6 +228,16 @@ class Profile(models.Model):
     avatar = models.ImageField(upload_to='avatars/', default='no-avatar.jpg', blank=True, verbose_name='ავატარი')
     gender = models.PositiveSmallIntegerField(choices=TYPES, blank=True, null=True, verbose_name='სქესი')
     birth = models.DateField(blank=True, null=True, verbose_name='დაბადების თარიღი')
+    facebook = models.URLField(null=True, validators=[RegexValidator(
+        regex=r'^((?:https?:\/\/)?(?:[^.]+\.)?)(facebook\.com\/)(.+)$',
+        message='გთხოვთ, შეიყვანოთ მხოლოდ Facebook-ის პროფაილის ლინკი',
+        code='invalid_url'
+    ), ])
+    instagram = models.URLField(null=True, validators=[RegexValidator(
+        regex=r'^((?:https?:\/\/)?(?:[^.]+\.)?)(instagram\.com\/)(.+)$',
+        message='გთხოვთ, შეიყვანოთ მხოლოდ Instagram-ის პროფაილის ლინკი',
+        code='invalid_url'
+    ), ])
 
     class Meta:
         verbose_name = 'პროფილი'
