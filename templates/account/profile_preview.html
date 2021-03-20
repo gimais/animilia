@@ -4,53 +4,53 @@
 {% load static %}
 {% load extra_tags %}
 {% block script %}
-    {% if user|is_member_of:"მოდერატორი" %}
-        <script src="{% static "js/585a602f5e66cbee0a62b1b5eff1f15d.js" %}?v=1"></script>
-        <link rel="stylesheet" href="{% static "css/585a602f5e66cbee0a62b1b5eff1f15d.css" %}" />
+    {% if perms.account.staff_tools %}
+        <script src="{% static "js/585a602f5e66cbee0a62b1b5eff1f15d.js" %}"></script>
+        <link rel="stylesheet" href="{% static "css/585a602f5e66cbee0a62b1b5eff1f15d.css" %}"/>
     {% endif %}
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="profile-page">
-        <div class="clearfix">
-            <div class="profile-avatar-container">
-                <div class="profile-img">
-                    <img id="active-avatar" src="/media/{{ user_profile.profile.avatar }}?r=1" alt="avatar">
+    <div class="container">
+        <div class="profile-page">
+            <div class="clearfix">
+                <div class="profile-avatar-container">
+                    <div class="profile-img">
+                        <img id="active-avatar" src="/media/{{ user_profile.profile.avatar }}?r=1" alt="avatar">
+                    </div>
                 </div>
-            </div>
-            <div class="profile-display">
-                <p id="profile-username">{{ user_profile.username }}</p>
-                {% if not user_profile.is_active %}
-                    <span style="color: #dc1515;font-weight: 600;">BANNED</span>
-                {% endif %}
-                <div class="profile-row">
-                    <div>
-                        <dl>
-                            <dt>რეგისტრაციის თარიღი:</dt>
-                            <dd>{{ user_profile.date_joined|date:"d.m.Y" }}</dd>
-                            <dt>ჯგუფი:</dt>
-                            {% if user_profile.is_superuser %}
-                                <dd>
-                                    <li class="anime-status" style="background-color:#973116">ადმინისტრატორი</li>
-                                </dd>
-                            {% elif user_profile.is_staff %}
-                                <dd>
-                                    {% for group in user_profile.groups.all %}
-                                        <li class="anime-status"
-                                            style="background-color:{{ group.display_color }}">{{ group }}</li>
-                                    {% endfor %}
-                                </dd>
-                            {% else %}
-                            <dd>მაყურებელი</dd>
-                        {% endif %}
-                        </dl>
-                        <dl>
-                            {% if user_profile.settings.show_gender %}
-                                <dt>სქესი:</dt>
-                                {% if user_profile.profile.gender == 0 %}
-                                    <dd>მამრობოთი</dd>
-                                {% elif user_profile.profile.gender == 1 %}
+                <div class="profile-display">
+                    <p id="profile-username">{{ user_profile.username }}</p>
+                    {% if not user_profile.is_active %}
+                        <span class="banned">BANNED</span>
+                    {% endif %}
+                    <div class="profile-row">
+                        <div>
+                            <dl>
+                                <dt>რეგისტრაციის თარიღი:</dt>
+                                <dd>{{ user_profile.date_joined|date:"d.m.Y" }}</dd>
+                                <dt>ჯგუფი:</dt>
+                                {% if user_profile.is_superuser %}
+                                    <dd>
+                                        <li class="anime-status" style="background-color:#973116">ადმინისტრატორი</li>
+                                    </dd>
+                                {% else %}
+                                    <dd>
+                                        {% for group in user_profile.groups.all %}
+                                            <li class="anime-status"
+                                                style="background-color:{{ group.display_color }}">{{ group }}</li>
+                                        {% empty %}
+                                            მაყურებელი
+                                        {% endfor %}
+                                    </dd>
+                                {% endif %}
+                            </dl>
+                            <dl>
+                                {% if user_profile.settings.show_gender %}
+                                    <dt>სქესი:</dt>
+                                    {% if user_profile.profile.gender == 0 %}
+                                        <dd>მამრობოთი</dd>
+                                    {% elif user_profile.profile.gender == 1 %}
                                     <dd>მდედრობითი</dd>
                                 {% else %}
                                     <dd>მითითებული არ არის</dd>

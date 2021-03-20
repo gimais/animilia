@@ -7,13 +7,13 @@ from django.contrib.auth.models import AbstractUser, PermissionsMixin, Group
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.core.mail import send_mail
-from django.core.validators import MinLengthValidator, RegexValidator
+from django.core.validators import MinLengthValidator
 from django.db import models
 from django.db.models import Count, Exists, OuterRef, Subquery, Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from account.validators import MyASCIIUsernameValidator
+from account.validators import MyASCIIUsernameValidator, OnlyDigitUsernameValidator, WebDomainValidator
 from anime.models import Anime
 
 
@@ -69,11 +69,12 @@ class CommentManager(models.Manager):
 class User(AbstractBaseUser, PermissionsMixin):
     username_validator = MyASCIIUsernameValidator()
     username_min_length = MinLengthValidator(3)
+    digits_validator = OnlyDigitUsernameValidator()
 
     username = models.CharField(
         max_length=16,
         unique=True,
-        validators=[username_validator, username_min_length],
+        validators=[username_validator, username_min_length, digits_validator],
         verbose_name='ნიკი'
     )
 
@@ -112,9 +113,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def get_notification_count(self):
         return self.notifications.filter(seen=False).count()
-
-    def is_member_of(self, group_name):
-        return self.groups.filter(name=group_name).exists()
 
 
 class Comment(models.Model):
@@ -223,21 +221,15 @@ class Profile(models.Model):
         (0, 'მამრობითი'),
         (1, 'მდედრობითი')
     )
+    facebook_validator = WebDomainValidator(['facebook', 'fb'], 'Facebook')
+    instagram_validator = WebDomainValidator(['instagr', 'instagram'], 'Instagram')
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, primary_key=True)
     avatar = models.ImageField(upload_to='avatars/', default='no-avatar.jpg', blank=True, verbose_name='ავატარი')
     gender = models.PositiveSmallIntegerField(choices=TYPES, blank=True, null=True, verbose_name='სქესი')
     birth = models.DateField(blank=True, null=True, verbose_name='დაბადების თარიღი')
-    facebook = models.URLField(null=True, validators=[RegexValidator(
-        regex=r'^((?:https?:\/\/)?(?:[^.]+\.)?)(facebook\.com\/)(.+)$',
-        message='გთხოვთ, შეიყვანოთ მხოლოდ Facebook-ის პროფაილის ლინკი',
-        code='invalid_url'
-    ), ])
-    instagram = models.URLField(null=True, validators=[RegexValidator(
-        regex=r'^((?:https?:\/\/)?(?:[^.]+\.)?)(instagram\.com\/)(.+)$',
-        message='გთხოვთ, შეიყვანოთ მხოლოდ Instagram-ის პროფაილის ლინკი',
-        code='invalid_url'
-    ), ])
+    facebook = models.URLField(null=True, validators=[facebook_validator])
+    instagram = models.URLField(null=True, validators=[instagram_validator])
 
     class Meta:
         verbose_name = 'პროფილი'
@@ -267,6 +259,10 @@ class Settings(models.Model):
     changed_username = models.PositiveSmallIntegerField(default=0)
 
     class Meta:
+        permissions = [
+            ("staff_tools", "სტაფის ინსტრუმენტები"),
+        ]
+
         verbose_name = 'პარამეტრი'
         verbose_name_plural = "პარამეტრები"
         db_table = 'user_settings'

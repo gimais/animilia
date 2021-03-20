@@ -197,7 +197,7 @@ $(window).on('click',function (e) {
                             {% if user.profile.avatar != 'no-avatar.jpg' %}
                                 <i class="fas fa-times-circle" id="clear-image"></i>
                             {% endif %}
-                            <img id="active-avatar" src="/media/{{ user.profile.avatar }}?r=1" alt="avatar">
+                            <img id="active-avatar" src="/media/{{ user.profile.avatar }}" alt="avatar">
 
                             <div id="avatarCroppieModal">
                               <div class="modal-content">
@@ -216,25 +216,23 @@ $(window).on('click',function (e) {
                               </div>
                             </div>
                         </div>
-                        <input type="file" style="display: none" name="avatar" accept="image/*" id="id_avatar">
-                        <div class="change-profile-img">ავატარის ატვირთვა <i class="fas fa-upload"></i></div>
-                    </div>
+                    <input type="file" style="display: none" name="avatar" accept="image/*" id="id_avatar">
+                    <div class="change-profile-img">ავატარის ატვირთვა <i class="fas fa-upload"></i></div>
+                </div>
                 <div class="profile-display">
                     <p id="profile-username">{{ user.username }}</p>
                     <div class="profile-row">
                         <dl>
                             <dt>რეგისტრაციის თარიღი:</dt>
-                                <dd>{{ user.date_joined|date:"d.m.Y" }}</dd>
+                            <dd>{{ user.date_joined|date:"d.m.Y" }}</dd>
                             <dt>ჯგუფი:</dt>
-                            {% if user.is_staff %}
-                                <dd>
-                                {% for group in user.groups.all %}
-                                    <li class="anime-status" style="background-color:{{ group.display_color }}">{{ group }}</li>
-                                {% endfor %}
-                                </dd>
-                            {% else %}
-                                <dd>მაყურებელი</dd>
-                            {% endif %}
+                            <dd>
+                            {% for group in user.groups.all %}
+                                <li class="anime-status" style="background-color:{{ group.display_color }}">{{ group }}</li>
+                            {% empty %}
+                                მაყურებელი
+                            {% endfor %}
+                            </dd>
                         </dl>
                         <dl>
                             <dt>სქესი:</dt>

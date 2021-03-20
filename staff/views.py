@@ -7,7 +7,7 @@ ERROR = {'error': 'moxda shecdoma!'}
 
 
 def avatar_delete(request, id):
-    if request.user.is_staff and request.user.is_member_of("მოდერატორი") and request.is_ajax():
+    if request.is_ajax() and request.user.has_perm('account.staff_tools'):
         if request.method == 'DELETE':
             profile = Profile.objects.get(pk=id)
             profile.avatar = 'no-avatar.jpg'
@@ -19,7 +19,7 @@ def avatar_delete(request, id):
 
 
 def show_info(request, id):
-    if request.user.is_staff and request.user.is_member_of("მოდერატორი") and request.is_ajax():
+    if request.is_ajax() and request.user.has_perm('account.staff_tools'):
         if request.method == 'GET':
             profile = Profile.objects.select_related('user__settings').get(pk=id)
 
@@ -41,7 +41,7 @@ def show_info(request, id):
 
 
 def send_message(request, user):
-    if request.user.is_staff and request.user.is_member_of("მოდერატორი") and request.is_ajax():
+    if request.is_ajax() and request.user.has_perm('account.staff_tools'):
         if request.method == 'POST':
             Message.objects.create(to_user_id=user, subject=request.POST['subject'], body=request.POST['body'])
 

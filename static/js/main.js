@@ -150,7 +150,7 @@ function makeCommentBoxHTML(data) {
                             <a class='comment-user${data['user_id'] === request_user_id ? " mine" : ""}' href="/profile/${data['user_id']}/">${data.username}</a>`;
 
     if (!data['user_active']) {
-        html += `<span style="color: #dc1515;font-weight: 600;font-size: 10px"> BANNED</span>`;
+        html += `<span class="banned"> BANNED</span>`;
     }
 
     if (typeof request_user_id !== "undefined" && data['user_active'])
@@ -213,7 +213,7 @@ function makeReplyCommentBoxHTML(data) {
                             <a class='comment-user${data['user_id'] === request_user_id ? " mine" : ""}' href="/profile/${data['user_id']}/">${data.username} </a>`;
 
     if (!data['user_active']) {
-        html += `<span style="color: #dc1515;font-weight: 600;font-size: 10px"> BANNED</span>`;
+        html += `<span class="banned"> BANNED</span>`;
     }
 
     if (typeof request_user_id !== "undefined" && data['user_active'])
@@ -266,7 +266,7 @@ function makeDeletedCommentBoxHTML(data) {
                         <div class="comment-info" data-id="${data['comment_id']}">
                             <a class='comment-user' href="/profile/${data['user_id']}/">${data.username}</a>`;
     if (!data['user_active']) {
-        html += `<span style="color: #dc1515;font-weight: 600;font-size: 10px"> BANNED</span>`;
+        html += `<span class="banned"> BANNED</span>`;
     }
     html += `<p class='comment-time'>${convertTimeGeo(data.time)}</p>
                         </div>

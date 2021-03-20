@@ -801,7 +801,7 @@ form.login-form a{
     padding: 15px 10px;
 }
 
-.profile-row dl{
+.profile-row dl {
     width: 49%;
     display: inline-table;
 }
@@ -810,7 +810,13 @@ form.login-form a{
     margin-top: 6px;
 }
 
-.item-page-row dt,.profile-row dt {
+.banned {
+    color: #dc1515;
+    font-weight: 600;
+    font-size: 10px;
+}
+
+.item-page-row dt, .profile-row dt {
     float: left;
     clear: left;
     margin-right: 8px;
