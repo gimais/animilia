@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block title %}{{ anime.name }} - Animilia{% endblock %}
-{% block logout_redirect %}{{ request.path }}{% endblock %}
 {% block description %}{{ anime.name }}, {{ anime.nameen }}, {{ anime.namejp }} ქართულად გახმოვანებული, qartulad
     gaxmovanebuli{% endblock %}
+{% block keywords %}{{ anime.name }}, {{ anime.nameen }}, {{ anime.namejp }}{% endblock %}
 {% block ogtitle %}
     <meta property="og:title" content="{{ anime.name }}"/>{% endblock %}
 {% block ogdescription %}
@@ -56,7 +56,7 @@
                         <dt>ჟანრები:</dt>
                         <dd>
                             {% for genre in anime.categories.all %}
-                                <li><a href="{% url 'search_anime' %}?categories={{ genre }}">{{ genre }}</a></li>
+                                <li><a class="searchable-item" href="{% url 'search_anime' %}?categories={{ genre }}">{{ genre }}</a></li>
                             {% endfor %}
                         </dd>
                         <dt>ასაკობრივი შეზღუდვა:</dt>
@@ -70,7 +70,7 @@
                         <dt>გამხმოვანებელი:</dt>
                         <dd>
                             {% for dubber in anime.dubbers.all %}
-                                <li><a href="{% url 'search_anime' %}?dubbers={{ dubber }}">{{ dubber }}</a></li>
+                                <li><a class="searchable-item" href="{% url 'search_anime' %}?dubbers={{ dubber }}">{{ dubber }}</a></li>
                             {% endfor %}
                         </dd>
                     </dl>

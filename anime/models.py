@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import Any, Callable
 
 from django.conf import settings
-from django.core.cache import cache
 from django.db import models
 from django.db.models import F
 from django.utils.functional import cached_property
@@ -115,6 +114,7 @@ class Anime(models.Model):
 
     @classmethod
     def searchable_fields(cls):
+        # tu axali searchable daemateba template-ic unda daematos
         return [get_name(cls.categories), get_name(cls.dubbers)]
 
     def increase_view_count(self, cookies):
@@ -171,7 +171,7 @@ class Schedule(models.Model):
         permissions = [
             ("view_all_schedule", "ყველა განრიგის ნახვის უფლება"),
         ]
-
+        ordering = ['date', 'from_time']
         db_table = 'schedule'
         verbose_name = 'განრიგი'
         verbose_name_plural = 'განრიგი'

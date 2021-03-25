@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 
 from account.forms import CommentForm
+from anime.filter import process_single_search_query
 from anime.models import Anime, Schedule, WatchOrder
 
 ERROR = {'error': 'moxda shecdoma!'}
@@ -25,8 +26,7 @@ def paginate_page(content, page):
 
 
 def index_view(request):
-    animes = Anime.objects.values('name', 'slug', 'age', 'rating', 'views', 'poster', 'soon').all().order_by(
-        '-updated')
+    animes = Anime.objects.values('name', 'slug', 'age', 'rating', 'views', 'poster', 'soon').order_by('-updated')
 
     return render(request, 'home.html', {'animes_list': paginate_page(animes, request.GET.get('page', 1))})
 
@@ -75,22 +75,26 @@ def anime_page_view(request, slug):
 
 
 def schedule(request):
-    objs = Schedule.objects.select_related('anime'). \
+    schedule = Schedule.objects.select_related('anime'). \
         values('date', 'from_time', 'text', 'to_time', 'anime__name', 'anime__poster',
-               'anime__slug', max=Count('anime__videos__row') + 1).all().order_by('date')
-    return render(request, 'schedule.html', {'schedule': objs})
+               'anime__slug', max=Count('anime__videos__row') + 1).all()
+    return render(request, 'schedule.html', {'schedule': schedule})
 
 
 def search_anime(request):
-    params = {"{}__name__in".format(field): value.split(',') for field, value in request.GET.items()
+    params = {field: value for field, value in request.GET.items()
               if value and field in Anime.searchable_fields()}
+
+    filter: dict = process_single_search_query(params)
+    if filter.get('filter_info', None) is None:
+        return index_view(request)
+
     query = QueryDict(request.GET.urlencode(), mutable=True)
     query.pop('page', None)
 
-    animes = Anime.objects.distinct().filter(**params).values('name', 'slug', 'age', 'rating', 'views', 'poster', 'soon') \
-        .all().order_by('-updated')
-
-    return render(request, 'home.html', {
+    return render(request, 'anime/filter.html', {
         'params': query.urlencode(),
-        'animes_list':  paginate_page(animes, request.GET.get('page', 1))
+        'template': filter.get('template'),
+        'filter_info': filter.get('filter_info'),
+        'animes_list': paginate_page(filter.get('animes'), request.GET.get('page', 1))
     })

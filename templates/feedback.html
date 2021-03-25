@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}კონტაქტი - Animilia.ge{% endblock %}
-{% block logout_redirect %}/contact/{% endblock %}
 {% load static %}
+
 {% block content %}
     <div class="container">
         <form method="POST" id="feedback-form" class="form-container" action="{% url 'feedback' %}">
@@ -21,14 +21,4 @@
             <input type="submit" id="submit" class="form-submit" value="გაგზვნა">
         </form>
     </div>
-{% endblock %}
-
-{% block script %}
-    <script>
-    var isMobile = (/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase()));
-
-    if(isMobile){
-        $('#id_email')[0].setAttribute('placeholder','Email (რომელზეც გსურთ პასუხის მიღება)');
-    }
-    </script>
 {% endblock %}

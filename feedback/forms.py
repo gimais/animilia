@@ -9,8 +9,7 @@ class FeedbackForm(forms.ModelForm):
         attrs={'class': 'form-input', 'placeholder': 'სახელი'}))
 
     email = forms.EmailField(max_length=254, widget=forms.TextInput(
-        attrs={'class': 'form-input', 'placeholder': 'Email (გთხოვთ მიუთითეთ ის Email,'
-                                                     ' რომელზეც გინდათ მიიღოთ პასუხი)'}))
+        attrs={'class': 'form-input', 'placeholder': 'Email'}))
 
     body = forms.CharField(
         widget=forms.Textarea(attrs={'placeholder': 'წერილი', 'class': 'form-input', })

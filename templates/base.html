@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <title>{% block title %}{% endblock %}</title>
     <meta name="description" content="{% block description %}ქართულად გახმოვანებული ანიმე სერიალები და ფილმები{% endblock %}">
-    <meta name="keywords" content="georgian, anime, animeebi, qartulad, kartulad, gaxmovaneba, gaxmovanebebi, geo">
+    <meta name="keywords" content="georgian, anime, animeebi, qartulad, kartulad, gaxmovanebuli, ქართულად, ანიმე, ანიმეები, გახმოვანებული, {% block keywords %}{% endblock %}">
     {% block ogtitle %}{% endblock %}
 	{% block ogdescription %}{% endblock %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -72,7 +72,7 @@
                             </a>
                         </li>
                         <li><a class='active' href="{% url 'profile' %}" data-id="{{ user.id }}">პროფილი</a></li>
-                        <li><a class="menu-icon fas fa-sign-out-alt" href="{% url 'logout' %}?next={% block logout_redirect %}{% endblock %}">
+                        <li><a class="menu-icon fas fa-sign-out-alt" href="{% url 'logout' %}?next={{ request.get_full_path }}">
                             <span>გასვლა</span>
                         </a></li>
                     {% endif %}

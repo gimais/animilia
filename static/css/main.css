@@ -374,7 +374,10 @@ section{
     color: #222;
 }
 
-.form-input::-webkit-input-placeholder, .form-input::-moz-placeholder, .form-input:-ms-input-placeholder, .form-input:-moz-placeholder {
+.form-input::-webkit-input-placeholder,
+.form-input::-moz-placeholder,
+.form-input:-ms-input-placeholder,
+.form-input:-moz-placeholder {
     color: #999;
     font-weight: 500;
 }
@@ -387,7 +390,9 @@ section{
     color: #ffffff;
 }
 
-.form-input:focus::-moz-placeholder,.form-input:focus:-ms-input-placeholder,.form-input:focus:-moz-placeholder {
+.form-input:focus::-moz-placeholder,
+.form-input:focus:-ms-input-placeholder,
+.form-input:focus:-moz-placeholder {
     color: #222;
 }
 
@@ -574,6 +579,30 @@ section{
     overflow: auto;
     display: flex;
     flex-wrap: wrap;
+}
+
+.filter-content {
+    background-color: #ffffff;
+    padding: 10px 0 0 0;
+}
+
+.filter-info {
+    padding: 10px;
+    font-size: 16px;
+    text-align: center;
+    border-bottom: 1px solid #aaa;
+    width: fit-content;
+    margin: 0 auto;
+}
+
+.filter-header{
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.filtered{
+    font-size: 18px;
 }
 
 .pagination {
@@ -911,6 +940,11 @@ form.login-form a{
 
 .episode-select-button.active{
     background: #973116;
+}
+
+.searchable-item{
+    color: #973116;
+    text-decoration: underline;
 }
 
 .item-player {

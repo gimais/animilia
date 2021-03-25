@@ -1,0 +1,56 @@
+{% load static %}
+{% if animes_list %}
+    <div class="items-list">
+        {% for anime in animes_list %}
+            <div class="item">
+                <a href = "/anime/{{ anime.slug }}">
+                    <div style="position: relative;overflow: hidden">
+                        <div class="home-item-image">
+                            <img src={% if anime.poster %}"/media/{{ anime.poster }}?v=2" {% else %} {% static 'img/no-poster-available.jpg' %} {% endif %} alt="{{ anime.name }}">
+                        </div>
+                        {% if anime.soon %}
+                            <img class='soon' src="{% static 'img/soon_poster.svg' %}"
+                                 alt="{{ anime.name }}">
+                        {% else %}
+                            <div class='age'
+                                 style="padding: {% if anime.age >= 10 %}10px {% endif %} 5px">{{ anime.age }}+
+                            </div>
+                        {% endif %}
+                        <div class="info">
+                            <div class='name'>{{ anime.name }}</div>
+                            <div class='details'>
+                                <span title="რეიტინგი"><i class="fas fa-star"></i> {{ anime.rating }}</span>
+                                <span style='float:right;' title="ნახვები"><i class="fas fa-eye"></i> {{ anime.views }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+        {% if animes_list.has_other_pages %}
+            <div class="pagination">
+                <div>
+{#                    <a>⇤</a>#}
+                    {% if animes_list.has_previous %}
+                        <a href="?page={{ animes_list.previous_page_number }}&{{ params }}">←</a>
+                    {% else %}
+                        <a class="disabled">←</a>
+                    {% endif %}
+                    {% for page in animes_list.paginator.page_range %}
+                        {% if animes_list.number == page %}
+                            <a class="active">{{ page }}</a>
+                        {% else %}
+                            <a href="?page={{ page }}&{{ params }}">{{ page }}</a>
+                        {% endif %}
+                    {% endfor %}
+                    {% if animes_list.has_next %}
+                        <a href="?page={{ animes_list.next_page_number }}&{{ params }}">→</a>
+                    {% else %}
+                        <a class="disabled">→</a>
+                    {% endif %}
+{#                    <a>⇥</a>#}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endif %}
