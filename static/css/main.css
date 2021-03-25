@@ -835,6 +835,11 @@ form.login-form a{
     margin-top: 6px;
 }
 
+.social-href{
+    color: #000000;
+    text-decoration: none;
+}
+
 .banned {
     color: #dc1515;
     font-weight: 600;

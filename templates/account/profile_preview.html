@@ -68,11 +68,11 @@
                     <div class="profile-social">
                         <dl>
                             {% if user_profile.profile.facebook %}
-                                <dd><a href="{{ user_profile.profile.facebook }}" target="_blank"><i
+                                <dd><a class="social-href" href="{{ user_profile.profile.facebook }}" target="_blank"><i
                                         class="fab fa-facebook"></i> Facebook</a></dd>
                             {% endif %}
                             {% if user_profile.profile.instagram %}
-                                <dd><a href="{{ user_profile.profile.instagram }}" target="_blank"><i
+                                <dd><a class="social-href" href="{{ user_profile.profile.instagram }}" target="_blank"><i
                                         class="fab fa-instagram"></i> Instagram</a></dd>
                             {% endif %}
                         </dl>
