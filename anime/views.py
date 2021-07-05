@@ -41,6 +41,7 @@ def anime_page_view(request, slug):
                 .filter(anime=anime).values('ordering_group_id')).order_by('id')
             .values('anime__name', 'anime__slug', 'not_here', 'anime__type', 'anime__episodes'),
         'types': Anime.TYPES,
+        'status': Anime.STATUS,
         'comment_form': CommentForm
     }
 

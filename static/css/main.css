@@ -882,11 +882,11 @@ form.login-form a{
     font-size: 13px;
 }
 
-.finished{
+.status-0 {
     background-color: #0ac40a;
 }
 
-.not-finished{
+.status-1, .status-2 {
     background-color: #ff2d01;
 }
 

@@ -41,14 +41,14 @@ class AnimeStaff(admin.ModelAdmin):
         models.ManyToManyField: {'widget': CheckboxSelectMultiple},
     }
 
-    list_display = ("name", 'dubbed', "type", 'slug', 'updated', 'finished')
+    list_display = ("name", 'dubbed', "type", 'updated', 'status')
     inlines = [VideoChoiceInline]
 
     fieldsets = (
         ('სახელები', {'fields': ('name', 'namege', 'nameen', 'namejp', 'nameru')}),
         ('დეტალები', {'fields': ('director', 'studio', 'year', 'age', 'categories',
                                  'type', 'episodes', 'rating', 'poster', 'description')}),
-        ('Animilia', {'fields': ('dubbers', 'slug', 'finished', 'soon')}),
+        ('Animilia', {'fields': ('dubbers', 'slug', 'status', 'soon')}),
     )
 
     def get_queryset(self, request):
@@ -69,10 +69,10 @@ class ScheduleStaff(admin.ModelAdmin):
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == 'anime':
             if request.user.has_perm('anime.view_all_schedule'):
-                kwargs["queryset"] = Anime.objects.filter(finished=False)
+                kwargs["queryset"] = Anime.objects.filter(status__in=[1, 2])
             else:
                 try:
-                    kwargs["queryset"] = request.user.dubber.get_dubbed_animes.filter(finished=False)
+                    kwargs["queryset"] = request.user.dubber.get_dubbed_animes.filter(status__in=[1, 2])
                 except Dubber.DoesNotExist:
                     kwargs["queryset"] = Anime.objects.none()
         return super(ScheduleStaff, self).formfield_for_foreignkey(db_field, request, **kwargs)
@@ -94,7 +94,7 @@ class ScheduleAdmin(admin.ModelAdmin):
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == 'anime':
-            kwargs["queryset"] = Anime.objects.filter(finished=False)
+            kwargs["queryset"] = Anime.objects.filter(status__in=[1, 2])
         return super(ScheduleAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_queryset(self, request):

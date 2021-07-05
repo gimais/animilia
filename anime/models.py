@@ -75,6 +75,12 @@ class Anime(models.Model):
         (4, 'ანიმაციური ფილმი'),
     )
 
+    STATUS = (
+        (0, 'გახმოვანებული'),
+        (1, 'გახმოვანების პროცესში'),
+        (2, 'ანონსი'),
+    )
+
     name = models.CharField(max_length=100, verbose_name='სახელი', unique=True)
     namege = models.CharField(max_length=100, verbose_name='ქართულად', blank=True)
     nameen = models.CharField(max_length=100, verbose_name='ინგლისურად', blank=True)
@@ -91,10 +97,10 @@ class Anime(models.Model):
     type = models.PositiveSmallIntegerField(choices=TYPES, default=0, verbose_name='ტიპი')
     episodes = models.PositiveSmallIntegerField(verbose_name='ეპიზოდების რაოდენობა', default=1)
     rating = models.DecimalField(max_digits=5, decimal_places=1, default=0, verbose_name='რეიტინგი')
-    updated = models.DateTimeField(auto_now=True, verbose_name="განახლებული")
+    updated = models.DateTimeField(auto_now_add=True, verbose_name="განახლებული")
     views = models.IntegerField(default=0, editable=False, verbose_name="ნახვა")
     slug = models.SlugField(unique=True, verbose_name='ლინკი')
-    finished = models.BooleanField(default=False, verbose_name="დამთავრებულია")
+    status = models.PositiveSmallIntegerField(choices=STATUS, default=0, verbose_name='სტატუსი')
     soon = models.BooleanField(default=False, verbose_name="მალე")
 
     class Meta:

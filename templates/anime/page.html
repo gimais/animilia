@@ -42,13 +42,9 @@
                 <div class="item-page-row">
                     <dl>
                         <dt>ტიპი:</dt>
-                            <dd>{{ types|access_collection_element:anime.type|access_collection_element:1}}</dd>
+                        <dd>{{ types|access_collection_element:anime.type|access_collection_element:1 }}</dd>
                         <dt>სტატუსი:</dt>
-                        {% if anime.finished %}
-                            <dd class="anime-status finished">გახმოვანებული</dd>
-                        {% else %}
-                            <dd class="anime-status not-finished">გახმოვანების პროცესში</dd>
-                        {% endif %}
+                        <dd class="anime-status status-{{ anime.status }}">{{ status|access_collection_element:anime.status|access_collection_element:1 }}</dd>
                         <dt>სტუდია:</dt>
                         <dd>{{ anime.studio }}</dd>
                         <dt>გამოშვების წელი:</dt>
@@ -56,7 +52,8 @@
                         <dt>ჟანრები:</dt>
                         <dd>
                             {% for genre in anime.categories.all %}
-                                <li><a class="searchable-item" href="{% url 'search_anime' %}?categories={{ genre }}">{{ genre }}</a></li>
+                                <li><a class="searchable-item"
+                                       href="{% url 'search_anime' %}?categories={{ genre }}">{{ genre }}</a></li>
                             {% endfor %}
                         </dd>
                         <dt>ასაკობრივი შეზღუდვა:</dt>
@@ -64,8 +61,8 @@
                         <dt>რეჟისორი:</dt>
                         <dd>{{ anime.director }}</dd>
                         {% if anime.type == 0 or anime.type == 2 or anime.type == 3 %}
-                        <dt>სერიების რაოდენობა:</dt>
-                        <dd>{{ anime.dubbed }}/{{anime.episodes}}</dd>
+                            <dt>სერიების რაოდენობა:</dt>
+                            <dd>{{ anime.dubbed }}/{{ anime.episodes }}</dd>
                         {% endif %}
                         <dt>გამხმოვანებელი:</dt>
                         <dd>
