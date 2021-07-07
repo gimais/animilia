@@ -228,8 +228,8 @@ class Profile(models.Model):
     avatar = models.ImageField(upload_to='avatars/', default='no-avatar.jpg', blank=True, verbose_name='ავატარი')
     gender = models.PositiveSmallIntegerField(choices=TYPES, blank=True, null=True, verbose_name='სქესი')
     birth = models.DateField(blank=True, null=True, verbose_name='დაბადების თარიღი')
-    facebook = models.URLField(null=True, validators=[facebook_validator])
-    instagram = models.URLField(null=True, validators=[instagram_validator])
+    facebook = models.URLField(blank=True, null=True, validators=[facebook_validator])
+    instagram = models.URLField(blank=True, null=True, validators=[instagram_validator])
 
     class Meta:
         verbose_name = 'პროფილი'
