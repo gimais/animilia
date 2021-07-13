@@ -76,10 +76,10 @@
             <div class="item-page-desc">
                 <p>{{ anime.description }}</p>
             </div>
-            {% if ordering %}
-                <div class="show-ordering">ყურების განრიგი</div>
+            {% if chronology %}
+                <div class="show-ordering">ქრონოლოგია</div>
                 <div class="item-page-ordering">
-                    {% for item in ordering %}
+                    {% for item in chronology %}
                         <div class="ordering-item">
                             <span>{{ forloop.counter }}.</span>
                             {% if item.anime__slug != None %}
@@ -115,9 +115,19 @@
                     </div>
                 {% else %}
                     <div class="item-player">
-                        {% with anime.videos.all|first as episode %}
-                            <iframe src="{{ episode.url }}" frameborder="0" allowfullscreen="true"></iframe>
-                        {% endwith %}
+                    {% with anime.videos.all|first as episode %}
+                        {% if episode.myvideo %}
+                            <iframe src="{{ episode.myvideo }}" frameborder="0" allowfullscreen="true"></iframe>
+                            {% if episode.ok %}
+                            <select class="non-series" id="players-choice" name="players-choice">
+                                <option value="{{ episode.myvideo }}">Myvideo.ge</option>
+                                <option value="{{ episode.ok }}">Ok.ru</option>
+                            </select>
+                            {% endif %}
+                        {% else %}
+                            <iframe src="{{ episode.ok }}" frameborder="0" allowfullscreen="true"></iframe>
+                        {% endif %}
+                    {% endwith %}
                     </div>
                 {% endif %}
             {% else %}

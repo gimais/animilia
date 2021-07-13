@@ -7,9 +7,7 @@ from django.shortcuts import render
 
 from account.forms import CommentForm
 from anime.filter import process_single_search_query
-from anime.models import Anime, Schedule, WatchOrder
-
-ERROR = {'error': 'moxda shecdoma!'}
+from anime.models import Anime, Schedule, ChronologyItem
 
 
 def paginate_page(content, page):
@@ -36,9 +34,9 @@ def anime_page_view(request, slug):
     anime.increase_view_count(request.COOKIES)
     context = {
         'anime': anime,
-        'ordering': WatchOrder.objects.select_related('anime').filter(
-            ordering_group__in=WatchOrder.objects.select_related('anime')
-                .filter(anime=anime).values('ordering_group_id')).order_by('id')
+        'chronology': ChronologyItem.objects.select_related('anime').filter(
+            chronology__in=ChronologyItem.objects.select_related('anime')
+                .filter(anime=anime).values('chronology_id')).order_by('id')
             .values('anime__name', 'anime__slug', 'not_here', 'anime__type', 'anime__episodes'),
         'types': Anime.TYPES,
         'status': Anime.STATUS,

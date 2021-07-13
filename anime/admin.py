@@ -3,7 +3,7 @@ from django.db import models
 from django.forms import CheckboxSelectMultiple, NumberInput
 
 from staff.admin import staff_site, admin_site
-from .models import Category, Anime, Video, Dubber, Schedule, WatchOrder, WatchingOrderingGroup
+from .models import Category, Anime, Video, Dubber, Schedule, Chronology, ChronologyItem
 
 
 class VideoChoiceInline(admin.TabularInline):
@@ -20,13 +20,13 @@ class VideoChoiceInline(admin.TabularInline):
         return queryset.select_related('anime')
 
 
-class OrderChoiceInline(admin.TabularInline):
-    model = WatchOrder
+class ChronologySequenceInline(admin.TabularInline):
+    model = ChronologyItem
     extra = 1
 
 
-class WatchingOrderingAdmin(admin.ModelAdmin):
-    inlines = [OrderChoiceInline]
+class ChronologyAdmin(admin.ModelAdmin):
+    inlines = [ChronologySequenceInline]
 
 
 class DubberAdmin(admin.ModelAdmin):
@@ -106,10 +106,10 @@ class ScheduleAdmin(admin.ModelAdmin):
 staff_site.register(Category)
 staff_site.register(Schedule, ScheduleStaff)
 staff_site.register(Anime, AnimeStaff)
-staff_site.register(WatchingOrderingGroup, WatchingOrderingAdmin)
+staff_site.register(Chronology, ChronologyAdmin)
 
 admin_site.register(Category)
 admin_site.register(Dubber, DubberAdmin)
 admin_site.register(Schedule, ScheduleAdmin)
-admin_site.register(WatchingOrderingGroup, WatchingOrderingAdmin)
+admin_site.register(Chronology, ChronologyAdmin)
 admin_site.register(Anime, AnimeStaff)

@@ -38,25 +38,25 @@ class Dubber(models.Model):
         return self.dubbed.all()
 
 
-class WatchingOrderingGroup(models.Model):
-    name = models.CharField(max_length=100, unique=True, verbose_name='ჯგუფის სახელი')
+class Chronology(models.Model):
+    name = models.CharField(max_length=100, unique=True, verbose_name='ქრონოლოგიის სახელი')
 
     class Meta:
-        verbose_name = "ყურების განრიგი"
-        verbose_name_plural = "ყურების განრიგი"
-        db_table = "anime_ordering"
+        verbose_name = "ქრონოლოგია"
+        verbose_name_plural = "ქრონოლოგია"
+        db_table = "chronology"
 
     def __str__(self):
         return self.name
 
 
-class WatchOrder(models.Model):
+class ChronologyItem(models.Model):
     anime = models.OneToOneField("Anime", null=True, blank=True,
-                                 related_name='animeorder', verbose_name='ანიმე', on_delete=models.CASCADE)
+                                 related_name='chronology', verbose_name='ანიმე', on_delete=models.CASCADE)
     not_here = models.CharField(max_length=100, null=True, blank=True, verbose_name='სხვა',
                                 help_text="თუ ანიმეს სიაში არ არის ესეიგი ჩვენთან ბაზაში არაა და ხელით აქ ჩაწერე")
-    ordering_group = models.ForeignKey(WatchingOrderingGroup, default=None,
-                                       related_name='ordergroup', verbose_name='ჯგუფი', on_delete=models.CASCADE)
+    chronology = models.ForeignKey(Chronology, default=None,
+                                   related_name='items', verbose_name='ქრონოლოგია', on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = "მიმდევრობა"
@@ -146,7 +146,9 @@ class Video(models.Model):
         verbose_name_plural = 'ვიდეოები'
 
     def save(self, *args, **kwargs):
-        if self._state.adding:
+        adding: bool = self._state.adding
+
+        if adding:
             last_episode = self.anime.videos.aggregate(models.Max('episode')).get('episode__max')
 
             if last_episode is not None:
@@ -157,8 +159,9 @@ class Video(models.Model):
 
         super(Video, self).save(*args, **kwargs)
 
-        self.anime.updated = datetime.now()
-        self.anime.save()
+        if adding:
+            self.anime.updated = datetime.now()
+            self.anime.save()
 
     def __str__(self):
         return '{} - {}'.format(self.anime, self.episode)

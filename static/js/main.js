@@ -436,11 +436,18 @@ $('.episode-select-button').on('click', function () {
 });
 
 $("#players-choice").on("change",function (e) {
-    let chosenVideo = $('.episode-select-button.active');
-    let value = e.target.value;
+    let select = $(this);
+    let player = $('.item-player iframe');
 
-    if(value === "myvideo") $('.item-player iframe').attr('src', chosenVideo.data('one'));
-    else $('.item-player iframe').attr('src', chosenVideo.data('two'));
+    if (select.hasClass("non-series")) {
+        player.attr('src', select.val());
+    } else {
+        let chosenVideo = $('.episode-select-button.active');
+
+        if (select.val() === "myvideo") player.attr('src', chosenVideo.data('one'));
+        else player.attr('src', chosenVideo.data('two'));
+    }
+
 });
 
 $('.comment-form').submit(function (e) {
