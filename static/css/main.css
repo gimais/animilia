@@ -964,6 +964,20 @@ form.login-form a{
     height: 100%;
 }
 
+#players-choice {
+    position: absolute;
+    top: 10px;
+    right: 16px;
+    background-color: #973116;
+    z-index: 10;
+    color: #ffffff;
+    border-radius: 4px;
+}
+
+#players-choice:focus {
+    border-radius: 4px 4px 0 0;
+}
+
 .soon-player {
     display: block;
     width: 100%;

@@ -405,11 +405,24 @@ $(".show-ordering").on('click',function () {
 
 $('.episode-select-button').on('click', function () {
     let clickedButton = $(this);
-    let videoURL = clickedButton.data('url');
+    let oneVideoURL = clickedButton.data('one');
+    let twoVideoURL = clickedButton.data('two');
+
     let itemPlayer = $('.item-player');
+    let choiceEl = $('#players-choice');
     let activatedButton = $('.episode-select-button.active');
 
-    $('.item-player iframe').attr('src', videoURL);
+    choiceEl.val("myvideo");
+
+    if (oneVideoURL)
+        $('.item-player iframe').attr('src', oneVideoURL);
+    else
+        $('.item-player iframe').attr('src', twoVideoURL);
+
+
+    if (oneVideoURL && twoVideoURL) choiceEl.removeClass("hidden");
+    else choiceEl.addClass("hidden");
+
 
     if (clickedButton !== activatedButton) {
         activatedButton.removeClass('active');
@@ -420,6 +433,14 @@ $('.episode-select-button').on('click', function () {
         itemPlayer.removeClass('hidden');
     }
     setCookie(itemSlug.substring(7, itemSlug.length - 1), clickedButton.data('id'), 30);
+});
+
+$("#players-choice").on("change",function (e) {
+    let chosenVideo = $('.episode-select-button.active');
+    let value = e.target.value;
+
+    if(value === "myvideo") $('.item-player iframe').attr('src', chosenVideo.data('one'));
+    else $('.item-player iframe').attr('src', chosenVideo.data('two'));
 });
 
 $('.comment-form').submit(function (e) {

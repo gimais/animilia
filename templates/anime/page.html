@@ -76,45 +76,53 @@
             <div class="item-page-desc">
                 <p>{{ anime.description }}</p>
             </div>
-        {% if ordering %}
-            <div class="show-ordering">ყურების განრიგი</div>
-            <div class="item-page-ordering">
-                {% for item in ordering %}
-                    <div class="ordering-item">
-                        <span>{{ forloop.counter }}.</span>
-                    {% if item.anime__slug != None %}
-                        {% if item.anime__type == 0 or item.anime__type == 2 or item.anime__type == 3 %}
-                             <span><a href="{% url 'page' item.anime__slug %}" {% if item.anime__slug == anime.slug %}class="current-order"{% endif %}>{{ item.anime__name }}</a> - {{ types|access_collection_element:item.anime__type|access_collection_element:1}} ({{item.anime__episodes}} ეპ.)</span>
-                        {% else %}
-                            <span><a href="{% url 'page' item.anime__slug %}" {% if item.anime__slug == anime.slug %}class="current-order"{% endif %}>{{ item.anime__name }} </a>- {{ types|access_collection_element:item.anime__type|access_collection_element:1}}</span>
-                        {% endif %}
-                    {% else %}
-                        <span>{{ item.not_here }} - ?</span>
-                    {% endif %}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-        {% if not anime.soon %}
-            {% if anime.type == 0 or anime.type == 2 or anime.type == 3 %}
-            <div class="item-page-episodes">
-                {% for episode in anime.videos.all|dictsort:"episode" %}
-                <div class="episode-select-button" data-id="{{episode.episode}}" data-url="{{episode.url}}">{{ episode.episode }}</div>
-                {% endfor %}
-            </div>
-            <div class="item-player hidden">
-                <iframe frameborder="0" allowfullscreen="true"></iframe>
-            </div>
-            {% else %}
-            <div class="item-player">
-                {% with anime.videos.all|first as episode %}
-                    <iframe src="{{ episode.url }}" frameborder="0" allowfullscreen="true"></iframe>
-                {% endwith %}
-            </div>
+            {% if ordering %}
+                <div class="show-ordering">ყურების განრიგი</div>
+                <div class="item-page-ordering">
+                    {% for item in ordering %}
+                        <div class="ordering-item">
+                            <span>{{ forloop.counter }}.</span>
+                            {% if item.anime__slug != None %}
+                                {% if item.anime__type == 0 or item.anime__type == 2 or item.anime__type == 3 %}
+                                    <span><a href="{% url 'page' item.anime__slug %}"
+                                             {% if item.anime__slug == anime.slug %}class="current-order"{% endif %}>{{ item.anime__name }}</a> - {{ types|access_collection_element:item.anime__type|access_collection_element:1 }} ({{ item.anime__episodes }} ეპ.)</span>
+                                {% else %}
+                                    <span><a href="{% url 'page' item.anime__slug %}"
+                                             {% if item.anime__slug == anime.slug %}class="current-order"{% endif %}>{{ item.anime__name }} </a>- {{ types|access_collection_element:item.anime__type|access_collection_element:1 }}</span>
+                                {% endif %}
+                            {% else %}
+                                <span>{{ item.not_here }} - ?</span>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
             {% endif %}
-        {% else %}
-            <div class="soon-player"></div>
-        {% endif %}
+            {% if not anime.soon %}
+                {% if anime.type == 0 or anime.type == 2 or anime.type == 3 %}
+                    <div class="item-page-episodes">
+                        {% for episode in anime.videos.all|dictsort:"episode" %}
+                            <div class="episode-select-button" data-id="{{ episode.episode }}"
+                                 data-one="{{ episode.myvideo }}"
+                                 data-two="{{ episode.ok }}">{{ episode.episode }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="item-player hidden">
+                        <iframe frameborder="0" allowfullscreen="true"></iframe>
+                        <select class="hidden" id="players-choice" name="players-choice">
+                            <option value="myvideo">Myvideo.ge</option>
+                            <option value="ok">Ok.ru</option>
+                        </select>
+                    </div>
+                {% else %}
+                    <div class="item-player">
+                        {% with anime.videos.all|first as episode %}
+                            <iframe src="{{ episode.url }}" frameborder="0" allowfullscreen="true"></iframe>
+                        {% endwith %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="soon-player"></div>
+            {% endif %}
             <hr>
             {% include "anime/comments.html" %}
         </div>
