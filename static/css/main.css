@@ -490,13 +490,19 @@ section{
     margin: 5px 0;
 }
 
+.item-container {
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+}
+
 .item img {
     max-width: 100%;
     height: auto;
     display: block;
 }
 
-.item:hover .info{
+.item:hover .info {
     padding: 10px 10px 0;
     position: absolute;
     background-color: rgba(15, 15, 15, 0.67);
@@ -512,7 +518,7 @@ section{
 }
 
 .age {
-    padding: 5px;
+    padding: 10px 5px;
     position: absolute;
     background-color: #2e2828bf;
     color: #ff2e01;
@@ -540,12 +546,13 @@ section{
     z-index: 1;
 }
 
-.name{
-	text-align:center;
-	border-bottom:1px solid;
-	padding: 5px 0 12px;
-	height:20%;
+.name {
+    text-align: center;
+    border-bottom: 1px solid;
+    padding: 5px 0 12px;
     font-size: 17px;
+    font-weight: 100;
+    margin: 0;
 }
 
 .item span{
