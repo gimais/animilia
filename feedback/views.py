@@ -39,9 +39,15 @@ def feedback(request):
 def get_message(request, id):
     message = get_object_or_404(Message.objects.filter(to_user=request.user), id=id)
 
+    response = {"message": message.body}
+
+    if message.feedback is not None:
+        response["feedback"] = {
+            "datetime": message.feedback.date,
+            "body": message.feedback.body
+        }
+
     if request.GET.get('visited', None) == '0':
         message.notification.filter(seen=False).update(seen=True)
 
-    return JsonResponse({
-        'message': message.body
-    }, status=200)
+    return JsonResponse(response, status=200)

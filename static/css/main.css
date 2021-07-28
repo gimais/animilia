@@ -1695,6 +1695,16 @@ a.change-pass-button {
     bottom: 0;
 }
 
+.message-feedback-container {
+    border: 1px solid gray;
+    padding: 0 15px;
+    width: 90%;
+    margin: 0 auto 12px;
+    line-height: 100%;
+    background-color: #e2e2e2;
+    color: #000000;
+}
+
 
 /*hiddens*/
 #mob-home, .upload-demo .upload-demo-wrap,

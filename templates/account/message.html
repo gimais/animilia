@@ -40,15 +40,26 @@
                     method: "GET",
                     url: '/contact/message/' + that.data('id'),
                     data: {
-                        visited : liParent.hasClass('visited') ? 1 : 0,
+                        visited: liParent.hasClass('visited') ? 1 : 0,
                     },
                     success: function (e) {
-                        body.text(e.message);
+                        let html = '';
+
+                        if (e.hasOwnProperty("feedback")) {
+                            html = `<div class="message-feedback-container">
+                                        <p><b>დრო:</b> ${convertTimeGeo(new Date(e.feedback['datetime']).getTime() / 1000)}</p>
+                                        <p><b>წერილი:</b> ${e.feedback['body']}</p>
+                                    </div>`;
+                        }
+
+                        html += `<p>${e.message}</p>`;
+
+                        body.html(html);
                         that.addClass('done');
 
-                        if(!liParent.hasClass('visited')){
+                        if (!liParent.hasClass('visited')) {
                             let notifCount = $('.notif-count');
-                            notifCount.text(notifCount.text() -1);
+                            notifCount.text(notifCount.text() - 1);
                         }
                     },
                     error: function () {
