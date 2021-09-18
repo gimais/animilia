@@ -24,61 +24,63 @@
 <div class="comments-box clearfix">
     {% for comment in comments %}
         <div class="comment clearfix">
-            <a class="comment-user-img" href="{% url 'profile_preview' comment.user_id %}">
-                <img src="/media/{{ comment.avatar }}?r=1" alt="{{ comment.username }}" loading="lazy">
-            </a>
-            <div class="comment-body">
-                <div class="comment-info" data-id="{{ comment.id }}">
-                    <a class='comment-user {% if comment.user_id == user.pk %}mine{% endif %}'
-                       href="{% url 'profile_preview' comment.user_id %}">{{ comment.username }}</a>
-                    {% if not comment.user_active %}
-                        <span class="banned">BANNED</span>
-                    {% endif %}
-                    {% if comment.active %}
-                        {% if user.is_authenticated and comment.user_active %}
-                            <p class="reply-button" data-id="{{ comment.id }}" data-username="{{ comment.username }}">
-                                <i class="fas fa-reply"></i> პასუხი
-                            </p>
+            <div class="inner-wrapper {{ comment.groups }}">
+                <a class="comment-user-img" href="{% url 'profile_preview' comment.user_id %}">
+                    <img src="/media/{{ comment.avatar }}?r=1" alt="{{ comment.username }}" loading="lazy">
+                </a>
+                <div class="comment-body">
+                    <div class="comment-info" data-id="{{ comment.id }}">
+                        <a class='comment-user {% if comment.user_id == user.pk %}mine{% endif %}'
+                           href="{% url 'profile_preview' comment.user_id %}">{{ comment.username }}</a>
+                        {% if not comment.user_active %}
+                            <span class="banned">BANNED</span>
                         {% endif %}
-                        {% if comment.priority != None %}
-                            <i class="fas fa-thumbtack" style="transform: scale(1.5,1.2) rotate(90deg);margin-left: 3px"></i>
-                        {% endif %}
-                        <p class='comment-time'>{{ comment.created|date:"d/m/Y | H:i" }}</p>
-                        </div>
-                        <p class="comment-text">
-                            {{ comment.body|linebreaksbr }}
-                        </p>
-                        <div class="comment-actions">
-                            <div class="comment-dl-buttons">
-                                <div class="comment-right-buttons" id='like-comment' style="color: #ff2e01;"><i
-                                        class="{% if comment.has_like %}fas{% else %} far{% endif %} fa-thumbs-up"></i>{{ comment.like_count }}
-                                </div>
-                                <div class="comment-right-buttons" id='dislike-comment' style="color: #ab3717;"><i
-                                        class="{% if comment.has_dislike %}fas{% else %} far{% endif %} fa-thumbs-down"></i>{{ comment.dislike_count }}
-                                </div>
-                            </div>
-                            {% if user.is_authenticated %}
-                                <div class="user-actions">
-                                    {% if comment.user_id == user.pk %}
-                                        {% if comment.like_count == 0 and comment.dislike_count == 0 and comment.active_children_count == 0 %}
-                                            <div class="comment-right-buttons" id='edit-comment'><i
-                                                    class="fas fa-edit"></i></div>
-                                        {% endif %}
-                                        <div class="comment-right-buttons" id='remove-comment'><i
-                                                class="fas fa-trash"></i></div>
-                                    {% endif %}
-                                    <p class="reply-button touch" data-id="{{ comment.id }}"
-                                       data-username="{{ comment.username }}">
-                                        <i class="fas fa-reply"></i> პასუხი
-                                    </p>
-                                </div>
+                        {% if comment.active %}
+                            {% if user.is_authenticated and comment.user_active %}
+                                <p class="reply-button" data-id="{{ comment.id }}" data-username="{{ comment.username }}">
+                                    <i class="fas fa-reply"></i> პასუხი
+                                </p>
                             {% endif %}
-                        </div>
-                    {% else %}
-                        <p class='comment-time'>{{ comment.created|date:"d/m/Y | H:i" }}</p>
-                        </div>
-                        <p class="deleted-comment">ეს კომენტარი წაშლილია</p>
-                    {% endif %}
+                            {% if comment.priority != None %}
+                                <i class="fas fa-thumbtack" style="transform: scale(1.5,1.2) rotate(90deg);margin-left: 3px"></i>
+                            {% endif %}
+                            <p class='comment-time'>{{ comment.created|date:"d/m/Y | H:i" }}</p>
+                            </div>
+                            <p class="comment-text">
+                                {{ comment.body|linebreaksbr }}
+                            </p>
+                            <div class="comment-actions">
+                                <div class="comment-dl-buttons">
+                                    <div class="comment-right-buttons" id='like-comment' style="color: #ff2e01;"><i
+                                            class="{% if comment.has_like %}fas{% else %} far{% endif %} fa-thumbs-up"></i>{{ comment.like_count }}
+                                    </div>
+                                    <div class="comment-right-buttons" id='dislike-comment' style="color: #ab3717;"><i
+                                            class="{% if comment.has_dislike %}fas{% else %} far{% endif %} fa-thumbs-down"></i>{{ comment.dislike_count }}
+                                    </div>
+                                </div>
+                                {% if user.is_authenticated %}
+                                    <div class="user-actions">
+                                        {% if comment.user_id == user.pk %}
+                                            {% if comment.like_count == 0 and comment.dislike_count == 0 and comment.active_children_count == 0 %}
+                                                <div class="comment-right-buttons" id='edit-comment'><i
+                                                        class="fas fa-edit"></i></div>
+                                            {% endif %}
+                                            <div class="comment-right-buttons" id='remove-comment'><i
+                                                    class="fas fa-trash"></i></div>
+                                        {% endif %}
+                                        <p class="reply-button touch" data-id="{{ comment.id }}"
+                                           data-username="{{ comment.username }}">
+                                            <i class="fas fa-reply"></i> პასუხი
+                                        </p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <p class='comment-time'>{{ comment.created|date:"d/m/Y | H:i" }}</p>
+                            </div>
+                            <p class="deleted-comment">ეს კომენტარი წაშლილია</p>
+                        {% endif %}
+            </div>
         </div>
         {% if comment.active_children_count %}
             <div class="comment-replies-check closed" data-id="{{ comment.id }}">

@@ -1056,8 +1056,40 @@ button.spoiler-button:disabled {
 
 .comment {
     border-bottom: 1px solid #e2e2e2;
-    padding: 5px;
+    padding: 2px;
 }
+
+.comment .inner-wrapper {
+    padding: 4px;
+}
+
+/*comment decorations by groups*/
+
+.comment .admin {
+    background: linear-gradient(9deg, #ff0000f5, #ffa5009c);
+    border-radius: 3px;
+    box-shadow: -2px 0px 10px 2px #f63b01e6;
+    animation: moveGradient 1s alternate infinite;
+}
+
+/*@keyframes moveGradient {*/
+/*  100% {*/
+/*        background: linear-gradient(*/
+/*            360deg,*/
+/*            hsl(224, 85%, 66%),*/
+/*            hsl(269, 85%, 66%),*/
+/*            hsl(314, 85%, 66%),*/
+/*            hsl(359, 85%, 66%),*/
+/*            hsl(44, 85%, 66%),*/
+/*            hsl(89, 85%, 66%),*/
+/*            hsl(134, 85%, 66%),*/
+/*            hsl(179, 85%, 66%)*/
+/*    );*/
+/*  }*/
+/*}*/
+
+/*end */
+
 
 .spoiler {
     display: none;
@@ -1075,8 +1107,8 @@ button.spoiler-button:disabled {
 }
 
 .comment-user-img {
-    width: 90px;
-    height: 90px;
+    width: 100px;
+    height: 100px;
     display: block;
     float: left;
 }
@@ -1089,11 +1121,10 @@ button.spoiler-button:disabled {
 .comment-body {
     display: inline-block;
     vertical-align: middle;
-    width: calc(100% - 105px);
+    width: calc(100% - 100px);
     position: relative;
     min-height: 100px;
-    margin-left: 10px;
-    padding: 5px 10px;
+    padding: 5px 15px;
     font-size: .9rem;
     color: #555;
     background-color: #FFF;

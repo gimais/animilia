@@ -6,6 +6,7 @@ from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import AbstractUser, PermissionsMixin, Group
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.aggregates import StringAgg
 from django.core.mail import send_mail
 from django.core.validators import MinLengthValidator
 from django.db import models
@@ -48,13 +49,17 @@ class CommentManager(models.Manager):
     def annotates_related_objects(self, user_obj):
         profiles = Profile.objects.filter(user_id=OuterRef('user_id'))
         user = get_user_model().objects.filter(pk=OuterRef('user_id'))
-        params = {'user_active': Subquery(user.values('is_active')[:1]),
-                  'avatar': Subquery(profiles.values('avatar')[:1]),
-                  'username': Subquery(user.values('username')[:1]),
-                  'like_count': Count('like', distinct=True),
-                  'dislike_count': Count('dislike', distinct=True),
-                  'children_count': Count('children', distinct=True),
-                  'active_children_count': Count('children', filter=Q(children__active=True), distinct=True)}
+
+        params = {
+            'user_active': Subquery(user.values('is_active')[:1]),
+            'avatar': Subquery(profiles.values('avatar')[:1]),
+            'username': Subquery(user.values('username')[:1]),
+            "groups": StringAgg("user__groups__classname", " "),
+            'like_count': Count('like', distinct=True),
+            'dislike_count': Count('dislike', distinct=True),
+            'children_count': Count('children', distinct=True),
+            'active_children_count': Count('children', filter=Q(children__active=True), distinct=True)
+        }
 
         if user_obj.is_authenticated:
             has_like = user_obj.likes.filter(id=OuterRef('id'))
@@ -303,3 +308,4 @@ class Notification(models.Model):
 
 
 Group.add_to_class('display_color', models.CharField(max_length=7, null=True))
+Group.add_to_class('classname', models.CharField(max_length=15, null=True))
