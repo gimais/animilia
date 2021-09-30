@@ -24,7 +24,7 @@
 <div class="comments-box clearfix">
     {% for comment in comments %}
         <div class="comment clearfix">
-            <div class="inner-wrapper {{ comment.groups }}">
+            <div class="inner-wrapper{% if comment.ui_class %} decorate" style="--color: #{{ comment.ui_class }}{% endif %}">
                 <a class="comment-user-img" href="{% url 'profile_preview' comment.user_id %}">
                     <img src="/media/{{ comment.avatar }}?r=1" alt="{{ comment.username }}" loading="lazy">
                 </a>

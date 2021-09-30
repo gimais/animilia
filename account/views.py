@@ -235,6 +235,7 @@ def add_comment(request):
                         'avatar': request.user.profile.avatar.name,
                         'user_id': request.user.id,
                         'user_active': request.user.is_active,
+                        'ui_class': request.user.profile.ui_class,
                         'comment_id': comment.id,
                         'editable': True,
                         'time': datetime.datetime.timestamp(comment.created),
@@ -286,6 +287,7 @@ def reply_comment(request):
 
                 return JsonResponse({
                     'username': request.user.username,
+                    'ui_class': request.user.profile.ui_class,
                     'avatar': request.user.profile.avatar.name,
                     'user_id': request.user.id,
                     'editable': True,

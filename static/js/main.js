@@ -142,6 +142,7 @@ function makeCommentTextHTML(body) {
 function makeCommentBoxHTML(data) {
     let html = '';
     html += `<div class="comment clearfix">
+                <div class="inner-wrapper ${data['ui_class'] ? "decorate" : ""}" ${data['ui_class'] ? `style="--color: #${data['ui_class']}"` : ""}>
                     <a class="comment-user-img" href="/profile/${data['user_id']}/">
                         <img src=${'/media/' + data.avatar} alt="avatar" loading="lazy">
                     </a>
@@ -188,7 +189,7 @@ function makeCommentBoxHTML(data) {
         html += `</div>`;
     }
 
-    html += `</div></div>`;
+    html += `</div></div></div>`;
 
     if (data['active_children_count'] > 0) {
         html += `<div class="comment-replies-check closed" data-id="${data['comment_id']}">
@@ -205,6 +206,7 @@ function makeCommentBoxHTML(data) {
 function makeReplyCommentBoxHTML(data) {
     let html = '';
     html += `<div class="comment">
+                <div class="inner-wrapper ${data['ui_class'] ? "decorate" : ""}" ${data['ui_class'] ? `style="--color: #${data['ui_class']}"` : ""}>
                     <a class="comment-user-img" href="/profile/${data['user_id']}/">
                         <img src=${'/media/' + data.avatar} alt="avatar" loading="lazy">
                     </a>
@@ -250,15 +252,15 @@ function makeReplyCommentBoxHTML(data) {
         }
     }
 
-    html += `</div></div></div>`;
+    html += `</div></div></div></div>`;
 
     return html
 }
 
-
 function makeDeletedCommentBoxHTML(data) {
     let html = '';
     html += `<div class="comment ${data['active_children_count'] ? 'clearfix' : ''}">
+                <div class="inner-wrapper ${data['ui_class'] ? "decorate" : ""}" ${data['ui_class'] ? `style="--color: #${data['ui_class']}"` : ""}>
                     <a class="comment-user-img" href="/profile/${data['user_id']}/">
                         <img src=${'/media/' + data.avatar} alt="avatar" loading="lazy">
                     </a>
@@ -271,7 +273,7 @@ function makeDeletedCommentBoxHTML(data) {
     html += `<p class='comment-time'>${convertTimeGeo(data.time)}</p>
                         </div>
                             <p class="deleted-comment">ეს კომენტარი წაშლილია</p>
-                    </div>`;
+                    </div></div>`;
 
     if (typeof data['active_children_count'] !== "undefined" && data['active_children_count'] > 0) {
         html += `<div class="comment-replies-check closed" data-id="${data['comment_id']}">

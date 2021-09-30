@@ -6,7 +6,6 @@ from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import AbstractUser, PermissionsMixin, Group
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.postgres.aggregates import StringAgg
 from django.core.mail import send_mail
 from django.core.validators import MinLengthValidator
 from django.db import models
@@ -54,7 +53,7 @@ class CommentManager(models.Manager):
             'user_active': Subquery(user.values('is_active')[:1]),
             'avatar': Subquery(profiles.values('avatar')[:1]),
             'username': Subquery(user.values('username')[:1]),
-            "groups": StringAgg("user__groups__classname", " "),
+            'ui_class': Subquery(profiles.values('ui_class')[:1]),
             'like_count': Count('like', distinct=True),
             'dislike_count': Count('dislike', distinct=True),
             'children_count': Count('children', distinct=True),
@@ -151,6 +150,7 @@ class Comment(models.Model):
             'user_id': self.user.pk,
             'user_active': self.user.is_active,
             'username': self.user.username,
+            'ui_class': self.user.profile.ui_class,
             'avatar': self.user.profile.avatar.name,
             'time': datetime.timestamp(self.created),
             'body': self.body,
@@ -176,6 +176,7 @@ class Comment(models.Model):
             'user_id': self.user.id,
             'user_active': self.user.is_active,
             'username': self.user.username,
+            'ui_class': self.user.profile.ui_class,
             'avatar': self.user.profile.avatar.name,
             'time': datetime.timestamp(self.created),
             'children_count': self.children.count(),
@@ -190,6 +191,7 @@ class Comment(models.Model):
                 'user_id': self.user.pk,
                 'user_active': self.user.is_active,
                 'username': self.user.username,
+                'ui_class': self.user.profile.ui_class,
                 'avatar': self.user.profile.avatar.name,
                 'time': datetime.timestamp(self.created),
                 'body': self.body,
@@ -211,6 +213,7 @@ class Comment(models.Model):
             return {
                 'deleted': True,
                 'username': self.user.username,
+                'ui_class': self.user.profile.ui_class,
                 'avatar': self.user.profile.avatar.name,
                 'time': datetime.timestamp(self.created),
                 'user_id': self.user.pk,
@@ -235,6 +238,7 @@ class Profile(models.Model):
     birth = models.DateField(blank=True, null=True, verbose_name='დაბადების თარიღი')
     facebook = models.URLField(blank=True, null=True, validators=[facebook_validator])
     instagram = models.URLField(blank=True, null=True, validators=[instagram_validator])
+    ui_class = models.CharField(blank=True, null=True, max_length=16, verbose_name="UI კლასი")
 
     class Meta:
         verbose_name = 'პროფილი'
@@ -308,4 +312,3 @@ class Notification(models.Model):
 
 
 Group.add_to_class('display_color', models.CharField(max_length=7, null=True))
-Group.add_to_class('classname', models.CharField(max_length=15, null=True))
