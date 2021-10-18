@@ -24,13 +24,14 @@ def paginate_page(content, page):
 
 
 def index_view(request):
-    animes = Anime.objects.values('name', 'slug', 'age', 'rating', 'views', 'poster', 'soon').order_by('-updated')
+    animes = Anime.objects.filter(deleted=False).values('name', 'slug', 'age', 'rating', 'views', 'poster',
+                                                        'soon').order_by('-updated')
 
     return render(request, 'home.html', {'animes_list': paginate_page(animes, request.GET.get('page', 1))})
 
 
 def anime_page_view(request, slug):
-    anime = get_object_or_404(Anime.objects, slug__iexact=slug)
+    anime = get_object_or_404(Anime.objects.filter(deleted=False), slug__iexact=slug)
     anime.increase_view_count(request.COOKIES)
     context = {
         'anime': anime,

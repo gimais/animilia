@@ -48,7 +48,7 @@ class AnimeStaff(admin.ModelAdmin):
         ('სახელები', {'fields': ('name', 'namege', 'nameen', 'namejp', 'nameru')}),
         ('დეტალები', {'fields': ('director', 'studio', 'year', 'age', 'categories',
                                  'type', 'episodes', 'rating', 'poster', 'description')}),
-        ('Animilia', {'fields': ('dubbers', 'slug', 'status', 'soon')}),
+        ('Animilia', {'fields': ('dubbers', 'slug', 'status', 'soon', 'deleted')}),
     )
 
     def get_queryset(self, request):
@@ -69,10 +69,10 @@ class ScheduleStaff(admin.ModelAdmin):
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == 'anime':
             if request.user.has_perm('anime.view_all_schedule'):
-                kwargs["queryset"] = Anime.objects.filter(status__in=[1, 2])
+                kwargs["queryset"] = Anime.objects.filter(status__in=[1, 2], deleted=False)
             else:
                 try:
-                    kwargs["queryset"] = request.user.dubber.get_dubbed_animes.filter(status__in=[1, 2])
+                    kwargs["queryset"] = request.user.dubber.get_dubbed_animes.filter(status__in=[1, 2], deleted=False)
                 except Dubber.DoesNotExist:
                     kwargs["queryset"] = Anime.objects.none()
         return super(ScheduleStaff, self).formfield_for_foreignkey(db_field, request, **kwargs)
@@ -94,7 +94,7 @@ class ScheduleAdmin(admin.ModelAdmin):
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == 'anime':
-            kwargs["queryset"] = Anime.objects.filter(status__in=[1, 2])
+            kwargs["queryset"] = Anime.objects.filter(status__in=[1, 2], deleted=False)
         return super(ScheduleAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_queryset(self, request):

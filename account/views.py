@@ -219,7 +219,7 @@ def add_comment(request):
             form = CommentForm(request.POST)
             if form.is_valid():
                 try:
-                    anime = Anime.objects.get(id=request.POST.get('id', False))
+                    anime = Anime.objects.filter(deleted=False).get(id=request.POST.get('id', False))
                 except (TypeError, ValueError, OverflowError, Anime.DoesNotExist):
                     anime = None
 

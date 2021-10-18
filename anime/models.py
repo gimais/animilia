@@ -102,6 +102,7 @@ class Anime(models.Model):
     slug = models.SlugField(unique=True, verbose_name='ლინკი')
     status = models.PositiveSmallIntegerField(choices=STATUS, default=0, verbose_name='სტატუსი')
     soon = models.BooleanField(default=False, verbose_name="მალე")
+    deleted = models.BooleanField(default=False, verbose_name="წაშლილია")
 
     class Meta:
         permissions = [
