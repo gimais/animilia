@@ -414,7 +414,7 @@ $('.episode-select-button').on('click', function () {
     let choiceEl = $('#players-choice');
     let activatedButton = $('.episode-select-button.active');
 
-    choiceEl.val("vk");
+    choiceEl.val("video");
 
     if (oneVideoURL)
         $('.item-player iframe').attr('src', oneVideoURL);
@@ -446,7 +446,7 @@ $("#players-choice").on("change",function (e) {
     } else {
         let chosenVideo = $('.episode-select-button.active');
 
-        if (select.val() === "vk") player.attr('src', chosenVideo.data('one'));
+        if (select.val() === "video") player.attr('src', chosenVideo.data('one'));
         else player.attr('src', chosenVideo.data('two'));
     }
 

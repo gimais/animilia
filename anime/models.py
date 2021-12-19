@@ -137,8 +137,8 @@ class Anime(models.Model):
 
 class Video(models.Model):
     anime = models.ForeignKey(Anime, on_delete=models.CASCADE, limit_choices_to={'type': 0}, related_name='videos')
-    vk = models.CharField(blank=True, max_length=100, verbose_name='VK ლინკი')
-    ok = models.CharField(blank=True, max_length=100, verbose_name='OK.RU ლინკი')
+    video = models.CharField(blank=True, max_length=100, verbose_name='ფლეიერი 1')
+    extra_video = models.CharField(blank=True, max_length=100, verbose_name='ფლეიერი 2')
     episode = models.PositiveSmallIntegerField(default=1, verbose_name='ეპიზოდი', editable=False)
 
     class Meta:

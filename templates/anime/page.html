@@ -102,30 +102,30 @@
                     <div class="item-page-episodes">
                         {% for episode in anime.videos.all|dictsort:"episode" %}
                             <div class="episode-select-button" data-id="{{ episode.episode }}"
-                                 data-one="{{ episode.vk }}"
-                                 data-two="{{ episode.ok }}">{{ episode.episode }}</div>
+                                 data-one="{{ episode.video }}"
+                                 data-two="{{ episode.extra_video }}">{{ episode.episode }}</div>
                         {% endfor %}
                     </div>
                     <div class="item-player hidden">
                         <iframe allowfullscreen="true"></iframe>
                         <select class="hidden" id="players-choice" name="players-choice">
-                            <option value="vk">VK</option>
-                            <option value="ok">Ok.ru</option>
+                            <option value="video">ფლეიერი 1</option>
+                            <option value="extra_video">ფლეიერი 2</option>
                         </select>
                     </div>
                 {% else %}
                     <div class="item-player">
                     {% with anime.videos.all|first as episode %}
-                        {% if episode.vk %}
-                            <iframe src="{{ episode.vk }}" allowfullscreen="true"></iframe>
-                            {% if episode.ok %}
+                        {% if episode.video %}
+                            <iframe src="{{ episode.video }}" allowfullscreen="true"></iframe>
+                            {% if episode.extra_video %}
                             <select class="non-series" id="players-choice" name="players-choice">
-                                <option value="{{ episode.vk }}">VK</option>
-                                <option value="{{ episode.ok }}">Ok.ru</option>
+                                <option value="{{ episode.video }}">ფლეიერი 1</option>
+                                <option value="{{ episode.extra_video }}">ფლეიერი 2</option>
                             </select>
                             {% endif %}
                         {% else %}
-                            <iframe src="{{ episode.ok }}" allowfullscreen="true"></iframe>
+                            <iframe src="{{ episode.extra_video }}" allowfullscreen="true"></iframe>
                         {% endif %}
                     {% endwith %}
                     </div>
