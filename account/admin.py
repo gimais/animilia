@@ -83,18 +83,22 @@ class ReplyAdmin(admin.ModelAdmin):
 
 class CommentStaff(admin.ModelAdmin):
     list_per_page = 20
-    list_display = ('id', 'user', 'anime', 'created', 'active')
+    list_display = ('id', 'user', 'anime', 'created', 'active', 'priority')
     list_filter = ('created',)
     search_fields = ('user__username',)
     readonly_fields = ('created', 'user', 'anime', 'parent_link')
-    exclude = ('parent', 'priority')
+    exclude = ('parent',)
     ordering = ('-id',)
 
     def get_readonly_fields(self, request, obj=None):
         readonly = super(CommentStaff, self).get_readonly_fields(request, obj)
+        user = request.user
 
-        if not request.user.has_perm('account.edit_comment_text'):
-            return readonly + ('body',)
+        if not user.has_perm('account.edit_comment_text'):
+            readonly = readonly + ('body',)
+
+        if not user.has_perm('account.set_priority'):
+            readonly = readonly + ('priority',)
 
         return readonly
 

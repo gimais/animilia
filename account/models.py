@@ -137,6 +137,7 @@ class Comment(models.Model):
         permissions = [
             ("view_all_comment", "ყველა კომენტარის ნახვის უფლება"),
             ("edit_comment_text", "ტექსტის შეცვლის უფლება"),
+            ("set_priority", "პრიორიტეტის მინიჭება (აპივნა)"),
         ]
 
         ordering = ['priority', '-id']

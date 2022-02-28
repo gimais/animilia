@@ -107,6 +107,7 @@ staff_site.register(Category)
 staff_site.register(Schedule, ScheduleStaff)
 staff_site.register(Anime, AnimeStaff)
 staff_site.register(Chronology, ChronologyAdmin)
+staff_site.register(Dubber, DubberAdmin)
 
 admin_site.register(Category)
 admin_site.register(Dubber, DubberAdmin)
