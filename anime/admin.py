@@ -3,7 +3,7 @@ from django.db import models
 from django.forms import CheckboxSelectMultiple, NumberInput
 
 from staff.admin import staff_site, admin_site
-from .models import Category, Anime, Video, Dubber, Schedule, Chronology, ChronologyItem
+from .models import Category, Anime, Video, Dubber, Translator, Schedule, Chronology, ChronologyItem
 
 
 class VideoChoiceInline(admin.TabularInline):
@@ -35,6 +35,12 @@ class DubberAdmin(admin.ModelAdmin):
     }
 
 
+class TranslatorAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        models.OneToOneField: {'widget': NumberInput},
+    }
+
+
 class AnimeStaff(admin.ModelAdmin):
     view_on_site = False
     formfield_overrides = {
@@ -48,7 +54,7 @@ class AnimeStaff(admin.ModelAdmin):
         ('სახელები', {'fields': ('name', 'namege', 'nameen', 'namejp', 'nameru')}),
         ('დეტალები', {'fields': ('director', 'studio', 'year', 'age', 'categories',
                                  'type', 'episodes', 'rating', 'poster', 'description')}),
-        ('Animilia', {'fields': ('dubbers', 'slug', 'status', 'soon', 'deleted')}),
+        ('Animilia', {'fields': ('dubbers', 'translators', 'slug', 'status', 'soon', 'deleted')}),
     )
 
     def get_queryset(self, request):
@@ -61,7 +67,7 @@ class AnimeStaff(admin.ModelAdmin):
         try:
             return request.user.dubber.get_dubbed_animes
         except Dubber.DoesNotExist:
-            return Schedule.objects.none()
+            return Anime.objects.none()
 
 
 class ScheduleStaff(admin.ModelAdmin):
@@ -108,9 +114,11 @@ staff_site.register(Schedule, ScheduleStaff)
 staff_site.register(Anime, AnimeStaff)
 staff_site.register(Chronology, ChronologyAdmin)
 staff_site.register(Dubber, DubberAdmin)
+staff_site.register(Translator, TranslatorAdmin)
 
 admin_site.register(Category)
 admin_site.register(Dubber, DubberAdmin)
+admin_site.register(Translator, TranslatorAdmin)
 admin_site.register(Schedule, ScheduleAdmin)
 admin_site.register(Chronology, ChronologyAdmin)
 admin_site.register(Anime, AnimeStaff)

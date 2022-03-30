@@ -70,6 +70,14 @@
                                 <li><a class="searchable-item" href="{% url 'search_anime' %}?dubbers={{ dubber }}">{{ dubber }}</a></li>
                             {% endfor %}
                         </dd>
+                        {% if anime.translators.all %}
+                            <dt>მთარგმნელი:</dt>
+                            <dd>
+                                {% for translator in anime.translators.all %}
+                                    <li><a class="searchable-item" href="{% url 'search_anime' %}?translators={{ translator }}">{{ translator }}</a></li>
+                                {% endfor %}
+                            </dd>
+                        {% endif %}
                     </dl>
                 </div>
             </div>

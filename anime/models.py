@@ -38,6 +38,23 @@ class Dubber(models.Model):
         return self.dubbed.all()
 
 
+class Translator(models.Model):
+    name = models.CharField(max_length=16, unique=True, verbose_name='სახელი')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'translator'
+        verbose_name = 'მთარგმნელი'
+        verbose_name_plural = 'მთარგმნელი'
+
+    def __str__(self):
+        return self.name
+
+    @cached_property
+    def get_translated_animes(self):
+        return self.translated.all()
+
+
 class Chronology(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name='ქრონოლოგიის სახელი')
 
@@ -87,6 +104,7 @@ class Anime(models.Model):
     namejp = models.CharField(max_length=100, verbose_name='იაპონურად', blank=True)
     nameru = models.CharField(max_length=100, verbose_name='რუსულად', blank=True)
     dubbers = models.ManyToManyField(Dubber, related_name='dubbed', verbose_name='გამხმოვანებელი')
+    translators = models.ManyToManyField(Translator, null=True, blank=True, related_name='translated', verbose_name='მთარგმნელი')
     poster = models.ImageField(upload_to='posters/', max_length=50, blank=True, verbose_name='სურათი')
     year = models.PositiveSmallIntegerField(verbose_name='გამოშვების წელი')
     director = models.CharField(max_length=45, verbose_name='რეჟისორი')
@@ -122,7 +140,7 @@ class Anime(models.Model):
     @classmethod
     def searchable_fields(cls):
         # tu axali searchable daemateba template-ic unda daematos
-        return [get_name(cls.categories), get_name(cls.dubbers)]
+        return [get_name(cls.categories), get_name(cls.dubbers), get_name(cls.translators)]
 
     def increase_view_count(self, cookies):
         if not cookies.get('_vEpAd', False):
